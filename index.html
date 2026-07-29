@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <style>
 :root{
   --bg:#0e0c0b;
@@ -1849,22 +1851,21 @@ function onChange(){
 }
 
 /* =====================================================================
-   ARMAZENAMENTO (localStorage)
+   ARMAZENAMENTO (Firebase Firestore — compartilhado entre todos)
    ===================================================================== */
-const LS_PREFIX = "";
-function lsSet(key, value){
-  localStorage.setItem(LS_PREFIX + key, value);
-  return { key, value, shared:false };
-}
-function lsGet(key){
-  const v = localStorage.getItem(LS_PREFIX + key);
-  if(v === null) return null;
-  return { key, value:v, shared:false };
-}
-function lsDelete(key){
-  localStorage.removeItem(LS_PREFIX + key);
-  return { key, deleted:true, shared:false };
-}
+// >>> COLE AQUI a configuração do SEU projeto Firebase (veja instruções) <<<
+const firebaseConfig = {
+  apiKey: "AIzaSyDdsHYhPWVIE-HdPolNv9P2vF4nIw1_AIg",
+  authDomain: "ecos-do-veu-e8fb4.firebaseapp.com",
+  projectId: "ecos-do-veu-e8fb4",
+  storageBucket: "ecos-do-veu-e8fb4.firebasestorage.app",
+  messagingSenderId: "1030936795205",
+  appId: "1:1030936795205:web:2746ea91e38bc1fb8beb2c"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const fichasRef = db.collection("fichas");
+
 function setStatus(text, isError){
   const el = $("#saveStatus");
   el.textContent = text;
@@ -1878,39 +1879,37 @@ function scheduleSave(){
 async function saveCurrent(){
   try{
     state.updatedAt = Date.now();
-    const res = lsSet("veu-char:" + state.id, JSON.stringify(state));
-    if(!res) throw new Error("sem resposta do armazenamento");
-    await updateIndex();
+    await fichasRef.doc(state.id).set(state);
     setStatus("Salvo às " + new Date(state.updatedAt).toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"}));
   }catch(err){
     console.error(err);
-    setStatus("Erro ao salvar — tente novamente", true);
+    setStatus("Erro ao salvar — verifique sua conexão e a configuração do Firebase", true);
   }
 }
 async function loadIndex(){
   try{
-    const r = lsGet("veu-index");
-    if(r && r.value) return JSON.parse(r.value);
-  }catch(e){ /* chave ainda não existe */ }
-  return {};
-}
-async function updateIndex(){
-  const idx = await loadIndex();
-  idx[state.id] = { nome: state.meta.nome || "Agente sem nome", updatedAt: state.updatedAt };
-  try{ lsSet("veu-index", JSON.stringify(idx)); }catch(e){ console.error(e); }
+    const snap = await fichasRef.get();
+    const idx = {};
+    snap.forEach(doc => {
+      const d = doc.data();
+      idx[doc.id] = { nome: (d.meta && d.meta.nome) || "Agente sem nome", updatedAt: d.updatedAt || 0 };
+    });
+    return idx;
+  }catch(e){
+    console.error(e);
+    setStatus("Erro ao carregar fichas — verifique a configuração do Firebase", true);
+    return {};
+  }
 }
 async function loadChar(id){
   try{
-    const r = lsGet("veu-char:" + id);
-    if(r && r.value) return JSON.parse(r.value);
-  }catch(e){ /* não encontrado */ }
+    const doc = await fichasRef.doc(id).get();
+    if(doc.exists) return doc.data();
+  }catch(e){ console.error(e); }
   return null;
 }
 async function deleteChar(id){
-  try{ lsDelete("veu-char:" + id); }catch(e){ /* já não existe */ }
-  const idx = await loadIndex();
-  delete idx[id];
-  try{ lsSet("veu-index", JSON.stringify(idx)); }catch(e){ console.error(e); }
+  try{ await fichasRef.doc(id).delete(); }catch(e){ console.error(e); }
 }
 async function populateCharSelect(selectedId){
   const idx = await loadIndex();
@@ -1919,6 +1918,10 @@ async function populateCharSelect(selectedId){
   if(!entries.length){ sel.innerHTML = `<option value="">Nenhum agente salvo</option>`; return; }
   sel.innerHTML = entries.map(([id,info]) => `<option value="${id}" ${id===selectedId?"selected":""}>${esc(info.nome || "Sem nome")}</option>`).join("");
 }
+// Mantém a lista de fichas atualizada em tempo real para todo mundo
+fichasRef.onSnapshot(() => {
+  populateCharSelect($("#charSelect") ? $("#charSelect").value : undefined);
+}, err => console.error(err));
 
 /* =====================================================================
    UI ESTÁTICA
