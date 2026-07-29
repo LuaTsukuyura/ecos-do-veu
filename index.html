@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecos do Véu — Ficha de Agente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0c0b;
+  --bg-alt:#141110;
+  --bg-panel:#1a1613;
+  --bg-card:#201b17;
+  --bg-input:#161210;
+  --border:#3a3128;
+  --border-light:#54473572;
+  --border-bright:#6b5a41;
+  --text:#e7ded0;
+  --text-muted:#9c9182;
+  --text-dim:#6c6355;
+  --blood:#8c3a34;
+  --blood-bright:#c25850;
+  --arcane:#6b5590;
+  --arcane-bright:#9179ba;
+  --brass:#b8935a;
+  --brass-bright:#dcb679;
+  --font-display:'Cinzel',Georgia,serif;
+  --font-body:'EB Garamond',Georgia,serif;
+  --font-mono:'JetBrains Mono','Courier New',monospace;
+  --radius:3px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 0%, rgba(139,58,52,0.06), transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(107,85,144,0.07), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.5;
+  min-height:100vh;
+}
+::selection{ background:var(--blood); color:#fff; }
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background:var(--bg-alt); }
+::-webkit-scrollbar-thumb{ background:var(--border-bright); border-radius:6px; }
+
+a{ color:var(--brass-bright); }
+h1,h2,h3{ font-family:var(--font-display); letter-spacing:.03em; margin:0; }
+button, input, select, textarea{ font-family:inherit; }
+:focus-visible{ outline:2px solid var(--brass-bright); outline-offset:2px; }
+
+.app{ max-width:1180px; margin:0 auto; padding:22px 20px 70px; }
+
+/* ---------- MASTHEAD ---------- */
+.masthead{
+  display:flex; align-items:center; gap:18px;
+  padding:18px 22px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-alt));
+  position:relative;
+  overflow:hidden;
+}
+.masthead::before{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(120deg, transparent 40%, rgba(184,147,90,0.05) 50%, transparent 60%);
+  pointer-events:none;
+}
+.emblem-svg{ width:56px; height:56px; flex:none; color:var(--brass); filter:drop-shadow(0 0 6px rgba(184,147,90,.25)); }
+.masthead-title{ flex:1; min-width:0; }
+.masthead-title h1{ font-size:clamp(22px,4vw,32px); font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:.12em; }
+.masthead-title p{ margin:4px 0 0; color:var(--text-muted); font-style:italic; font-size:14px; }
+.masthead-stamp{
+  flex:none;
+  font-family:var(--font-mono);
+  font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--blood-bright);
+  border:2px solid var(--blood-bright);
+  border-radius:50%;
+  width:78px; height:78px;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  transform:rotate(-9deg);
+  opacity:.72;
+  padding:6px;
+  mix-blend-mode:screen;
+}
+@media (max-width:640px){ .masthead-stamp{ display:none; } }
+
+/* ---------- CHAR BAR ---------- */
+.char-bar{
+  margin-top:14px;
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+  padding:12px 16px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--bg-panel);
+}
+.char-bar-select{ display:flex; align-items:center; gap:8px; }
+.char-bar-select label{ font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); }
+.char-bar select{ min-width:180px; }
+.char-bar-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-left:auto; }
+.char-bar-status{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-dim); flex-basis:100%; text-align:right; }
+@media (min-width:641px){ .char-bar-status{ flex-basis:auto; margin-left:10px; } }
+.char-bar-status.error{ color:var(--blood-bright); }
+
+button{
+  cursor:pointer;
+  background:var(--bg-card);
+  color:var(--text);
+  border:1px solid var(--border-bright);
+  border-radius:var(--radius);
+  padding:8px 14px;
+  font-size:13px;
+  letter-spacing:.03em;
+  transition:border-color .15s, background .15s;
+}
+button:hover{ border-color:var(--brass); background:#241f1a; }
+button:active{ transform:translateY(1px); }
+.btn-primary{ border-color:var(--brass); color:var(--brass-bright); }
+.btn-primary:hover{ background:rgba(184,147,90,.12); }
+.btn-danger{ color:var(--blood-bright); border-color:#5c2b27; }
+.btn-danger:hover{ border-color:var(--blood-bright); background:rgba(140,58,52,.12); }
+.btn-secondary{ font-size:12.5px; padding:7px 12px; }
+.btn-add{ margin-top:10px; border-style:dashed; color:var(--brass-bright); }
+.btn-remove{
+  background:transparent; border:1px solid var(--border);
+  color:var(--text-dim); width:28px; height:28px; padding:0; border-radius:50%;
+  line-height:1; flex:none;
+}
+.btn-remove:hover{ color:var(--blood-bright); border-color:var(--blood-bright); }
+
+/* ---------- VITALS BAR ---------- */
+.vitals-bar{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+.vital{
+  background:var(--bg-panel);
+  padding:10px 8px;
+  text-align:center;
+}
+.vital-label{ display:block; font-size:10px; text-transform:uppercase; letter-spacing:.14em; color:var(--text-dim); margin-bottom:4px; }
+.vital-value{ display:block; font-family:var(--font-mono); font-size:17px; font-weight:600; color:var(--text); }
+.vital.pv .vital-value{ color:var(--blood-bright); }
+.vital.san .vital-value{ color:var(--arcane-bright); }
+.vital.res .vital-value{ color:var(--brass-bright); }
+@media (max-width:700px){ .vitals-bar{ grid-template-columns:repeat(3,1fr); } .vital:nth-child(4),.vital:nth-child(5){ border-top:1px solid var(--border); } }
+
+/* ---------- ROLL LOG ---------- */
+.roll-bar{
+  margin-top:10px; display:flex; align-items:center; gap:10px;
+  padding:8px 14px; border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--bg-card);
+}
+.roll-bar-label{ font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); flex:none; }
+.roll-bar-current{ font-family:var(--font-mono); font-size:13px; color:var(--text); flex:1; min-width:0; }
+.roll-bar-current .rc-crit{ color:var(--brass-bright); font-weight:700; }
+.roll-bar-current .rc-fail{ color:var(--blood-bright); font-weight:700; }
+.roll-bar-toggle{ flex:none; font-size:12px; padding:6px 10px; }
+.roll-history{ margin-top:8px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:8px 12px; max-height:170px; overflow-y:auto; display:none; }
+.roll-history.open{ display:block; }
+.roll-history-item{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); padding:3px 0; border-bottom:1px solid var(--border-light); }
+.roll-history-item:last-child{ border-bottom:none; }
+.roll-history-empty{ color:var(--text-dim); font-style:italic; font-size:12.5px; }
+
+/* ---------- DICE / ROLL BUTTONS ---------- */
+.skill-box{ flex-wrap:wrap; }
+.skill-box .skill-main{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
+.skill-box .skill-total{ font-family:var(--font-mono); font-size:11px; color:var(--text-dim); flex-basis:100%; padding-left:2px; }
+.skill-box .skill-total.has-bonus{ color:var(--brass-bright); }
+.attr-box .attr-total{ font-family:var(--font-mono); font-size:11px; color:var(--text-dim); margin-top:4px; }
+.attr-box .attr-total.has-bonus{ color:var(--brass-bright); }
+
+/* ---------- BUFF CHOICE ---------- */
+.buff-choice{ margin-top:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.buff-choice label{ font-size:11.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em; }
+.buff-choice select{ width:auto; min-width:170px; padding:5px 26px 5px 8px; font-size:13px; }
+.buff-fixed-note{ margin-top:6px; font-size:12.5px; color:var(--brass-bright); font-style:italic; }
+
+/* ---------- USE / SPEND BUTTONS ---------- */
+.btn-use{
+  font-size:12px; padding:6px 11px; border-color:var(--brass); color:var(--brass-bright);
+  margin-top:8px;
+}
+.btn-use:hover{ background:rgba(184,147,90,.12); }
+.btn-use:disabled{ opacity:.4; cursor:not-allowed; }
+.entry-card-foot{ display:flex; align-items:center; gap:10px; margin-top:6px; flex-wrap:wrap; }
+.use-feedback{ font-size:12px; color:var(--text-dim); font-family:var(--font-mono); }
+.use-feedback.err{ color:var(--blood-bright); }
+
+/* ---------- DURATION / ACTIVE-TURNS CONTROL (Chagas/Rituais/Maldições) ---------- */
+.duration-box{
+  margin-top:10px; padding:10px 12px;
+  border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--bg-input);
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+}
+.duration-box .field{ margin:0; flex:none; }
+.duration-box .field label{ white-space:nowrap; }
+.duration-box input[type=number]{ width:70px; text-align:center; }
+.duration-status{ font-family:var(--font-mono); font-size:12.5px; flex:1; min-width:140px; }
+.duration-status .st-on{ color:var(--brass-bright); font-weight:600; }
+.duration-status .st-off{ color:var(--text-dim); }
+.duration-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+.btn-turn{ font-size:12px; padding:6px 10px; }
+.btn-turn-off{ color:var(--blood-bright); border-color:#5c2b27; }
+.btn-turn-off:hover{ border-color:var(--blood-bright); background:rgba(140,58,52,.12); }
+.entry-card.is-inactive-effect{ opacity:.82; }
+.entry-card.is-active-effect{ border-left:3px solid var(--brass); }
+
+/* ---------- CATALOG "ADD TO INVENTORY" BUTTONS ---------- */
+.ref-table td.add-col{ text-align:right; white-space:nowrap; }
+.btn-add-row{
+  font-size:11px; padding:4px 10px; border-color:var(--brass); color:var(--brass-bright);
+}
+.btn-add-row:hover{ background:rgba(184,147,90,.12); }
+.btn-add-row.added{ color:var(--text-dim); border-color:var(--border); }
+
+/* ---------- LAYOUT ---------- */
+.layout{ margin-top:16px; display:grid; grid-template-columns:210px 1fr; gap:16px; align-items:start; }
+@media (max-width:860px){ .layout{ grid-template-columns:1fr; } }
+
+.tabs{
+  display:flex; flex-direction:column; gap:2px;
+  position:sticky; top:16px;
+  border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--bg-panel); padding:6px;
+}
+@media (max-width:860px){
+  .tabs{ position:static; flex-direction:row; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .tab-btn{ white-space:nowrap; }
+}
+.tab-btn{
+  background:transparent; border:1px solid transparent; text-align:left;
+  color:var(--text-muted); font-size:12.5px; letter-spacing:.03em;
+  padding:10px 12px; border-radius:2px;
+}
+.tab-btn:hover{ color:var(--text); background:rgba(255,255,255,.03); }
+.tab-btn.active{ color:var(--brass-bright); background:rgba(184,147,90,.08); border-left:2px solid var(--brass); font-weight:600;}
+
+.content{
+  border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--bg-panel);
+  padding:22px 24px 26px;
+  min-width:0;
+}
+.tab-panel{ display:none; animation:fadein .18s ease; }
+.tab-panel.active{ display:block; }
+@keyframes fadein{ from{opacity:0; transform:translateY(3px);} to{opacity:1; transform:none;} }
+
+.panel-title{
+  font-size:15px; text-transform:uppercase; letter-spacing:.1em; color:var(--brass-bright);
+  padding-bottom:8px; margin-bottom:16px; margin-top:28px;
+  border-bottom:1px solid var(--border);
+}
+.panel-title:first-child{ margin-top:0; }
+
+.hint{ color:var(--text-muted); font-size:13px; margin:-8px 0 16px; line-height:1.55; }
+
+/* ---------- FIELDS ---------- */
+.field-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:14px; }
+.field-grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px; }
+.field-grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:10px; }
+.field-grid-4{ display:grid; grid-template-columns:2fr 1fr 1fr 1.4fr; gap:10px; margin-bottom:10px; flex:1; }
+@media (max-width:600px){ .field-grid-4{ grid-template-columns:1fr 1fr; } .field-grid-3{ grid-template-columns:1fr; } }
+.field{ display:flex; flex-direction:column; gap:5px; }
+.field-full{ grid-column:1/-1; }
+.field label{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); }
+
+input[type=text], input[type=number], select, textarea{
+  background:var(--bg-input);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  color:var(--text);
+  padding:8px 10px;
+  font-size:14.5px;
+  width:100%;
+}
+input[type=number]{ font-family:var(--font-mono); }
+textarea{ resize:vertical; font-family:var(--font-body); line-height:1.5; }
+input:focus, select:focus, textarea:focus{ border-color:var(--brass); background:#1c1712; }
+input[readonly]{ color:var(--brass-bright); background:#181410; }
+select{ appearance:none; background-image:linear-gradient(45deg,transparent 50%, var(--text-dim) 50%),linear-gradient(135deg,var(--text-dim) 50%,transparent 50%); background-position:calc(100% - 16px) center, calc(100% - 11px) center; background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:30px;}
+
+/* ---------- ORIGIN CARD ---------- */
+.origin-card{
+  margin:4px 0 18px; padding:14px 16px;
+  border-left:3px solid var(--brass);
+  background:var(--bg-card); border-radius:var(--radius);
+}
+.origin-card-head{ display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+.origin-name{ font-family:var(--font-display); color:var(--brass-bright); font-size:16px; letter-spacing:.04em; }
+.origin-vida{ font-size:12.5px; color:var(--text-muted); }
+.origin-vida strong{ color:var(--blood-bright); font-family:var(--font-mono); }
+.origin-flavor{ font-style:italic; color:var(--text-muted); font-size:13.5px; margin:4px 0 8px; }
+.origin-bonus{ font-size:13.5px; color:var(--text); }
+
+/* ---------- REFERENCE / DETAILS ---------- */
+details.reference{
+  margin:14px 0; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card);
+}
+details.reference summary{
+  cursor:pointer; padding:10px 14px; font-size:12.5px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--brass-bright); list-style:none; display:flex; align-items:center; gap:8px;
+}
+details.reference summary::before{ content:"▸"; transition:transform .15s; }
+details.reference[open] summary::before{ transform:rotate(90deg); }
+details.reference summary::-webkit-details-marker{ display:none; }
+.reference-inner{ padding:4px 16px 16px; }
+.ref-table{ width:100%; border-collapse:collapse; font-size:12.5px; margin:8px 0 14px; }
+.ref-table caption{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); margin-bottom:6px; }
+.ref-table th, .ref-table td{ text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+.ref-table th{ color:var(--brass-bright); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
+.ref-table td.num, .ref-table th.num{ font-family:var(--font-mono); white-space:nowrap; }
+
+/* ---------- ATTRIBUTES ---------- */
+.points-tracker{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+  font-family:var(--font-mono); font-size:13px; padding:9px 14px; margin-bottom:14px;
+  background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
+}
+.pts-remaining{ color:var(--brass-bright); font-weight:600; }
+.pts-remaining.over-budget{ color:var(--blood-bright); }
+.attr-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:8px; }
+.attr-box{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:12px; text-align:center;
+}
+.attr-box label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); margin-bottom:8px; }
+.attr-box input{ text-align:center; font-size:20px; font-weight:600; }
+
+.skills-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px 14px; }
+.skill-box{ display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid var(--border); padding:6px 0; }
+.skill-box label{ font-size:13.5px; color:var(--text); }
+.skill-box input{ width:64px; text-align:center; padding:5px 6px; }
+
+/* ---------- ORIGEM / CAMINHO ---------- */
+.path-select{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:16px; }
+.path-radio{
+  display:flex; align-items:center; gap:9px; padding:11px 13px;
+  border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); cursor:pointer;
+  font-size:14px;
+}
+.path-radio:has(input:checked){ border-color:var(--brass); background:rgba(184,147,90,.08); color:var(--brass-bright); }
+.path-radio input{ accent-color:var(--brass); }
+.path-levels{ display:flex; flex-direction:column; gap:10px; }
+.level-card{ border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:12px 14px; }
+.level-check{ display:flex; align-items:center; gap:9px; font-size:13.5px; cursor:pointer; }
+.level-check input{ accent-color:var(--brass); width:16px; height:16px; }
+.level-card p{ margin:8px 0 0 25px; font-size:13.5px; color:var(--text-muted); line-height:1.55; }
+.pe-tracker{ font-family:var(--font-mono); font-size:13px; color:var(--brass-bright); margin-top:14px; }
+.pe-tracker .hint{ font-family:var(--font-body); }
+
+/* ---------- ENTRY CARDS (chagas/rituais/armas/inventario/marcas) ---------- */
+.entry-card{
+  border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card);
+  padding:14px 16px; margin-bottom:12px; position:relative;
+}
+.entry-card-head{ display:flex; gap:10px; align-items:center; margin-bottom:12px; }
+.entry-select{ flex:1; }
+.entry-card-compact{ display:flex; align-items:flex-end; gap:10px; padding:12px 14px; }
+.entry-card .field{ margin-bottom:10px; }
+.entry-card .field:last-child{ margin-bottom:0; }
+.empty-note{ color:var(--text-dim); font-style:italic; font-size:13.5px; padding:10px 2px; }
+
+/* ---------- STRIKES / COMBAT ---------- */
+.strikes-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:10px; }
+.strike-box{ background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:12px; text-align:center; }
+.strike-box label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); margin-bottom:8px; }
+.strike-box input{ text-align:center; font-size:18px; }
+#strikesSummary.warn{ color:var(--blood-bright); font-weight:600; }
+
+/* ---------- MARCAS & MALDIÇÕES ---------- */
+.marca-count-bar{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+  font-family:var(--font-mono); font-size:13px; padding:9px 14px; margin-bottom:14px;
+  background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
+}
+.marca-count-bar .warn-text{ color:var(--blood-bright); font-weight:600; }
+.marca-count-bar .ok-text{ color:var(--brass-bright); font-weight:600; }
+.slot-badge{
+  display:inline-block; font-family:var(--font-mono); font-size:11px;
+  padding:2px 8px; border-radius:10px; border:1px solid var(--border-bright);
+  color:var(--text-muted); margin-left:8px;
+}
+.slot-badge.over{ color:var(--blood-bright); border-color:var(--blood-bright); }
+.maldicao-card{ border-left:3px solid var(--blood); }
+.marca-card{ border-left:3px solid var(--arcane); }
+.target-toggle{ display:flex; gap:8px; margin-bottom:10px; }
+.target-toggle label{
+  flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--bg-input); font-size:13px; cursor:pointer; color:var(--text-muted);
+}
+.target-toggle label:has(input:checked){ border-color:var(--arcane); color:var(--arcane-bright); background:rgba(107,85,144,.1); }
+.maldicao-card .target-toggle label:has(input:checked){ border-color:var(--blood); color:var(--blood-bright); background:rgba(140,58,52,.1); }
+.target-toggle input{ accent-color:var(--brass); }
+
+footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; margin-top:22px; letter-spacing:.04em; }
+
+/* ---------- PRINT ---------- */
+@media print{
+  body{ background:#fff !important; color:#111 !important; }
+  .char-bar, .tabs, .masthead-stamp, .btn-add, .btn-remove, details.reference, footer.appfoot{ display:none !important; }
+  .app{ max-width:100%; padding:0; }
+  .masthead{ border:1px solid #999; background:#fff !important; }
+  .masthead-title h1, .masthead-title p{ color:#111 !important; }
+  .layout{ display:block !important; }
+  .content, .vital, .vitals-bar, .masthead{ background:#fff !important; border-color:#999 !important; }
+  .tab-panel{ display:block !important; page-break-inside:avoid; margin-bottom:18px; }
+  input, textarea, select{ background:#fff !important; color:#111 !important; border:1px solid #999 !important; }
+  .vital-value, .vital-label, .panel-title, .origin-name, .pts-remaining{ color:#111 !important; }
+}
+@media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="masthead">
+    <svg class="emblem-svg" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="50" cy="50" r="37" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+      <line x1="50" y1="18" x2="50" y2="63" stroke="currentColor" stroke-width="2.2"/>
+      <polygon points="50,13 45,23 55,23" fill="currentColor"/>
+      <line x1="37" y1="59" x2="63" y2="59" stroke="currentColor" stroke-width="2.4"/>
+      <line x1="50" y1="63" x2="50" y2="77" stroke="currentColor" stroke-width="3.4"/>
+      <circle cx="50" cy="80" r="2.6" fill="currentColor"/>
+      <g stroke="currentColor" stroke-width="1.6" opacity="0.85">
+        <line x1="50" y1="5" x2="50" y2="11"/>
+        <line x1="88" y1="27" x2="82.3" y2="30.3"/>
+        <line x1="88" y1="73" x2="82.3" y2="69.7"/>
+        <line x1="50" y1="95" x2="50" y2="89"/>
+        <line x1="12" y1="73" x2="17.7" y2="69.7"/>
+        <line x1="12" y1="27" x2="17.7" y2="30.3"/>
+      </g>
+    </svg>
+    <div class="masthead-title">
+      <h1>Ecos do Véu</h1>
+      <p>Ficha de Agente — V.E.U. · Veritas Ex Umbra · "A Verdade a partir da Sombra"</p>
+    </div>
+    <div class="masthead-stamp">V.E.U.<br>Arquivo<br>Confidencial</div>
+  </header>
+
+  <div class="char-bar">
+    <div class="char-bar-select">
+      <label for="charSelect">Agente</label>
+      <select id="charSelect"></select>
+    </div>
+    <div class="char-bar-actions">
+      <button type="button" id="btnNew" class="btn-primary">+ Novo Agente</button>
+      <button type="button" id="btnSave">Salvar</button>
+      <button type="button" id="btnDuplicate">Duplicar</button>
+      <button type="button" id="btnPrint">Imprimir</button>
+      <button type="button" id="btnDelete" class="btn-danger">Excluir</button>
+    </div>
+    <div class="char-bar-status" id="saveStatus">—</div>
+  </div>
+
+  <div class="vitals-bar">
+    <div class="vital pv"><span class="vital-label">PV</span><span class="vital-value" id="vitalPV">0 / 0</span></div>
+    <div class="vital san"><span class="vital-label">Sanidade</span><span class="vital-value" id="vitalSAN">100 / 100</span></div>
+    <div class="vital res"><span class="vital-label">Resiliência</span><span class="vital-value" id="vitalRES">0 / 0</span></div>
+    <div class="vital"><span class="vital-label">N.A.</span><span class="vital-value" id="vitalNA">1</span></div>
+    <div class="vital"><span class="vital-label">Strikes</span><span class="vital-value" id="vitalStrikes">0</span></div>
+  </div>
+
+  <div class="roll-bar">
+    <span class="roll-bar-label">🎲 Última Rolagem</span>
+    <span class="roll-bar-current" id="rollCurrent">Nenhuma rolagem ainda.</span>
+    <button type="button" class="btn-secondary roll-bar-toggle" id="btnToggleRollLog">Histórico</button>
+  </div>
+  <div class="roll-history" id="rollHistory"></div>
+
+  <div class="layout">
+    <nav class="tabs" id="tabNav">
+      <button type="button" class="tab-btn active" data-tab="identificacao">I · Identificação</button>
+      <button type="button" class="tab-btn" data-tab="atributos">II · Atributos &amp; Perícias</button>
+      <button type="button" class="tab-btn" data-tab="origem">III · Origem &amp; Caminho</button>
+      <button type="button" class="tab-btn" data-tab="trauma">IV · Trauma &amp; Mente</button>
+      <button type="button" class="tab-btn" data-tab="chagas">V · Chagas</button>
+      <button type="button" class="tab-btn" data-tab="rituais">VI · Rituais</button>
+      <button type="button" class="tab-btn" data-tab="marcas">VII · Marcas &amp; Maldições</button>
+      <button type="button" class="tab-btn" data-tab="combate">VIII · Combate</button>
+      <button type="button" class="tab-btn" data-tab="inventario">IX · Inventário</button>
+    </nav>
+
+    <main class="content">
+
+      <!-- I. IDENTIFICAÇÃO -->
+      <section class="tab-panel active" data-panel="identificacao">
+        <h2 class="panel-title">Identificação do Agente</h2>
+        <div class="field-grid">
+          <div class="field field-full"><label for="f-nome">Nome / Codinome</label><input type="text" id="f-nome" placeholder="Nome completo ou codinome de campo"></div>
+          <div class="field"><label for="f-origem">Origem</label><select id="f-origem"></select></div>
+          <div class="field"><label for="f-idade">Idade</label><input type="text" id="f-idade"></div>
+          <div class="field"><label for="f-sexo">Sexo</label><input type="text" id="f-sexo"></div>
+          <div class="field"><label for="f-na">N.A. (Nível de Agente)</label><input type="number" id="f-na" min="0" max="10"></div>
+          <div class="field"><label for="f-pm">PM (Pontos de Missão)</label><input type="number" id="f-pm" min="0"></div>
+          <div class="field"><label for="f-pe">PE (Pontos de Experiência)</label><input type="number" id="f-pe" min="0"></div>
+        </div>
+        <div class="field field-full" style="margin-bottom:16px;"><label for="f-descfisica">Descrição Física</label><textarea id="f-descfisica" rows="3" placeholder="Aparência, marcas, trejeitos..."></textarea></div>
+
+        <div class="origin-card" id="originCard" hidden>
+          <div class="origin-card-head">
+            <span class="origin-name" id="originName"></span>
+            <span class="origin-vida">Vida Base: <strong id="originVida"></strong></span>
+          </div>
+          <p class="origin-flavor" id="originFlavor"></p>
+          <p class="origin-bonus" id="originBonus"></p>
+          <div id="originBuffBox"></div>
+        </div>
+
+        <details class="reference">
+          <summary>Consultar Tabela de Nível de Agente (N.A.)</summary>
+          <div class="reference-inner" id="refNA"></div>
+        </details>
+
+        <h2 class="panel-title">História &amp; Antecedentes</h2>
+        <div class="field field-full"><textarea id="f-historia" rows="7" placeholder="O que trouxe este agente até a V.E.U.? Que cicatrizes carrega do encontro com o inexplicável?"></textarea></div>
+      </section>
+
+      <!-- II. ATRIBUTOS & PERÍCIAS -->
+      <section class="tab-panel" data-panel="atributos">
+        <h2 class="panel-title">Atributos</h2>
+        <p class="hint">Distribua 30 pontos. FOR / AGI / INT / CAR / VON começam em 1 (máx. 20, custo 1 ponto cada). VIT começa em 0 (máx. 5, custo 2 pontos cada — concede +2 PV por ponto, até +10).</p>
+        <div class="points-tracker">
+          <span>Pontos usados: <strong id="ptsUsed">0</strong> / 30</span>
+          <span id="ptsRemaining" class="pts-remaining">30 restantes</span>
+        </div>
+        <div class="attr-grid" id="attrGrid"></div>
+        <p class="hint">O campo "Total" abaixo de cada atributo mostra o valor base somado a bônus vindos de Origem, Caminho, Chagas, Marcas, Maldições e Rituais.</p>
+
+        <h2 class="panel-title">Perícias</h2>
+        <p class="hint">Valores em %. Referência de proficiência: 20 Iniciante · 40 Aprendiz · 50 Competente · 60 Experiente · 65 Especialista · 70 Mestre.</p>
+        <div class="skills-grid" id="skillsGrid"></div>
+
+        <details class="reference">
+          <summary>Consultar Custos de Progressão (PE)</summary>
+          <div class="reference-inner" id="refPE"></div>
+        </details>
+      </section>
+
+      <!-- III. ORIGEM & CAMINHO -->
+      <section class="tab-panel" data-panel="origem">
+        <h2 class="panel-title">Progressão de Origem</h2>
+        <p class="hint" id="origemHint">Selecione uma Origem na aba <strong>Identificação</strong> para desbloquear os Caminhos de especialização.</p>
+        <div id="caminhoArea" hidden>
+          <p class="hint">Escolha um Caminho da sua Origem. Cada nível é desbloqueado gastando PE: Caminho (15), Proficiência (25) e Mestre da Origem (35).</p>
+          <div class="path-select" id="pathSelect"></div>
+          <div class="path-levels" id="pathLevels"></div>
+          <div class="pe-tracker">PE investidos nesta progressão: <span id="peOrigemSpent">0</span></div>
+        </div>
+      </section>
+
+      <!-- IV. TRAUMA & MENTE -->
+      <section class="tab-panel" data-panel="trauma">
+        <h2 class="panel-title">Trauma Inicial</h2>
+        <div class="field-grid" style="align-items:end;">
+          <div class="field"><label for="f-traumaTipo">Tipo de Trauma</label><select id="f-traumaTipo"></select></div>
+          <div class="field"><button type="button" id="btnRollTrauma" class="btn-secondary">🎲 Rolar 1d6</button></div>
+        </div>
+        <div class="field field-full" style="margin-bottom:0;"><label for="f-traumaDesc">Descrição / Manifestação em Jogo</label><textarea id="f-traumaDesc" rows="4"></textarea></div>
+
+        <h2 class="panel-title">Sanidade</h2>
+        <div class="field-grid">
+          <div class="field"><label for="f-sanAtual">Sanidade Atual</label><input type="number" id="f-sanAtual"></div>
+          <div class="field"><label for="f-sanMax">Sanidade Máxima</label><input type="number" id="f-sanMax"></div>
+        </div>
+        <p class="hint" id="sanHint"></p>
+
+        <h2 class="panel-title">Resiliência</h2>
+        <div class="field-grid">
+          <div class="field"><label for="f-resAtual">Resiliência Atual</label><input type="number" id="f-resAtual"></div>
+          <div class="field"><label for="f-resMax">Resiliência Máxima (VON ÷ 2)</label><input type="number" id="f-resMax" readonly></div>
+        </div>
+        <p class="hint">Restaurada ao máximo ao final de toda sessão. Gasta para resistir a Ecos ou ativar Chagas.</p>
+      </section>
+
+      <!-- V. CHAGAS -->
+      <section class="tab-panel" data-panel="chagas">
+        <h2 class="panel-title">Chagas — Fragmentos do Além</h2>
+        <p class="hint">Toda Chaga corrompe, desgasta ou atrai a atenção dos Ecos. Com 2+ Chagas: debuff narrativo em testes sociais. Com 3+: atrai atenção instintiva de Ecos. A cada nova Chaga, a Sanidade máxima reduz em 10. Se a Chaga conceder um bônus (ou penalidade) mecânico a um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
+        <div id="chagasList"></div>
+        <button type="button" class="btn-add" id="btnAddChaga">+ Adicionar Chaga</button>
+      </section>
+
+      <!-- VI. RITUAIS -->
+      <section class="tab-panel" data-panel="rituais">
+        <h2 class="panel-title">Rituais Conhecidos</h2>
+        <p class="hint">Todo ritual exige teste de Rituais ou Ocultismo. Rituais Simples: até 1 turno em combate. Médios: 1+ turno, podem ser interrompidos. Avançados: até 2 turnos, alta exigência de concentração. Se o ritual conceder um bônus temporário a um Atributo ou Perícia enquanto ativo, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
+        <div id="rituaisList"></div>
+        <button type="button" class="btn-add" id="btnAddRitual">+ Adicionar Ritual</button>
+      </section>
+
+      <!-- VII. MARCAS & MALDIÇÕES -->
+      <section class="tab-panel" data-panel="marcas">
+        <h2 class="panel-title">Marcas — Runas Permanentes</h2>
+        <p class="hint">Gravuras aplicadas a itens/armas/equipamentos ou ao próprio corpo, concedendo melhorias <strong>permanentes</strong>. Custo sugerido: 2 de Resiliência + Ritual específico (teste de Ocultismo ou Rituais, recomendado 50%+) — ajuste ou deixe em branco o campo de Custo caso a Marca não exija gastar Resiliência. Limite: Armas simples até 1 Marca · Armas táticas até 2 Marcas · Corpo sem limite fixo, mas com risco. Se a Marca conceder um bônus mecânico, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
+        <div class="marca-count-bar">
+          <span>Total de Marcas: <strong id="marcasCount">0</strong></span>
+          <span id="marcasStatus" class="ok-text">Sem efeitos negativos (1–2 marcas)</span>
+        </div>
+        <div id="marcasList"></div>
+        <button type="button" class="btn-add" id="btnAddMarca">+ Adicionar Marca</button>
+
+        <details class="reference">
+          <summary>Consultar Regras de Marcas</summary>
+          <div class="reference-inner">
+            <table class="ref-table">
+              <thead><tr><th class="num">Marcas</th><th>Efeito</th></tr></thead>
+              <tbody>
+                <tr><td class="num">1–2</td><td>Nenhum efeito negativo.</td></tr>
+                <tr><td class="num">3–4</td><td>Debuff narrativo em testes e interações sociais.</td></tr>
+                <tr><td class="num">5+</td><td>Chama atenção de Ecos e pessoas sensíveis ao sobrenatural.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2 class="panel-title">Maldições — O Preço do Abismo</h2>
+        <p class="hint">Mais fortes que Marcas, sempre vêm com efeitos colaterais. Impostas por falha crítica em rituais, pactos ou por escolha própria (com preço). Carregam efeito permanente positivo <em>e</em> negativo — ou apenas negativo. Só podem ser removidas por rituais de purificação, o que também remove os buffs. Armas/itens/equipamentos: apenas 1 maldição por vez. O corpo pode ter mais de uma. Se a Maldição alterar um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias (use valores negativos para penalidades).</p>
+        <div id="maldicoesList"></div>
+        <button type="button" class="btn-add" id="btnAddMaldicao">+ Adicionar Maldição</button>
+
+        <details class="reference">
+          <summary>Consultar Regras de Maldições</summary>
+          <div class="reference-inner">
+            <p style="font-size:13.5px; color:var(--text-muted); line-height:1.6; margin:0 0 10px;">
+              Maldições podem ser aplicadas no próprio corpo ou em armas/itens/equipamentos. São mais fortes que Marcas e sempre vêm com um preço. Podem surgir de falha crítica em rituais, pactos com NPCs, ou por escolha deliberada do agente. A remoção exige um ritual de purificação — e junto com a maldição, os benefícios que ela concedia também desaparecem.
+            </p>
+            <table class="ref-table">
+              <thead><tr><th>Regra</th><th>Detalhe</th></tr></thead>
+              <tbody>
+                <tr><td>Origem</td><td>Falha crítica em rituais, pactos, ou imposta pelo Mestre; ou voluntária, com preço.</td></tr>
+                <tr><td>Efeitos</td><td>Permanente positivo + negativo, ou apenas negativo.</td></tr>
+                <tr><td>Remoção</td><td>Apenas por rituais de purificação — remove também os buffs.</td></tr>
+                <tr><td>Limite em itens</td><td>1 maldição por vez em cada arma/item/equipamento.</td></tr>
+                <tr><td>Limite no corpo</td><td>Pode acumular mais de uma.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- VIII. COMBATE -->
+      <section class="tab-panel" data-panel="combate">
+        <h2 class="panel-title">Pontos de Vida</h2>
+        <div class="field-grid" style="align-items:end;">
+          <div class="field"><label for="f-pvAtual">PV Atual</label><input type="number" id="f-pvAtual"></div>
+          <div class="field"><label for="f-pvMax">PV Máximo (calculado)</label><input type="number" id="f-pvMax" readonly></div>
+          <div class="field"><button type="button" id="btnRestorePV" class="btn-secondary">Restaurar ao Máximo</button></div>
+        </div>
+
+        <h2 class="panel-title">Strikes (Sistema de Dano por Localização)</h2>
+        <p class="hint">A cada 4 strikes acumulados (qualquer região): −1 em todos os testes. Dano crítico: +2 strikes na mesma região. Mesma região 3x: efeito narrativo específico (ex: membro inutilizado). Total de 9 strikes: colapso físico / inconsciência.</p>
+        <div class="strikes-grid">
+          <div class="strike-box"><label>Cabeça</label><input type="number" min="0" id="s-cabeca"></div>
+          <div class="strike-box"><label>Tronco</label><input type="number" min="0" id="s-tronco"></div>
+          <div class="strike-box"><label>Membros</label><input type="number" min="0" id="s-membros"></div>
+        </div>
+        <p class="hint" id="strikesSummary"></p>
+
+        <h2 class="panel-title">Armas e Proteções Equipadas</h2>
+        <div id="armasList"></div>
+        <button type="button" class="btn-add" id="btnAddArma">+ Adicionar Arma / Proteção</button>
+
+        <details class="reference">
+          <summary>Consultar Catálogo de Armas</summary>
+          <div class="reference-inner" id="refArmas"></div>
+        </details>
+      </section>
+
+      <!-- IX. INVENTÁRIO -->
+      <section class="tab-panel" data-panel="inventario">
+        <h2 class="panel-title">Inventário</h2>
+        <p class="hint">Espaços utilizados: <strong id="invUsed">0</strong> / <strong id="invMax">8</strong> — 8 espaços padrão + 1 a cada 5 pontos de AGI. Armas e proteções equipadas (aba Combate) já contam automaticamente aqui.</p>
+        <div id="invList"></div>
+        <button type="button" class="btn-add" id="btnAddItem">+ Adicionar Item</button>
+
+        <details class="reference">
+          <summary>Consultar Catálogo de Equipamentos e Proteções</summary>
+          <div class="reference-inner" id="refEquip"></div>
+        </details>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="appfoot">Ecos do Véu · V.E.U. — Veritas Ex Umbra · Fichas salvas automaticamente neste navegador</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+function esc(v){
+  return String(v ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function clampInt(v,min,max){ let n = parseInt(v,10); if(isNaN(n)) n = min; return Math.max(min, Math.min(max, n)); }
+function uid(){ return "char_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,8); }
+
+/* =====================================================================
+   DADOS DO SISTEMA (extraídos dos livros de regras enviados)
+   ===================================================================== */
+
+const ATTRS = [
+  {key:"for", nome:"Força (FOR)", id:"a-for", min:1, max:20, rollable:true},
+  {key:"agi", nome:"Agilidade (AGI)", id:"a-agi", min:1, max:20, rollable:true},
+  {key:"int", nome:"Intelecto (INT)", id:"a-int", min:1, max:20, rollable:true},
+  {key:"car", nome:"Carisma (CAR)", id:"a-car", min:1, max:20, rollable:true},
+  {key:"von", nome:"Vontade (VON)", id:"a-von", min:1, max:20, rollable:true},
+  {key:"vit", nome:"Vitalidade (VIT)", id:"a-vit", min:0, max:5, rollable:false},
+];
+
+const SKILLS = [
+  {key:"armasFogo", nome:"Armas de Fogo"},
+  {key:"armasBrancas", nome:"Armas Brancas"},
+  {key:"briga", nome:"Briga"},
+  {key:"ocultismo", nome:"Ocultismo"},
+  {key:"medicina", nome:"Medicina"},
+  {key:"tecnologia", nome:"Tecnologia"},
+  {key:"investigacao", nome:"Investigação"},
+  {key:"intimidacao", nome:"Intimidação"},
+  {key:"intuicao", nome:"Intuição"},
+  {key:"sobrevivencia", nome:"Sobrevivência"},
+  {key:"rituais", nome:"Rituais"},
+  {key:"atletismo", nome:"Atletismo"},
+  {key:"erudicao", nome:"Erudição"},
+  {key:"percepcao", nome:"Percepção"},
+  {key:"ciencias", nome:"Ciências"},
+  {key:"sagacidade", nome:"Sagacidade"},
+  {key:"oficios", nome:"Ofícios"},
+  {key:"ladroagem", nome:"Ladroagem"},
+  {key:"furtividade", nome:"Furtividade"},
+];
+
+const TRAUMAS = [
+  {key:"fobia", nome:"Fobia", desc:`Medo irracional e paralisante de algo específico. Ao confrontar o objeto da fobia, teste de VON ou entra em pânico por 1d4 turnos, sofrendo -20% em todas as ações durante esse tempo.`},
+  {key:"alucinacoes", nome:"Alucinações Leves", desc:`Vê ou ouve coisas que não estão lá. A cada cena estressante, teste de VON; em falha, uma alucinação se manifesta e pode interferir em decisões, testes sociais ou de percepção.`},
+  {key:"compulsao", nome:"Compulsão", desc:`Comportamento obsessivo que precisa repetir (contar objetos, limpar as mãos, checar trancas). Resistir exige teste de VON; em falha, é forçado a executar a ação, perdendo tempo e foco.`},
+  {key:"culpa", nome:"Culpa Obsessiva", desc:`Sente-se responsável por uma perda, falha ou morte do passado. Ao falhar em proteger aliados ou falhar criticamente, perde 1d4 de Sanidade e pode entrar em retraimento (-10% em ações sociais e mentais).`},
+  {key:"apatia", nome:"Apatia Emocional", desc:`Dificuldade em demonstrar ou sentir emoções fortes. Sofre -20% em testes sociais relacionados à empatia, mas recebe +10% para resistir a manipulações emocionais ou possessões.`},
+  {key:"memoria", nome:"Memória Reprimida", desc:`Há lacunas na memória de eventos importantes. Flashes podem surgir em sonhos ou sob estresse, trazendo confusão ou revelando pistas ocultas ao longo da campanha.`},
+];
+
+const ORIGENS = {
+  militar:{
+    nome:"Militar", vidaBase:60,
+    descricao:`Você foi moldado pelo conflito. Seja como soldado, policial de elite, segurança privada ou membro de uma força especial, aprendeu a manter a calma sob fogo cruzado e a agir com precisão. Agora, a guerra é contra o invisível.`,
+    bonus:`+5% em Armas de Fogo ou Armas Brancas. +1 ponto de Resiliência inicial. Em combate, pode agir primeiro no turno independente do resultado do teste (1x por missão).`,
+    caminhos:[
+      {nome:"Atirador de Elite", n1:`+10% em Percepção para detectar inimigos à distância.`, n2:`2x por missão, pode transformar um ataque em crítico automático (gasta 1 de Resiliência).`, n3:`Ataques à distância ignoram cobertura leve e armaduras dos inimigos.`},
+      {nome:"Forças Especiais", n1:`+5% em Furtividade ou Atletismo.`, n2:`Pode realizar duas ações no mesmo turno (2x por missão).`, n3:`Sua primeira ação de Furtividade da missão é um sucesso automático.`},
+      {nome:"Veterano de Guerrilha", n1:`+5% em Sobrevivência ou Briga.`, n2:`Pode criar uma arma improvisada por missão (1d6 de dano).`, n3:`Ignora penalidades de ambiente hostil (fome, frio, escuridão).`},
+      {nome:"Demolidor", n1:`+5% em Tecnologia ou Ciências (armamentos).`, n2:`Pode montar 2 armadilhas improvisadas por missão.`, n3:`Pode criar uma carga explosiva devastadora (3d16 de dano em área de 5m, 1x por missão).`},
+    ]
+  },
+  ocultista:{
+    nome:"Ocultista", vidaBase:40,
+    descricao:`Você foi iniciado — por uma ordem esquecida, uma linhagem ancestral ou escolha própria — mas o preço foi alto. Conhece os nomes que não se devem pronunciar e os selos que selam aquilo que nunca dorme.`,
+    bonus:`+5% em Ocultismo ou Rituais. Pode realizar um ritual simples e médio sem estojo. Consegue sentir distúrbios no Véu até 5 metros, mesmo sem testes.`,
+    caminhos:[
+      {nome:"Invocador", n1:`+5% em Rituais, pode sentir presenças até 10m.`, n2:`Pode chamar entidades menores como distração ou para conseguir informação (teste de Ocultismo).`, n3:`Pode invocar de 1 a 2 aliados espirituais temporários por missão (teste de Ocultismo).`},
+      {nome:"Selador", n1:`+5% em Ocultismo, +5 em resistir a possessão (teste de VON).`, n2:`Pode reforçar selos ou círculos dos rituais de aprisionamento (+10% em conjuração de rituais similares).`, n3:`Pode fechar portais menores automaticamente (2x por missão).`},
+      {nome:"Maledicente", n1:`+5% em Intimidação. Consegue sussurrar maldições que afetam o psicológico de alvos humanos.`, n2:`Pode amaldiçoar um inimigo 2x por missão (-20% em uma perícia e -3 em um atributo do alvo + a maldição).`, n3:`Uma vez por missão, pode lançar uma maldição poderosa (-30% em duas perícias e -5 em um atributo do alvo + a maldição).`},
+      {nome:"Conjurador Bélico", n1:`+5% em teste de Rituais ofensivos (ataques, maldições).`, n2:`Pode gastar 1 Resiliência para aumentar o dano de um ritual em +1d6.`, n3:`Uma vez por missão, pode lançar um ritual avançado como ação rápida, sem tempo de preparação.`},
+    ]
+  },
+  cetico:{
+    nome:"Cético", vidaBase:45,
+    descricao:`Você não acredita em demônios, fantasmas ou deuses — não porque não viu, mas porque se recusa. Sua mente racional é um escudo contra o absurdo, o que ironicamente o torna mais resistente ao sobrenatural.`,
+    bonus:`+5% em Tecnologia ou Percepção. +3 em testes de Sanidade. Uma vez por missão, pode anular um efeito de medo ou ilusão.`,
+    caminhos:[
+      {nome:"Investigador Forense", n1:`+10% em Investigação.`, n2:`Sempre detecta mentiras simples sem testes.`, n3:`Ganha pistas a mais para enigmas complexos.`},
+      {nome:"Tecnólogo", n1:`+5% em Tecnologia, pode criar gambiarras.`, n2:`Pode reparar ou alterar equipamentos improvisadamente.`, n3:`+5% de Tecnologia; pode hackear qualquer sistema (mesmo protegido).`},
+      {nome:"Racionalista", n1:`+5 em VON, pode ignorar efeitos emocionais fracos.`, n2:`2x por missão, ignora um ataque mental/sobrenatural.`, n3:`Imune a possessões fracas e ilusões fortes.`},
+      {nome:"Executor Lógico", n1:`+5% em Armas de Fogo ou Briga.`, n2:`Pode gastar 1 Resiliência para rolar ataque duas vezes e ficar com o melhor.`, n3:`Duas vezes por missão, pode negar qualquer bônus defensivo de um inimigo (ignora cobertura, armadura leve ou resistência sobrenatural).`},
+    ]
+  },
+  medium:{
+    nome:"Médium", vidaBase:40,
+    descricao:`Desde criança, você vê o que não devia. Sente frio em lugares onde o calor deveria reinar. Sua mente é um canal, por vezes aberto demais, para o Outro Lado. Os mortos sabem seu nome, e os Ecos o reconhecem como um espelho.`,
+    bonus:`+5% em Rituais ou Intuição. Pode sentir presenças ocultas num raio de 10 metros. Uma vez por missão, pode canalizar uma visão ou mensagem espiritual involuntária.`,
+    caminhos:[
+      {nome:"Canalizador", n1:`+5% em Rituais, espíritos sussurram dicas.`, n2:`Pode pedir ajuda a 1 espírito aliado (Mestre define o efeito).`, n3:`Pode "fundir-se" com 1 espírito, ganhando +20% em 2 perícias por cena ou por 1d4 turnos.`},
+      {nome:"Oráculo", n1:`+5% em Intuição, sonhos premonitórios ocasionais.`, n2:`Pode gastar Resiliência para prever 1 perigo imediato.`, n3:`1x por missão, pode pedir uma revelação narrativa ao Mestre.`},
+      {nome:"Necroempata", n1:`+5% em VON, sente emoções dos mortos.`, n2:`Pode absorver a dor de um aliado (cura 1d6 PV, perde igual em Sanidade).`, n3:`Pode absorver ferimentos mortais (pode morrer no lugar de um aliado).`},
+      {nome:"Flagelo Espiritual", n1:`+5% em Intuição ou Briga.`, n2:`Duas vezes por missão, pode usar um ataque físico como ataque espiritual (ignora defesa física, atinge entidades incorpóreas).`, n3:`Ao gastar 2 Resiliência, pode atacar 2 vezes no mesmo turno com bônus de +10% no segundo ataque.`},
+    ]
+  },
+  erudito:{
+    nome:"Erudito", vidaBase:50,
+    descricao:`Você passou anos mergulhado em arquivos esquecidos, manuscritos empoeirados e símbolos que só aparecem à luz da vela. Você não é um ocultista: você é o que os ocultistas consultam quando têm medo.`,
+    bonus:`+5% em Erudição ou Ciências. Começa com 5 pontos em INT. Pode identificar a origem de textos, símbolos ou entidades com um único teste de Erudição.`,
+    caminhos:[
+      {nome:"Linguista", n1:`+5% em Erudição.`, n2:`Pode traduzir línguas mortas ou códigos instantaneamente.`, n3:`Pode conversar com entidades através de linguagem esquecida.`},
+      {nome:"Historiador Arcano", n1:`+5% em Ocultismo.`, n2:`Reconhece rituais antigos com apenas uma olhada.`, n3:`Consegue prever efeitos de um ritual só de vê-lo.`},
+      {nome:"Mestre dos Textos", n1:`+5% em Investigação.`, n2:`Pode criar falsificações convincentes de escritos arcanos.`, n3:`Uma vez por missão, pode criar um ritual falso que engana até o sobrenatural.`},
+      {nome:"Caçador Arcanista", n1:`+5% em Ocultismo quando usado de forma ofensiva (ex: identificar fraquezas para atacar).`, n2:`Pode gastar 1 Resiliência para dar +1d6 de dano extra ao ataque de um aliado, apontando o ponto fraco da criatura.`, n3:`Uma vez por missão, pode "nomear" uma entidade em combate — todos os ataques contra ela recebem +1d4 de dano até o fim da cena.`},
+    ]
+  },
+  medico:{
+    nome:"Médico", vidaBase:30,
+    descricao:`Você já esteve entre a vida e a morte — e nem sempre no papel que esperava. Aprendeu a lidar com corpos partidos e decisões tomadas em segundos. Mas os Ecos não sangram como os humanos.`,
+    bonus:`+5% em Medicina ou Sobrevivência. Pode estabilizar um aliado à beira da morte (0 PV) sem rolagem, uma vez por sessão. Pode identificar estruturas anatômicas humanas e anômalas com um teste de INT simples.`,
+    caminhos:[
+      {nome:"Cirurgião de Campo", n1:`+5% em Medicina.`, n2:`Pode curar 1d6 PV extras ao usar kits.`, n3:`Pode salvar alguém morto há até 1 turno.`},
+      {nome:"Alquimista", n1:`+5% em Ciências (misturas/compostos).`, n2:`Pode preparar 1 tônico (1d4 de cura ou 2 de resistência, 2 usos por missão).`, n3:`Pode criar 1 frasco especial 1x por missão (cura total ou resistência total).`},
+      {nome:"Exorcista Clínico", n1:`+5% em VON.`, n2:`Pode "diagnosticar" possessões como doenças e purificá-las.`, n3:`Pode expulsar espíritos fracos apenas com contato físico.`},
+      {nome:"Cirurgião Letal", n1:`+5% em Armas Brancas (uso de bisturis, lâminas, serras improvisadas).`, n2:`Uma vez por missão, pode declarar um ataque como golpe preciso; se acertar, causa dano dobrado.`, n3:`Pode gastar 1 Resiliência para ignorar resistência física do alvo em um ataque corpo a corpo.`},
+    ]
+  },
+  amigoanimais:{
+    nome:"Amigo dos Animais", vidaBase:45,
+    descricao:`Você sempre teve uma conexão instintiva com os animais — selvagens, domésticos ou até aqueles que os outros não conseguem ver de maneira comum. Talvez um trauma, ou um dom inexplicável, o aproximou das criaturas do mundo natural e sobrenatural.`,
+    bonus:`+5% em Intuição ou Sobrevivência. Pode se comunicar com animais. Inicia com um companheiro animal fiel (estatísticas definidas com o Mestre).`,
+    caminhos:[
+      {nome:"Domador Espiritual", n1:`+5% em Rituais; companheiro animal ganha resistência sobrenatural.`, n2:`Pode invocar espíritos-animais por breves instantes (Mestre decide o efeito).`, n3:`Animal ganha habilidade Sobrenatural (ex: visão no Véu, ataque espiritual).`},
+      {nome:"Batedor Animal", n1:`+10% em Percepção quando acompanhado do animal.`, n2:`O animal pode agir 2x por turno (2x por missão).`, n3:`Animal pode rastrear qualquer ser ou sentir entidades a 10m (mesmo sobrenatural).`},
+      {nome:"Caçador Instintivo", n1:`+5% em Sobrevivência ou Armas de Fogo.`, n2:`Duas vezes por missão, pode coordenar seu animal para atacar junto, causando +1d6 de dano extra.`, n3:`Quando o companheiro animal abate um inimigo, ganha +10% em seu próximo ataque na mesma cena.`},
+      {nome:"Alfa Instintivo", n1:`+10% em Intimidação. Animais selvagens não o atacam sem motivo.`, n2:`Pode comandar temporariamente animais próximos por 1d4 turnos (exceto os totalmente sobrenaturais).`, n3:`Uma vez por missão, pode invocar uma matilha ou bando para ajudar por 1d5 turnos.`},
+    ]
+  },
+};
+
+/* =====================================================================
+   BUFFS AUTOMÁTICOS (bônus numéricos de Origem e Caminho, nível 1)
+   type: "skill" (aplica em SKILLS) ou "attr" (aplica em ATTRS)
+   options: se tiver mais de 1, o jogador escolhe onde aplicar ("ou")
+   ===================================================================== */
+const BUFF_RULES = {
+  militar:{
+    origem:{ type:"skill", amount:5, options:["armasFogo","armasBrancas"] },
+    caminhos:[
+      { type:"skill", amount:10, options:["percepcao"] },          // Atirador de Elite
+      { type:"skill", amount:5, options:["furtividade","atletismo"] }, // Forças Especiais
+      { type:"skill", amount:5, options:["sobrevivencia","briga"] },   // Veterano de Guerrilha
+      { type:"skill", amount:5, options:["tecnologia","ciencias"] },   // Demolidor
+    ]
+  },
+  ocultista:{
+    origem:{ type:"skill", amount:5, options:["ocultismo","rituais"] },
+    caminhos:[
+      { type:"skill", amount:5, options:["rituais"] },       // Invocador
+      { type:"skill", amount:5, options:["ocultismo"] },     // Selador
+      { type:"skill", amount:5, options:["intimidacao"] },   // Maledicente
+      { type:"skill", amount:5, options:["rituais"] },       // Conjurador Bélico
+    ]
+  },
+  cetico:{
+    origem:{ type:"skill", amount:5, options:["tecnologia","percepcao"] },
+    caminhos:[
+      { type:"skill", amount:10, options:["investigacao"] }, // Investigador Forense
+      { type:"skill", amount:5, options:["tecnologia"] },    // Tecnólogo
+      { type:"attr", amount:5, options:["von"] },            // Racionalista
+      { type:"skill", amount:5, options:["armasFogo","briga"] }, // Executor Lógico
+    ]
+  },
+  medium:{
+    origem:{ type:"skill", amount:5, options:["rituais","intuicao"] },
+    caminhos:[
+      { type:"skill", amount:5, options:["rituais"] },   // Canalizador
+      { type:"skill", amount:5, options:["intuicao"] },  // Oráculo
+      { type:"attr", amount:5, options:["von"] },        // Necroempata
+      { type:"skill", amount:5, options:["intuicao","briga"] }, // Flagelo Espiritual
+    ]
+  },
+  erudito:{
+    origem:{ type:"skill", amount:5, options:["erudicao","ciencias"] },
+    origemAttr:{ type:"attr", amount:5, options:["int"] }, // "Começa com 5 pontos em INT"
+    caminhos:[
+      { type:"skill", amount:5, options:["erudicao"] },     // Linguista
+      { type:"skill", amount:5, options:["ocultismo"] },    // Historiador Arcano
+      { type:"skill", amount:5, options:["investigacao"] }, // Mestre dos Textos
+      { type:"skill", amount:5, options:["ocultismo"] },    // Caçador Arcanista
+    ]
+  },
+  medico:{
+    origem:{ type:"skill", amount:5, options:["medicina","sobrevivencia"] },
+    caminhos:[
+      { type:"skill", amount:5, options:["medicina"] },     // Cirurgião de Campo
+      { type:"skill", amount:5, options:["ciencias"] },     // Alquimista
+      { type:"attr", amount:5, options:["von"] },           // Exorcista Clínico
+      { type:"skill", amount:5, options:["armasBrancas"] }, // Cirurgião Letal
+    ]
+  },
+  amigoanimais:{
+    origem:{ type:"skill", amount:5, options:["intuicao","sobrevivencia"] },
+    caminhos:[
+      { type:"skill", amount:5, options:["rituais"] },            // Domador Espiritual
+      { type:"skill", amount:10, options:["percepcao"] },         // Batedor Animal
+      { type:"skill", amount:5, options:["sobrevivencia","armasFogo"] }, // Caçador Instintivo
+      { type:"skill", amount:10, options:["intimidacao"] },       // Alfa Instintivo
+    ]
+  },
+};
+
+const CHAGA_CATS = {protecao:"Proteção", combate:"Combate", cura:"Cura", runico:"Aprimoramento Rúnico"};
+const CHAGAS = {
+  protecao:[
+    {nome:"Cicatrizes Compartilhadas", efeito:`Você pode absorver parte do dano que um aliado iria sofrer.`, custo:"1 de Resiliência", colateral:`Você sofre metade do dano, mesmo que a origem seja sobrenatural.`},
+    {nome:"Sopro do Vazio", efeito:`Ao sussurrar em voz baixa, pode causar terror profundo em um alvo humanoide.`, custo:"1 de Resiliência", colateral:`O sussurrante ouve vozes por 1d4 horas.`},
+    {nome:"Olhos Reversos", efeito:`Pode ver entidades ocultas por 1d6 turnos.`, custo:"1 de Resiliência", colateral:`-10% em testes sociais até o fim da cena (pupilas inumanas).`},
+    {nome:"Sangue que Queima", efeito:`Ao sofrer dano físico, pode causar 1d6 de dano espiritual no atacante.`, custo:"1 de Resiliência", colateral:`Perde 1d4 PV adicionais no turno seguinte.`},
+    {nome:"Voz da Ausência", efeito:`Pode emitir uma onda de silêncio absoluto em um raio de 10m (1 turno).`, custo:"1 de Resiliência", colateral:`Sofre -20% em testes de VON por 1 cena.`},
+    {nome:"Toque da Falha", efeito:`Pode desativar temporariamente um objeto tecnológico com o toque (drone, câmera, trava).`, custo:"1 de Resiliência", colateral:`Interferência magnética descontrolada afeta itens pessoais (perda temporária de 1 item eletrônico).`},
+    {nome:"Grito Além do Véu", efeito:`Emite um grito que afasta entidades incorpóreas por 1d4 turnos.`, custo:"1 de Resiliência", colateral:`Fica mudo por 1d6 turnos.`},
+    {nome:"Sombra Descolada", efeito:`Sua sombra pode agir independentemente por 1 turno, executando pequenas ações (abrir portas, distrair, pegar objetos).`, custo:"1 de Resiliência", colateral:`A sombra pode se mover sozinha por 1d4 turnos, causando paranoia.`},
+    {nome:"Maré do Abismo", efeito:`Encharca a área em um raio de 3m com escuridão viscosa. -20% para inimigos atacarem ou se moverem.`, custo:"1 de Resiliência", colateral:`Perde 1d10 de Sanidade ao fim do efeito.`},
+    {nome:"Manto do Vazio", efeito:`Ao entrar em área de penumbra ou escuridão total, seu corpo se mistura ao véu. Ganha +20% em Furtividade e Subterfúgio e pode ignorar 1 ataque direto por cena.`, custo:"1 de Resiliência por ativação (dura até sair da escuridão)", colateral:`Sua presença deixa rastros sombrios — criaturas sensíveis ao Véu te detectam com mais facilidade por 1 hora.`},
+  ],
+  combate:[
+    {nome:"Mente Paralela", efeito:`Ganha um turno adicional em combate (apenas para movimento ou percepção).`, custo:"1 de Resiliência", colateral:`Alucina durante o próximo turno.`},
+    {nome:"Forja Rubra", efeito:`Seu corpo incandesce por dentro. Todos os ataques físicos causam +2 de dano até o fim da cena.`, custo:"1 de Resiliência", colateral:`Durante o efeito, você se torna vulnerável: recebe +2 de dano de qualquer ataque físico.`},
+    {nome:"Resplendor da Fúria", efeito:`Canalizando sua fúria como combustível, seu próximo ataque físico rola 1d3+2 (bônus aplicado a um único ataque).`, custo:"1 de Resiliência", colateral:`Até o final da cena, todos os inimigos causam +1d3+2 de dano contra você no primeiro ataque que te acertarem.`},
+    {nome:"Ossos de Basalto", efeito:`Seu corpo se torna denso como pedra. Ignora os efeitos de até 2 Strikes em ataques físicos por uma cena.`, custo:"1 de Resiliência", colateral:`Sua mobilidade reduz drasticamente (metade da AGI do usuário).`},
+    {nome:"Espasmo da Fera", efeito:`Seus tendões se contraem violentamente. Recebe +2 em FOR para testes e danos físicos até o final da cena.`, custo:"1 de Resiliência", colateral:`Ao final da cena, sofre 1 Strike automático pela tensão muscular extrema.`},
+    {nome:"Sopro Carmesim", efeito:`Canalizando fúria sobrenatural, pode atacar duas vezes no mesmo turno com armas brancas.`, custo:"1 de Resiliência", colateral:`Seus olhos sangram e sua pressão interna se desregula — testes de VON sofrem -2 por 1 cena.`},
+    {nome:"Espinha Fragmentada", efeito:`Pode realizar uma manobra impossível (torcer o corpo, atravessar um espaço minúsculo). Ganha +4 em um teste de AGI ou de esquiva física.`, custo:"1 de Resiliência", colateral:`A manobra desloca sua coluna de forma dolorosa — sofre -1 PV imediato e -1 em qualquer teste de movimentação por 1 cena.`},
+    {nome:"Fúria da Lâmina Viva", efeito:`Ao entrar em combate corpo a corpo, entra em fúria controlada. Ganha +10% em testes com armas brancas e ignora penalidades por ferimentos até o fim do combate.`, custo:"1 de Resiliência por combate ativado", colateral:`Após o combate, sente dores intensas e recebe -10% em qualquer teste físico até descansar.`},
+    {nome:"Corte do Véu", efeito:`Seus ataques corpo a corpo podem atingir criaturas parcialmente fora da realidade. Armas brancas empunhadas por você causam dano mágico.`, custo:"1 de Resiliência por ataque que ignora intangibilidade", colateral:`Sua arma se torna instável — a cada 3 usos deve ser reforjada com um ritual simples, ou se quebra ao falhar.`},
+    {nome:"Eco Sangrento", efeito:`Quando acerta um golpe crítico com arma branca, pode gastar 1 Resiliência para causar hemorragia (dano contínuo por 1d4 turnos).`, custo:"1 de Resiliência por ativação", colateral:`Role 1d6: com resultado 1-2, você sofre 1 PV de dano.`},
+    {nome:"Sombra Enraizada", efeito:`Pode usar sua própria sombra como extensão do corpo. Uma vez por cena, pode atacar à distância com a sombra (alcance de até 5 metros).`, custo:"2 de Resiliência", colateral:`Enquanto a sombra estiver ativa, luz intensa causa dano extra em você (+1d6 por fontes de luz sagrada ou mágica).`},
+    {nome:"Comando das Sombras", efeito:`Comanda todas as sombras ao redor em um raio de 13m², que podem ser moldadas e usadas da forma que quiser.`, custo:"2 de Resiliência", colateral:`Logo após o uso, perde 15 pontos de Sanidade e -20% em testes de VON durante 2 cenas, ficando incapaz de agir durante 2 turnos.`},
+  ],
+  cura:[
+    {nome:"Toque da Carne Costurada", efeito:`Ao tocar um aliado, cura instantaneamente 1d4 PV.`, custo:"1 de Resiliência", colateral:`A área tocada fica com cicatrizes grotescas e visíveis, mesmo após a cura.`},
+    {nome:"Hemostasia Espiritual", efeito:`Estanca qualquer sangramento crítico ou impede a morte imediata.`, custo:"2 de Resiliência", colateral:`Sensação de sangramento interno por horas, reduzindo -1 em todas as ações físicas.`},
+    {nome:"Pulso Invertido", efeito:`Restaura os sinais vitais de um agente morrendo (0 PV), estabilizando-o.`, custo:"1 de Resiliência e 1 PV seu", colateral:`Por 1 hora, sente o ritmo cardíaco do outro — se ele morrer, sofre 2 de dano psíquico.`},
+    {nome:"Curandeiro do Véu", efeito:`Sempre que usar um ritual de cura, pode repetir a rolagem de cura uma vez.`, custo:"Passivo", colateral:`Vozes de pacientes falecidos sussurram durante os rituais — role 1d4 de perda de Sanidade.`},
+  ],
+  runico:[
+    {nome:"Marcar da Carne", efeito:`Cortes com lâminas insculpidas com símbolos rúnicos são mais precisos. Ganha +15% ao atacar criaturas que tenham corpo físico.`, custo:"2 de Resiliência", colateral:`Dura 2 horas; enquanto ativo, rolagens de Sanidade sofrem -10%.`},
+    {nome:"Pele de Códice", efeito:`Projeta símbolos arcanos em sua pele, recebendo +10% em Ocultismo e Rituais por 1 cena.`, custo:"1 de Resiliência", colateral:`Sofre -1d6 de Sanidade ao término, devido à exposição às inscrições.`},
+  ],
+};
+
+const RITUAL_CATS = {investigacao:"Investigação", protecao:"Proteção", combate:"Combate", cura:"Cura"};
+const RITUAIS = {
+  investigacao:[
+    {nome:"Corrente de Sussurros (Simples)", descricao:`O usuário diz palavras ritualísticas enquanto medita.`, componentes:"Nenhum", efeito:`Envia uma mensagem mental curta a qualquer ser conhecido.`, tempo:"1 minuto", falha:`A mensagem vai para qualquer ser aleatório perto.`},
+    {nome:"Chave de Sangue (Simples)", descricao:`O usuário usa o próprio sangue para criar uma chave de sangue coagulado.`, componentes:"Sangue humano", efeito:`Abre qualquer fechadura não eletrônica em até 5m.`, tempo:"1 turno / 5 minutos", falha:`A fechadura enferruja e trava permanentemente.`},
+    {nome:"Invocação da Testemunha (Médio)", descricao:`Desenha um pentagrama no chão e chama por espíritos próximos.`, componentes:"Estojo de Rituais", efeito:`Invoca um espírito do local para responder 3 perguntas.`, tempo:"10 minutos", falha:`O espírito se torna inimigo ou pode atrair outros Ecos.`},
+    {nome:"Fenda da Lembrança (Médio)", descricao:`Desenha um símbolo na testa, abrindo a mente para memórias do local.`, componentes:"Estojo de Rituais", efeito:`Permite ver uma memória forte ocorrida no local.`, tempo:"5 minutos", falha:`Revive memórias pessoais traumáticas (teste de VON).`},
+  ],
+  protecao:[
+    {nome:"Bênção dos Ligamentos Ocultos (Simples)", descricao:`O executor massageia rituais em espiral nos próprios braços ou pernas.`, componentes:"Nenhum", efeito:`Ignora penalidades por ferimentos em locomoção ou ataque por 1d4 turnos.`, tempo:"Ação rápida", falha:`Sofre -1 em testes de atributos físicos por entorpecimento.`},
+    {nome:"Corrente Espectral (Médio)", descricao:`Recita palavras ritualísticas enquanto invoca um símbolo embaixo da entidade.`, componentes:"Estojo de Rituais (Crucifixo)", efeito:`Restringe o movimento de uma entidade por 1d4 turnos + 1d3 de dano.`, tempo:"1 turno / 5 minutos", falha:`A corrente se rompe e atinge o conjurador (1d6 dano espiritual).`},
+    {nome:"Espiral de Sangue (Médio)", descricao:`Desenha um símbolo com o próprio sangue ao redor.`, componentes:"Sangue do próprio conjurador", efeito:`Marca o chão com um símbolo espiralado. Quem entra perde 1d4 de Sanidade.`, tempo:"1 turno / 5 minutos", falha:`O símbolo atrai uma presença por 1 cena.`},
+    {nome:"Vínculo Reverso (Médio)", descricao:`Recita palavras ritualísticas, criando uma corrente espiritual entre ele e o alvo.`, componentes:"Estojo de Rituais", efeito:`Desvia 50% do dano sofrido para o alvo vinculado por 1d4 turnos.`, tempo:"1 turno / 5 minutos", falha:`Ambos compartilham o dano completo.`},
+    {nome:"Muralha de Pele (Médio)", descricao:`O executor escreve um símbolo no próprio peito.`, componentes:"Estojo ritual", efeito:`Reduz em 1d6 o dano do próximo ataque recebido por 3 turnos.`, tempo:"1 turno / 5 minutos", falha:`Os músculos contraem de forma brusca; fica incapacitado de se mover por 2 turnos.`},
+    {nome:"Véu da Escuridão (Avançado)", descricao:`Desenha um pentagrama com giz negro, recitando palavras de uma língua ritualística.`, componentes:"Estojo Avançado", efeito:`Cria uma área de escuridão sobrenatural por 1d5 turnos.`, tempo:"2 turnos / 10 minutos", falha:`O conjurador também fica cego por 1 turno.`},
+    {nome:"Marca da Passagem (Avançado)", descricao:`Desenha uma marca em local escolhido como âncora, vinculando ponto de origem ao destino.`, componentes:"Estojo Avançado", efeito:`Marca um ponto usado como âncora para teleporte (1 uso por história; requer marca de destino previamente criada).`, tempo:"10 min para a marca + 2 turnos para teleporte", falha:`A marca invoca um Eco de nível aleatório.`},
+    {nome:"Ritual da Quebra (Avançado)", descricao:`Desenha um símbolo no chão, alvo de joelhos no centro; desenha símbolo na testa do alvo recitando palavras antigas.`, componentes:"Estojo Avançado", efeito:`Rompe um pacto ou efeito espiritual que afeta o alvo ou aliado.`, tempo:"2 turnos / 10 minutos", falha:`A entidade possui o conjurador — deve resistir rolando 12 de VON durante 3 turnos.`},
+  ],
+  combate:[
+    {nome:"Predador Silencioso (Simples)", descricao:`Óleo ritualístico de sangue, carvão e ervas amargas aplicado na lâmina.`, componentes:"Estojo de Rituais", efeito:`A arma se torna silenciosa ao cortar e ignora armaduras leves por 1 cena.`, tempo:"1 turno / 5 minutos", falha:`A arma ganha -10% em testes por 1 hora devido à corrosão do unguento.`},
+    {nome:"Dança do Sangue Escorrido (Simples)", descricao:`Derrama uma gota do próprio sangue sobre a lâmina entoando um cântico rítmico.`, componentes:"Estojo de Rituais, 1 PV do executor", efeito:`Ganha +10% em Armas Brancas por 3 turnos.`, tempo:"Ação rápida", falha:`Perde mais 1 PV por exaustão mística.`},
+    {nome:"Punho do Eco Fraturado (Simples)", descricao:`O executor estala os próprios dedos três vezes.`, componentes:"Nenhum", efeito:`O próximo ataque desarmado ignora armaduras leves.`, tempo:"Ação rápida", falha:`Sofre 1d4 de dano na mão usada.`},
+    {nome:"Cicatriz na Mandíbula (Simples)", descricao:`O lutador corta levemente o próprio rosto.`, componentes:"Sangue do usuário", efeito:`Ganha +2 em ataques desarmados por 3 turnos.`, tempo:"1 turno / 5 minutos", falha:`Toma 2 de dano de sangramento por 2 turnos.`},
+    {nome:"Corte do Além (Médio)", descricao:`Desenha um símbolo antigo sobre a lâmina com tinta de ossos moídos.`, componentes:"Estojo de Rituais", efeito:`O próximo ataque com a arma atinge criaturas mesmo em planos paralelos ou intangíveis.`, tempo:"1 turno / 5 minutos", falha:`O véu se enfraquece — invoca uma Complicação automática ao usar.`},
+    {nome:"Estouro dos Ossos (Médio)", descricao:`O executor quebra diversos ossos ritualísticos e usa o pó nos punhos.`, componentes:"Estojo de Rituais", efeito:`Recebe +1d3+2 de dano fixo no próximo ataque desarmado.`, tempo:"1 turno / 5 minutos", falha:`Sofre -10% em testes físicos por 1 cena (tensão muscular extrema).`},
+    {nome:"Espírito dos Punhos (Médio)", descricao:`O usuário prende um espírito em seu equipamento temporariamente.`, componentes:"Estojo de Rituais", efeito:`As armas de punho causam +2 de dano espiritual por 1d4 turnos.`, tempo:"2 turnos / 10 minutos", falha:`O espírito se revolta e se prende à arma, causando 1 de dano na durabilidade.`},
+    {nome:"Armas do Juízo Final (Avançado)", descricao:`Uma inscrição complexa é feita ao redor do punho da arma com cinzas humanas.`, componentes:"Estojo de Rituais Avançado", efeito:`Durante 1 combate, seus golpes causam o dobro de dano.`, tempo:"2 turnos / 10 minutos", falha:`Se a arma for quebrada ou deixada para trás, torna-se ponto de ruptura do Véu e pode gerar um Eco de nível aleatório.`},
+    {nome:"Chamar Sombras Antigas (Avançado)", descricao:`Desenha com giz negro um pentagrama; sombras surgem do chão e seguem o usuário.`, componentes:"Estojo de Rituais Avançado, ambiente escuro", efeito:`Pode manipular a sombra como uma arma viva (dano de arma leve, 1d6) por até 3 turnos.`, tempo:"2 turnos / 10 minutos", falha:`As sombras se revoltam e prendem o usuário no local, incapacitando-o por 3 turnos.`},
+    {nome:"Selo do Impacto Esquecido (Avançado)", descricao:`Um símbolo antigo é desenhado no executor.`, componentes:"Estojo Avançado", efeito:`Por 1 combate, sempre que acertar um soco, o alvo deve testar VON ou ficar atordoado por 1 turno (1x por alvo).`, tempo:"2 turnos / 10 minutos", falha:`O selo trinca; o executor perde 1 de Resiliência (temporariamente) e 1d10 de Sanidade.`},
+  ],
+  cura:[
+    {nome:"Costura da Carne Silente (Simples)", descricao:`Com linhas de cabelo humano e agulha de prata, fecha feridas rapidamente.`, componentes:"Estojo de Rituais", efeito:`Cura 1d6 de um aliado.`, tempo:"1 turno / 5 minutos", falha:`O aliado recebe 1d3 de dano.`},
+    {nome:"Alívio Profano (Médio)", descricao:`Invoca uma presença invisível que alivia a dor do alvo, mesmo sob tortura ou sofrimento extremo.`, componentes:"Estojo de Rituais", efeito:`Remove penalidades por dor, hemorragia ou trauma físico por 1 cena.`, tempo:"2 turnos / 10 minutos", falha:`A presença atrapalha na cura.`},
+    {nome:"Bênção do Anestesista (Médio)", descricao:`Recita palavras reconfortantes antigas passadas entre os médicos da V.E.U. no ouvido do alvo.`, componentes:"Estojo de Rituais", efeito:`Cura 1d4 PV e remove condições como Atordoado ou Aterrorizado.`, tempo:"2 turnos / 10 minutos", falha:`O conjurador recebe uma visão de guerra, e quem recebeu a cura fica com uma penalidade.`},
+    {nome:"Elixir do Além-Pulso (Avançado)", descricao:`Desenha um símbolo no chão com um recipiente ao centro, mistura componentes sussurrando palavras ritualísticas.`, componentes:"Estojo Avançado", efeito:`Um aliado que beber o elixir recupera 1d6 PV e 1 ponto de Resiliência.`, tempo:"2 turnos / 10 minutos de preparo", falha:`O aliado perde PV ao ingerir o elixir (1d6).`},
+  ],
+};
+
+/* =====================================================================
+   CATÁLOGO DE ARMAS E EQUIPAMENTOS (com adição automática ao clicar)
+   Cada linha vira uma arma (aba Combate) ou item (aba Inventário)
+   ===================================================================== */
+const WEAPON_TABLES = [
+  { caption:"Armas Simples — Corpo a Corpo", cols:["Categoria","Espaço","Dano","Exemplos"], rows:[
+    {nome:"Leves — Uma Mão", espaco:1, dano:"1d6", extra:"Adaga, Cutelo, Facão, Foice"},
+    {nome:"Medianas — Uma Mão", espaco:1, dano:"1d7", extra:"Bastão, Clava, Porrete"},
+    {nome:"Pesadas — Duas Mãos", espaco:2, dano:"1d8", extra:"Bordão, Lança"},
+  ]},
+  { caption:"À Distância — Especiais", cols:["Categoria","Espaço","Dano","Exemplos"], rows:[
+    {nome:"Média Distância — Duas Mãos", espaco:2, dano:"1d6", extra:"Arco Curto"},
+    {nome:"Longa Distância — Duas Mãos", espaco:2, dano:"1d8", extra:"Besta de Caça, Arco Composto"},
+  ]},
+  { caption:"Armas Táticas — Corpo a Corpo (N.A. 2+)", cols:["Categoria","Espaço","Dano","Exemplos"], rows:[
+    {nome:"Leves", espaco:1, dano:"1d6", extra:"Machadinha, Faca de Combate"},
+    {nome:"Uma Mão", espaco:1, dano:"1d8", extra:"Espada, Picareta, Sabre"},
+    {nome:"Duas Mãos", espaco:2, dano:"2d6", extra:"Acha, Montante, Marreta, Machado, Katana"},
+  ]},
+  { caption:"Itens de Arremesso", cols:["Item","Espaço","Dano","Efeito"], rows:[
+    {nome:"Granada", espaco:1, dano:"3d20", extra:"Alcance 6m"},
+    {nome:"Faca de Arremesso", espaco:1, dano:"1d6", extra:"—"},
+    {nome:"Granada de Fumaça", espaco:1, dano:"—", extra:"Cobre 10m; alvo direto -20% Percepção por 3 turnos"},
+    {nome:"Granada de Luz", espaco:1, dano:"—", extra:"-30% Percepção (2 turnos) e -10% em todas as perícias (4 turnos) na área"},
+    {nome:"Granada Incendiária / Molotov", espaco:1, dano:"1d5+3/turno", extra:"Área em chamas de 5m"},
+  ]},
+  { caption:"Armas de Fogo Simples", cols:["Arma","Dano","Alcance","Cap.","Esp."], rows:[
+    {nome:"Pistola", dano:"1d8", espaco:1, extra:"Alcance: Médio · Cap.: 12"},
+    {nome:"Revólver", dano:"1d10", espaco:1, extra:"Alcance: Curto · Cap.: 6"},
+    {nome:"Carabina", dano:"1d6", espaco:2, extra:"Alcance: Médio · Cap.: 20"},
+    {nome:"Submetralhadora Uzi", dano:"1d8", espaco:2, extra:"Alcance: Curto · Cap.: 30"},
+    {nome:"Espingarda de Cano Duplo", dano:"2d6 (4d6 ambos)", espaco:2, extra:"Alcance: Muito curto · Cap.: 2"},
+  ]},
+  { caption:"Armas de Fogo Táticas (N.A. 3+)", cols:["Arma","Dano","Alcance","Cap.","Esp."], rows:[
+    {nome:"Escopeta", dano:"2d6", espaco:2, extra:"Alcance: Curto · Cap.: 8"},
+    {nome:"Espingarda", dano:"2d8", espaco:2, extra:"Alcance: Médio · Cap.: 6"},
+    {nome:"Fuzil de Assalto", dano:"1d10+1d6", espaco:2, extra:"Alcance: Médio/Longo · Cap.: 30"},
+    {nome:"Fuzil de Caça", dano:"2d8", espaco:2, extra:"Alcance: Longo · Cap.: 6"},
+    {nome:"Fuzil de Precisão", dano:"3d6", espaco:2, extra:"Alcance: Extremo · Cap.: 10"},
+    {nome:"Lança-Chamas", dano:"3d6 (área)", espaco:3, extra:"Alcance: Cone curto"},
+    {nome:"Lança-Granadas", dano:"4d6 (área 3m)", espaco:3, extra:"Cap.: 5"},
+    {nome:"Metralhadora", dano:"1d10/alvo", espaco:3, extra:"Alcance: Linha 5m · Cap.: 25"},
+    {nome:"SPAS-12 Semiautomática", dano:"2d6", espaco:2, extra:"Alcance: Curto · Cap.: 8"},
+  ]},
+];
+
+const EQUIP_TABLES = [
+  { caption:"Proteções", cols:["Item","Espaço","Efeito"], rows:[
+    {nome:"Colete Nível I", espacos:2, extra:"-2 Dano Físico, -3% AGI, resiste 3 hits"},
+    {nome:"Colete Nível II", espacos:3, extra:"-3 Dano Físico, -4% AGI, resiste 5 hits"},
+    {nome:"Colete Nível III", espacos:4, extra:"-4 Dano Físico, -5% AGI, resiste 7 hits"},
+    {nome:"Símbolo Consagrado", espacos:1, extra:"+10% contra possessão e medo sobrenatural (2 durabilidade)"},
+    {nome:"Talismã", espacos:1, extra:"1 re-rolagem por sessão em testes de Sanidade (2 durabilidade)"},
+  ]},
+  { caption:"Equipamentos Gerais", cols:["Item","Espaço","Efeito"], rows:[
+    {nome:"Luva de Combate", espacos:0, extra:"+1 dano de soco"},
+    {nome:"Soco Inglês", espacos:0, extra:"+2 dano de soco"},
+    {nome:"Estojo de Rituais Básico", espacos:2, extra:"Necessário para rituais simples e médios"},
+    {nome:"Máscara de Gás", espacos:2, extra:"Evita gases venenosos"},
+    {nome:"Lanterna UV", espacos:1, extra:"Revela símbolos ocultos, sangue, fluidos espectrais"},
+    {nome:"Gravador de Fenômenos", espacos:1, extra:"+10% Investigação contra entidades"},
+    {nome:"Correntes / Cordas", espacos:0, extra:"Amarração, fixação ou sustentação de cargas"},
+    {nome:"Kit Médico P (1 uso)", espacos:1, extra:"Restaura 1d4 PV por uso"},
+    {nome:"Kit Médico M (2 usos)", espacos:2, extra:"Restaura 1d7 PV por uso"},
+    {nome:"Kit Médico G (3 usos)", espacos:3, extra:"Restaura 1d10 PV por uso"},
+    {nome:"Lente do Véu", espacos:1, extra:"Vê auras espirituais por 1 turno (1 uso/missão)"},
+  ]},
+  { caption:"Equipamentos Especiais (N.A. 4+)", cols:["Item","Espaço","Efeito"], rows:[
+    {nome:"Estojo de Rituais Avançados", espacos:3, extra:"Rituais avançados sem penalidade; +5% Ocultismo/Rituais"},
+    {nome:"Coldre Tático do Véu", espacos:2, extra:"Trocar de arma como ação gratuita; 1x/missão +10 Iniciativa"},
+    {nome:"Grimório Vazio", espacos:2, extra:"Armazena 3 rituais; permite ler sem rolagem; 2 rituais simples no mesmo turno"},
+    {nome:"Scanner de Realidade", espacos:1, extra:"+10% Investigação/Tecnologia em locais sobrenaturais; revela pista oculta 1x/missão"},
+    {nome:"Medalhão de Cristal", espacos:1, extra:"+5% Rituais, +5 VON; absorve 1 manifestação espiritual/sessão"},
+    {nome:"Diário do Inominado", espacos:2, extra:"+10% Percepção/Investigação ao estudar pistas; identifica entidade 1x/missão"},
+  ]},
+];
+
+/* =====================================================================
+   ESTADO
+   ===================================================================== */
+let state = null;
+let saveTimer = null;
+
+function blankState(){
+  return {
+    id: uid(),
+    meta:{ nome:"", origem:"", idade:"", sexo:"", descFisica:"", na:1, pm:0, pe:0, historia:"" },
+    atributos:{ for:1, agi:1, int:1, car:1, von:1, vit:0 },
+    pericias: Object.fromEntries(SKILLS.map(s=>[s.key,0])),
+    caminho:{ pathIndex:null, n1:false, n2:false, n3:false },
+    buffChoices:{ origem:"", caminho:"" },
+    rollLog:[],
+    trauma:{ tipo:"", desc:"" },
+    sanidade:{ atual:100, max:100 },
+    resiliencia:{ atual:1 },
+    chagas:[],
+    rituais:[],
+    marcas:[],
+    maldicoes:[],
+    pv:{ atual:0 },
+    strikes:{ cabeca:0, tronco:0, membros:0 },
+    armas:[],
+    inventario:[],
+    updatedAt: Date.now(),
+  };
+}
+
+function pvMax(){
+  const o = ORIGENS[state.meta.origem];
+  const base = o ? o.vidaBase : 0;
+  return base + state.atributos.vit*2;
+}
+function resilienciaMax(){
+  let m = Math.ceil(state.atributos.von/2);
+  if(state.meta.origem === "militar") m += 1;
+  return m;
+}
+function sanidadeSugestao(){ return 100 - state.chagas.length*10; }
+function strikesInfo(){
+  const total = (Number(state.strikes.cabeca)||0) + (Number(state.strikes.tronco)||0) + (Number(state.strikes.membros)||0);
+  return { total, penalty: Math.floor(total/4), unconscious: total >= 9 };
+}
+function invMax(){ return 8 + Math.floor(state.atributos.agi/5); }
+function invUsed(){
+  const itens = state.inventario.reduce((s,i)=> s + (Number(i.espacos)||0), 0);
+  const armas = (state.armas||[]).reduce((s,a)=> s + (Number(a.espaco)||0), 0);
+  return itens + armas;
+}
+function attrPointsSpent(){
+  const a = state.atributos;
+  return (a.for-1)+(a.agi-1)+(a.int-1)+(a.car-1)+(a.von-1) + a.vit*2;
+}
+
+/* ---------- BUFFS (Origem/Caminho -> Perícias/Atributos) ---------- */
+function ensureBuffChoices(){
+  if(!state.buffChoices) state.buffChoices = { origem:"", caminho:"" };
+}
+function activeBuffs(){
+  ensureBuffChoices();
+  const out = [];
+  const rules = BUFF_RULES[state.meta.origem];
+  if(!rules) return out.concat(entryBasedBuffs());
+
+  if(rules.origem){
+    const r = rules.origem;
+    const key = r.options.length > 1 ? state.buffChoices.origem : r.options[0];
+    if(key) out.push({ type:r.type, key, amount:r.amount, source:"Origem" });
+  }
+  if(rules.origemAttr){
+    const r = rules.origemAttr;
+    const key = r.options.length > 1 ? state.buffChoices.origemAttr : r.options[0];
+    if(key) out.push({ type:r.type, key, amount:r.amount, source:"Origem" });
+  }
+  if(state.caminho.n1 && state.caminho.pathIndex !== null && rules.caminhos && rules.caminhos[state.caminho.pathIndex]){
+    const r = rules.caminhos[state.caminho.pathIndex];
+    const key = r.options.length > 1 ? state.buffChoices.caminho : r.options[0];
+    if(key) out.push({ type:r.type, key, amount:r.amount, source:"Caminho" });
+  }
+  return out.concat(entryBasedBuffs());
+}
+function entryBasedBuffs(){
+  return [
+    // Chagas, Rituais e Maldições só concedem o buff enquanto estiverem ATIVAS (turnos > 0).
+    ...entryBuffs(state.chagas, "Chaga", true),
+    ...entryBuffs(state.maldicoes, "Maldição", true),
+    ...entryBuffs(state.rituais, "Ritual", true),
+    // Marcas são permanentes — o buff está sempre ligado enquanto a Marca existir.
+    ...entryBuffs(state.marcas, "Marca", false),
+  ];
+}
+function entryBuffs(list, sourceLabel, gateByActive){
+  const out = [];
+  (list||[]).forEach(entry => {
+    if(gateByActive && !isEntryEffectActive(entry)) return;
+    if(entry.buffTipo && entry.buffAlvo && Number(entry.buffValor)){
+      out.push({
+        type: entry.buffTipo === "atributo" ? "attr" : "skill",
+        key: entry.buffAlvo,
+        amount: Number(entry.buffValor) || 0,
+        source: sourceLabel + (entry.nome ? ": " + entry.nome : "")
+      });
+    }
+  });
+  return out;
+}
+
+/* ---------- ATIVAÇÃO POR TURNOS (Chagas / Rituais / Maldições) ---------- */
+function isEntryEffectActive(entry){
+  return !!entry.ativa && (Number(entry.turnosRestantes) || 0) > 0;
+}
+function turnControlHTML(entry, kind, idx){
+  const ativa = isEntryEffectActive(entry);
+  const turnos = Number(entry.turnos) || 0;
+  const restantes = Number(entry.turnosRestantes) || 0;
+  return `
+    <div class="duration-box">
+      <div class="field">
+        <label>Duração (turnos)</label>
+        <input type="number" min="0" max="99" data-field="turnos" value="${esc(turnos)}">
+      </div>
+      <div class="duration-status">
+        ${ativa
+          ? `<span class="st-on">🟢 Ativa — ${restantes} turno${restantes===1?"":"s"} restante${restantes===1?"":"s"}</span>`
+          : `<span class="st-off">⚪ Inativa — sem efeito no momento</span>`}
+      </div>
+      <div class="duration-actions">
+        ${ativa
+          ? `<button type="button" class="btn-turn btn-secondary" data-turn-minus="${kind}:${idx}">-1 Turno</button>
+             <button type="button" class="btn-turn btn-turn-off" data-turn-off="${kind}:${idx}">Desligar agora</button>`
+          : `<button type="button" class="btn-turn btn-secondary" data-turn-on="${kind}:${idx}">Ativar (${turnos || 1} turno${(turnos||1)===1?"":"s"})</button>`}
+      </div>
+    </div>`;
+}
+function getEntryList(kind){
+  if(kind === "chaga") return state.chagas;
+  if(kind === "ritual") return state.rituais;
+  if(kind === "maldicao") return state.maldicoes;
+  return null;
+}
+function activateEntryEffect(kind, idx, costFn){
+  const list = getEntryList(kind); if(!list) return;
+  const entry = list[idx]; if(!entry) return;
+  const turnos = Math.max(1, Number(entry.turnos) || 1);
+  if(costFn && !costFn(entry)) return; // custo (ex: Resiliência) não foi pago — não ativa
+  entry.ativa = true;
+  entry.turnos = turnos;
+  entry.turnosRestantes = turnos;
+  renderEntryKind(kind); onChange();
+}
+function decrementEntryTurn(kind, idx){
+  const list = getEntryList(kind); if(!list) return;
+  const entry = list[idx]; if(!entry) return;
+  const restantes = Math.max(0, (Number(entry.turnosRestantes) || 0) - 1);
+  entry.turnosRestantes = restantes;
+  if(restantes <= 0){ entry.ativa = false; entry.turnosRestantes = 0; }
+  renderEntryKind(kind); onChange();
+}
+function deactivateEntryEffect(kind, idx){
+  const list = getEntryList(kind); if(!list) return;
+  const entry = list[idx]; if(!entry) return;
+  entry.ativa = false;
+  entry.turnosRestantes = 0;
+  renderEntryKind(kind); onChange();
+}
+function renderEntryKind(kind){
+  if(kind === "chaga") renderChagas();
+  else if(kind === "ritual") renderRituais();
+  else if(kind === "maldicao") renderMaldicoes();
+}
+function flashAdded(btn){
+  const original = btn.textContent;
+  btn.textContent = "✓ Adicionado";
+  btn.classList.add("added");
+  btn.disabled = true;
+  setTimeout(() => { btn.textContent = original; btn.classList.remove("added"); btn.disabled = false; }, 900);
+}
+
+function wireTurnControls(containerId, kind, labelFn){
+  const el = document.getElementById(containerId);
+  el.addEventListener("click", e => {
+    const onBtn = e.target.closest("[data-turn-on]");
+    const minusBtn = e.target.closest("[data-turn-minus]");
+    const offBtn = e.target.closest("[data-turn-off]");
+    const btn = onBtn || minusBtn || offBtn;
+    if(!btn) return;
+    const raw = (onBtn ? onBtn.dataset.turnOn : minusBtn ? minusBtn.dataset.turnMinus : offBtn.dataset.turnOff);
+    const [, idxStr] = raw.split(":");
+    const idx = +idxStr;
+    const list = getEntryList(kind);
+    const entry = list && list[idx];
+    if(!entry) return;
+    if(onBtn){
+      const cost = parseResilienciaCost(entry.custo);
+      activateEntryEffect(kind, idx, () => cost > 0 ? spendResiliencia(cost, labelFn(entry)) : true);
+    } else if(minusBtn){
+      decrementEntryTurn(kind, idx);
+    } else if(offBtn){
+      deactivateEntryEffect(kind, idx);
+    }
+  });
+}
+function buffOptionsHTML(tipo, selected){
+  if(tipo === "atributo"){
+    return `<option value="">— Selecione —</option>` + ATTRS.map(a => `<option value="${a.key}" ${selected===a.key?"selected":""}>${esc(a.nome)}</option>`).join("");
+  }
+  if(tipo === "pericia"){
+    return `<option value="">— Selecione —</option>` + SKILLS.map(s => `<option value="${s.key}" ${selected===s.key?"selected":""}>${esc(s.nome)}</option>`).join("");
+  }
+  return "";
+}
+function buffFieldsHTML(entry){
+  const tipo = entry.buffTipo || "";
+  return `
+    <div class="buff-choice">
+      <label>Buff concedido</label>
+      <select data-field="buffTipo">
+        <option value="" ${tipo===""?"selected":""}>Nenhum</option>
+        <option value="atributo" ${tipo==="atributo"?"selected":""}>Atributo</option>
+        <option value="pericia" ${tipo==="pericia"?"selected":""}>Perícia</option>
+      </select>
+      ${tipo ? `<select data-field="buffAlvo">${buffOptionsHTML(tipo, entry.buffAlvo)}</select>
+      <input type="number" data-field="buffValor" value="${esc(entry.buffValor ?? 0)}" style="width:80px;" placeholder="±valor">` : ``}
+    </div>`;
+}
+function skillBonus(key){ return activeBuffs().filter(b=>b.type==="skill" && b.key===key).reduce((s,b)=>s+b.amount,0); }
+function skillTotal(key){ return clampInt((Number(state.pericias[key])||0) + skillBonus(key), 0, 200); }
+function attrBonus(key){ return activeBuffs().filter(b=>b.type==="attr" && b.key===key).reduce((s,b)=>s+b.amount,0); }
+function attrTotal(key){ return (Number(state.atributos[key])||0) + attrBonus(key); }
+function needsOrigemChoice(){
+  const rules = BUFF_RULES[state.meta.origem];
+  return !!(rules && rules.origem && rules.origem.options.length > 1);
+}
+function needsCaminhoChoice(){
+  const rules = BUFF_RULES[state.meta.origem];
+  if(!rules || !rules.caminhos || state.caminho.pathIndex === null) return false;
+  const r = rules.caminhos[state.caminho.pathIndex];
+  return !!(r && r.options.length > 1);
+}
+
+function maybeTopUp(){
+  if(!state.pv.atual){ state.pv.atual = pvMax(); const el=$("#f-pvAtual"); if(el) el.value = state.pv.atual; }
+  if(!state.resiliencia.atual){ state.resiliencia.atual = resilienciaMax(); const el=$("#f-resAtual"); if(el) el.value = state.resiliencia.atual; }
+}
+
+/* =====================================================================
+   MOTOR DE ROLAGEM DE DADOS
+   ===================================================================== */
+function d(sides){ return 1 + Math.floor(Math.random()*sides); }
+
+function pushRoll(entry){
+  if(!state.rollLog) state.rollLog = [];
+  entry.time = new Date().toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+  state.rollLog.unshift(entry);
+  state.rollLog = state.rollLog.slice(0, 40);
+  renderRollLog();
+  scheduleSave();
+}
+
+function renderRollLog(){
+  const cur = $("#rollCurrent");
+  if(!cur) return;
+  const list = state.rollLog || [];
+  if(!list.length){ cur.textContent = "Nenhuma rolagem ainda."; }
+  else {
+    const r = list[0];
+    const cls = r.crit ? "rc-crit" : (r.fail ? "rc-fail" : "");
+    cur.innerHTML = `<span class="${cls}">${esc(r.text)}</span>`;
+  }
+  const hist = $("#rollHistory");
+  if(hist){
+    if(!list.length){ hist.innerHTML = `<p class="roll-history-empty">Sem rolagens registradas.</p>`; }
+    else{
+      hist.innerHTML = list.map(r => `<div class="roll-history-item">[${r.time}] ${esc(r.text)}</div>`).join("");
+    }
+  }
+}
+
+/* ---------- GASTO DE RESILIÊNCIA ---------- */
+function parseResilienciaCost(text){
+  if(!text) return 0;
+  const m = String(text).match(/(\d+)\s*(?:de\s*)?resili[eê]ncia/i);
+  return m ? parseInt(m[1],10) : 0;
+}
+function spendResiliencia(cost, label){
+  if(cost > 0 && state.resiliencia.atual < cost){
+    pushRoll({ text: `${label}: Resiliência insuficiente (precisa de ${cost}, tem ${state.resiliencia.atual}).`, fail:true });
+    return false;
+  }
+  if(cost > 0){
+    state.resiliencia.atual -= cost;
+    const el = $("#f-resAtual"); if(el) el.value = state.resiliencia.atual;
+  }
+  pushRoll({ text: cost > 0 ? `${label}: usado (-${cost} Resiliência, restam ${state.resiliencia.atual}).` : `${label}: usado (sem custo de Resiliência).` });
+  onChange();
+  return true;
+}
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function renderAll(){
+  $("#ptsUsed").textContent = attrPointsSpent();
+  const rem = 30 - attrPointsSpent();
+  const remEl = $("#ptsRemaining");
+  remEl.textContent = rem + " restantes";
+  remEl.classList.toggle("over-budget", rem < 0);
+
+  $("#f-pvMax").value = pvMax();
+  $("#f-resMax").value = resilienciaMax();
+  $("#sanHint").textContent = "Sugestão com base nas Chagas atuais: " + sanidadeSugestao() + " (cada nova Chaga reduz a Sanidade máxima em 10).";
+
+  const si = strikesInfo();
+  const strikesEl = $("#strikesSummary");
+  strikesEl.textContent = "Total: " + si.total + " · Penalidade atual: -" + si.penalty + " em todos os testes" + (si.unconscious ? " · PERSONAGEM EM COLAPSO / INCONSCIENTE (9+ strikes)" : "");
+  strikesEl.classList.toggle("warn", si.unconscious || si.penalty>0);
+
+  $("#invUsed").textContent = invUsed();
+  $("#invMax").textContent = invMax();
+
+  $("#vitalPV").textContent = state.pv.atual + " / " + pvMax();
+  $("#vitalSAN").textContent = state.sanidade.atual + " / " + state.sanidade.max;
+  $("#vitalRES").textContent = state.resiliencia.atual + " / " + resilienciaMax();
+  $("#vitalNA").textContent = state.meta.na;
+  $("#vitalStrikes").textContent = si.total + (si.penalty ? " (-" + si.penalty + ")" : "");
+
+  renderMarcasStatus();
+  renderBuffBadges();
+  renderRollLog();
+}
+
+function renderBuffBadges(){
+  SKILLS.forEach(s => {
+    const el = document.getElementById("skillTotal-" + s.key);
+    if(!el) return;
+    const bonus = skillBonus(s.key);
+    if(bonus){
+      el.textContent = "Total: " + skillTotal(s.key) + "% (base " + (Number(state.pericias[s.key])||0) + "% +" + bonus + "%)";
+      el.classList.add("has-bonus");
+    } else {
+      el.textContent = "";
+      el.classList.remove("has-bonus");
+    }
+  });
+  ATTRS.filter(a=>a.rollable).forEach(a => {
+    const el = document.getElementById("attrTotal-" + a.key);
+    if(!el) return;
+    const bonus = attrBonus(a.key);
+    if(bonus){
+      el.textContent = "Total: " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + " +" + bonus + ")";
+      el.classList.add("has-bonus");
+    } else {
+      el.textContent = "";
+      el.classList.remove("has-bonus");
+    }
+  });
+}
+
+function renderMarcasStatus(){
+  const count = state.marcas.length;
+  $("#marcasCount").textContent = count;
+  const statusEl = $("#marcasStatus");
+  let text, cls;
+  if(count <= 2){ text = "Sem efeitos negativos (1–2 marcas)"; cls = "ok-text"; }
+  else if(count <= 4){ text = "Debuff narrativo em testes e interações sociais (3–4 marcas)"; cls = "warn-text"; }
+  else { text = "Chama atenção de Ecos e sensíveis ao sobrenatural (5+ marcas)"; cls = "warn-text"; }
+  statusEl.textContent = text;
+  statusEl.className = cls;
+}
+
+function renderOriginCard(){
+  const key = state.meta.origem;
+  const card = $("#originCard");
+  if(!key || !ORIGENS[key]){ card.hidden = true; return; }
+  const o = ORIGENS[key];
+  card.hidden = false;
+  $("#originName").textContent = o.nome;
+  $("#originVida").textContent = o.vidaBase;
+  $("#originFlavor").textContent = o.descricao;
+  $("#originBonus").textContent = o.bonus;
+
+  ensureBuffChoices();
+  const box = $("#originBuffBox");
+  const rules = BUFF_RULES[key];
+  if(!rules || !rules.origem){ box.innerHTML = ""; return; }
+  const r = rules.origem;
+  if(r.options.length > 1){
+    box.innerHTML = `
+      <div class="buff-choice">
+        <label for="f-buffOrigem">Aplicar bônus de Origem (+${r.amount}${r.type==="skill"?"%":""}) em</label>
+        <select id="f-buffOrigem">
+          <option value="">— escolha —</option>
+          ${r.options.map(k => {
+            const nome = r.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
+            return `<option value="${k}" ${state.buffChoices.origem===k?"selected":""}>${esc(nome||k)}</option>`;
+          }).join("")}
+        </select>
+      </div>`;
+  } else {
+    const k = r.options[0];
+    const nome = r.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
+    box.innerHTML = `<p class="buff-fixed-note">Bônus automático aplicado: +${r.amount}${r.type==="skill"?"%":""} em ${esc(nome||k)}.</p>`;
+  }
+  const sel = $("#f-buffOrigem");
+  if(sel) sel.addEventListener("change", e=>{ state.buffChoices.origem = e.target.value; onChange(); });
+
+  if(rules.origemAttr){
+    const ra = rules.origemAttr;
+    const rk = ra.options[0];
+    const rn = (ATTRS.find(a=>a.key===rk)||{}).nome;
+    box.innerHTML += `<p class="buff-fixed-note">Bônus automático aplicado: +${ra.amount} em ${esc(rn||rk)}.</p>`;
+  }
+}
+
+function renderCaminhoArea(){
+  const key = state.meta.origem;
+  const area = $("#caminhoArea");
+  const hint = $("#origemHint");
+  if(!key || !ORIGENS[key]){ area.hidden = true; hint.hidden = false; return; }
+  hint.hidden = true; area.hidden = false;
+  const o = ORIGENS[key];
+  $("#pathSelect").innerHTML = o.caminhos.map((p,i) => `
+    <label class="path-radio">
+      <input type="radio" name="pathRadio" value="${i}" ${state.caminho.pathIndex===i ? "checked" : ""}>
+      <span>${esc(p.nome)}</span>
+    </label>`).join("");
+  renderPathLevels();
+}
+function renderPathLevels(){
+  const wrap = $("#pathLevels");
+  const key = state.meta.origem;
+  const idx = state.caminho.pathIndex;
+  if(idx===null || idx===undefined || !ORIGENS[key]){ wrap.innerHTML = ""; $("#peOrigemSpent").textContent = "0"; return; }
+  const p = ORIGENS[key].caminhos[idx];
+  ensureBuffChoices();
+  const rules = BUFF_RULES[key];
+  const cr = rules && rules.caminhos ? rules.caminhos[idx] : null;
+  let n1BuffHtml = "";
+  if(cr && state.caminho.n1){
+    if(cr.options.length > 1){
+      n1BuffHtml = `
+        <div class="buff-choice">
+          <label for="f-buffCaminho">Aplicar bônus (+${cr.amount}${cr.type==="skill"?"%":""}) em</label>
+          <select id="f-buffCaminho">
+            <option value="">— escolha —</option>
+            ${cr.options.map(k => {
+              const nome = cr.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
+              return `<option value="${k}" ${state.buffChoices.caminho===k?"selected":""}>${esc(nome||k)}</option>`;
+            }).join("")}
+          </select>
+        </div>`;
+    } else {
+      const k = cr.options[0];
+      const nome = cr.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
+      n1BuffHtml = `<p class="buff-fixed-note">Bônus automático aplicado: +${cr.amount}${cr.type==="skill"?"%":""} em ${esc(nome||k)}.</p>`;
+    }
+  }
+
+  wrap.innerHTML = `
+    <div class="level-card">
+      <label class="level-check"><input type="checkbox" id="chk-n1" ${state.caminho.n1?"checked":""}> <strong>Caminho</strong> — 15 PE</label>
+      <p>${esc(p.n1)}</p>
+      ${n1BuffHtml}
+    </div>
+    <div class="level-card">
+      <label class="level-check"><input type="checkbox" id="chk-n2" ${state.caminho.n2?"checked":""}> <strong>Proficiência</strong> — 25 PE</label>
+      <p>${esc(p.n2)}</p>
+    </div>
+    <div class="level-card">
+      <label class="level-check"><input type="checkbox" id="chk-n3" ${state.caminho.n3?"checked":""}> <strong>Mestre da Origem</strong> — 35 PE</label>
+      <p>${esc(p.n3)}</p>
+    </div>`;
+  $("#chk-n1").addEventListener("change", e=>{ state.caminho.n1 = e.target.checked; if(!e.target.checked) state.buffChoices.caminho=""; renderPathLevels(); updatePeOrigem(); onChange(); });
+  $("#chk-n2").addEventListener("change", e=>{ state.caminho.n2 = e.target.checked; updatePeOrigem(); onChange(); });
+  $("#chk-n3").addEventListener("change", e=>{ state.caminho.n3 = e.target.checked; updatePeOrigem(); onChange(); });
+  const buffSel = $("#f-buffCaminho");
+  if(buffSel) buffSel.addEventListener("change", e=>{ state.buffChoices.caminho = e.target.value; onChange(); });
+  updatePeOrigem();
+}
+function updatePeOrigem(){
+  let spent = 0;
+  if(state.caminho.n1) spent += 15;
+  if(state.caminho.n2) spent += 25;
+  if(state.caminho.n3) spent += 35;
+  $("#peOrigemSpent").textContent = spent;
+}
+
+/* ---------- AUTO-INVENTÁRIO ---------- */
+const NON_ITEM_COMPONENT_PATTERNS = /nenhum|sangue do usu[aá]rio|\d+\s*pv|ambiente/i;
+function autoAddComponentsToInventory(componentesStr){
+  if(!componentesStr) return;
+  const parts = componentesStr.split(",").map(p=>p.trim()).filter(Boolean);
+  let added = [];
+  parts.forEach(part => {
+    if(NON_ITEM_COMPONENT_PATTERNS.test(part)) return;
+    const already = state.inventario.some(it => (it.nome||"").trim().toLowerCase() === part.toLowerCase());
+    if(!already){
+      state.inventario.push({ nome: part, espacos: 1 });
+      added.push(part);
+    }
+  });
+  if(added.length){
+    renderInventario();
+    pushRoll({ text: "Inventário: item(ns) adicionado(s) automaticamente — " + added.join(", ") + "." });
+  }
+}
+
+function chagaOptionsHTML(selectedKey){
+  let html = "";
+  for(const cat of Object.keys(CHAGA_CATS)){
+    html += `<optgroup label="${esc(CHAGA_CATS[cat])}">`;
+    CHAGAS[cat].forEach((item,i) => {
+      const val = cat + "|" + i;
+      html += `<option value="${val}" ${selectedKey===val?"selected":""}>${esc(item.nome)}</option>`;
+    });
+    html += `</optgroup>`;
+  }
+  return html;
+}
+function ritualOptionsHTML(selectedKey){
+  let html = "";
+  for(const cat of Object.keys(RITUAL_CATS)){
+    html += `<optgroup label="${esc(RITUAL_CATS[cat])}">`;
+    RITUAIS[cat].forEach((item,i) => {
+      const val = cat + "|" + i;
+      html += `<option value="${val}" ${selectedKey===val?"selected":""}>${esc(item.nome)}</option>`;
+    });
+    html += `</optgroup>`;
+  }
+  return html;
+}
+
+function renderChagas(){
+  const list = state.chagas;
+  const el = $("#chagasList");
+  if(!list.length){ el.innerHTML = `<p class="empty-note">Nenhuma Chaga adquirida ainda.</p>`; return; }
+  el.innerHTML = list.map((c,i) => `
+    <div class="entry-card ${isEntryEffectActive(c)?"is-active-effect":"is-inactive-effect"}" data-idx="${i}">
+      <div class="entry-card-head">
+        <select class="entry-select" data-field="preset">
+          <option value="">— Personalizada —</option>
+          ${chagaOptionsHTML(c.presetKey)}
+        </select>
+        <button type="button" class="btn-remove" title="Remover">✕</button>
+      </div>
+      <div class="field"><label>Nome</label><input type="text" data-field="nome" value="${esc(c.nome)}"></div>
+      <div class="field"><label>Efeito</label><textarea data-field="efeito" rows="2">${esc(c.efeito)}</textarea></div>
+      <div class="field"><label>Custo</label><input type="text" data-field="custo" value="${esc(c.custo)}"></div>
+      <div class="field"><label>Colateral</label><textarea data-field="colateral" rows="2">${esc(c.colateral)}</textarea></div>
+      ${buffFieldsHTML(c)}
+      ${turnControlHTML(c, "chaga", i)}
+    </div>`).join("");
+}
+
+function renderRituais(){
+  const list = state.rituais;
+  const el = $("#rituaisList");
+  if(!list.length){ el.innerHTML = `<p class="empty-note">Nenhum ritual conhecido ainda.</p>`; return; }
+  el.innerHTML = list.map((r,i) => `
+    <div class="entry-card ${isEntryEffectActive(r)?"is-active-effect":"is-inactive-effect"}" data-idx="${i}">
+      <div class="entry-card-head">
+        <select class="entry-select" data-field="preset">
+          <option value="">— Personalizado —</option>
+          ${ritualOptionsHTML(r.presetKey)}
+        </select>
+        <button type="button" class="btn-remove" title="Remover">✕</button>
+      </div>
+      <div class="field"><label>Nome</label><input type="text" data-field="nome" value="${esc(r.nome)}"></div>
+      <div class="field"><label>Descrição</label><textarea data-field="descricao" rows="2">${esc(r.descricao)}</textarea></div>
+      <div class="field-grid-2">
+        <div class="field"><label>Componentes</label><input type="text" data-field="componentes" value="${esc(r.componentes)}"></div>
+        <div class="field"><label>Tempo de Execução</label><input type="text" data-field="tempo" value="${esc(r.tempo)}"></div>
+      </div>
+      <div class="field"><label>Efeito</label><textarea data-field="efeito" rows="2">${esc(r.efeito)}</textarea></div>
+      <div class="field"><label>Falha</label><textarea data-field="falha" rows="2">${esc(r.falha)}</textarea></div>
+      ${buffFieldsHTML(r)}
+      ${turnControlHTML(r, "ritual", i)}
+    </div>`).join("");
+}
+
+function renderArmas(){
+  const list = state.armas;
+  const el = $("#armasList");
+  if(!list.length){ el.innerHTML = `<p class="empty-note">Nenhuma arma ou proteção equipada.</p>`; return; }
+  el.innerHTML = list.map((a,i) => `
+    <div class="entry-card entry-card-compact" data-idx="${i}">
+      <div class="field-grid-4">
+        <div class="field"><label>Nome</label><input type="text" data-field="nome" value="${esc(a.nome)}"></div>
+        <div class="field"><label>Dano</label><input type="text" data-field="dano" value="${esc(a.dano)}"></div>
+        <div class="field"><label>Espaço</label><input type="number" min="0" data-field="espaco" value="${esc(a.espaco)}"></div>
+        <div class="field"><label>Notas</label><input type="text" data-field="notas" value="${esc(a.notas)}"></div>
+      </div>
+      <button type="button" class="btn-remove" title="Remover">✕</button>
+    </div>`).join("");
+}
+
+function renderInventario(){
+  const list = state.inventario;
+  const el = $("#invList");
+  if(!list.length){ el.innerHTML = `<p class="empty-note">Inventário vazio.</p>`; return; }
+  el.innerHTML = list.map((it,i) => `
+    <div class="entry-card entry-card-compact" data-idx="${i}">
+      <div class="field-grid-2">
+        <div class="field"><label>Item</label><input type="text" data-field="nome" value="${esc(it.nome)}"></div>
+        <div class="field"><label>Espaços</label><input type="number" min="0" max="3" data-field="espacos" value="${esc(it.espacos)}"></div>
+      </div>
+      <button type="button" class="btn-remove" title="Remover">✕</button>
+    </div>`).join("");
+}
+
+/* --- Marcas --- */
+function renderMarcas(){
+  const list = state.marcas;
+  const el = $("#marcasList");
+  if(!list.length){ el.innerHTML = `<p class="empty-note">Nenhuma Marca aplicada ainda.</p>`; }
+  else{
+    el.innerHTML = list.map((m,i) => `
+      <div class="entry-card marca-card" data-idx="${i}">
+        <div class="entry-card-head">
+          <div class="entry-select" style="font-family:var(--font-display); color:var(--arcane-bright); letter-spacing:.04em; font-size:14px;">Marca #${i+1}</div>
+          <button type="button" class="btn-remove" title="Remover">✕</button>
+        </div>
+        <div class="target-toggle">
+          <label><input type="radio" name="marcaTarget${i}" value="corpo" data-field="alvoTipo" ${m.alvoTipo!=="item"?"checked":""}> No Corpo</label>
+          <label><input type="radio" name="marcaTarget${i}" value="item" data-field="alvoTipo" ${m.alvoTipo==="item"?"checked":""}> Em Item/Arma</label>
+        </div>
+        <div class="field-grid-2">
+          <div class="field"><label>Nome da Marca</label><input type="text" data-field="nome" value="${esc(m.nome)}" placeholder="Ex: Runa de Ferro"></div>
+          <div class="field"><label>${m.alvoTipo==="item" ? "Item/Arma Marcada" : "Local no Corpo"}</label><input type="text" data-field="alvoNome" value="${esc(m.alvoNome)}" placeholder="${m.alvoTipo==="item" ? "Ex: Espada Tática" : "Ex: Antebraço direito"}"></div>
+        </div>
+        <div class="field"><label>Efeito Permanente</label><textarea data-field="efeito" rows="2" placeholder="Ex: +5% em Armas Brancas contra criaturas físicas">${esc(m.efeito)}</textarea></div>
+        <div class="field-grid-2">
+          <div class="field"><label>Ritual Usado</label><input type="text" data-field="ritual" value="${esc(m.ritual)}" placeholder="Ex: Marca da Carne"></div>
+          <div class="field"><label>Teste (mín. 50% recomendado)</label><input type="text" data-field="teste" value="${esc(m.teste)}" placeholder="Ex: Ocultismo 55%"></div>
+        </div>
+        <div class="field"><label>Custo de Ativação (se houver)</label><input type="text" data-field="custo" value="${esc(m.custo||"")}" placeholder="Ex: 2 de Resiliência (deixe em branco se não houver custo)"></div>
+        ${buffFieldsHTML(m)}
+        <div class="entry-card-foot">
+          <button type="button" class="btn-use" data-use-marca="${i}">🔥 Gravar/Ativar Marca${parseResilienciaCost(m.custo) ? " (-"+parseResilienciaCost(m.custo)+" Resiliência)" : ""}</button>
+        </div>
+      </div>`).join("");
+  }
+  renderMarcasStatus();
+}
+
+/* --- Maldições --- */
+function renderMaldicoes(){
+  const list = state.maldicoes;
+  const el = $("#maldicoesList");
+  if(!list.length){ el.innerHTML = `<p class="empty-note">Nenhuma Maldição ativa.</p>`; return; }
+  el.innerHTML = list.map((m,i) => `
+    <div class="entry-card maldicao-card ${isEntryEffectActive(m)?"is-active-effect":"is-inactive-effect"}" data-idx="${i}">
+      <div class="entry-card-head">
+        <div class="entry-select" style="font-family:var(--font-display); color:var(--blood-bright); letter-spacing:.04em; font-size:14px;">Maldição #${i+1}</div>
+        <button type="button" class="btn-remove" title="Remover">✕</button>
+      </div>
+      <div class="target-toggle">
+        <label><input type="radio" name="maldicaoTarget${i}" value="corpo" data-field="alvoTipo" ${m.alvoTipo!=="item"?"checked":""}> No Corpo</label>
+        <label><input type="radio" name="maldicaoTarget${i}" value="item" data-field="alvoTipo" ${m.alvoTipo==="item"?"checked":""}> Em Item/Arma</label>
+      </div>
+      <div class="field-grid-2">
+        <div class="field"><label>Nome da Maldição</label><input type="text" data-field="nome" value="${esc(m.nome)}" placeholder="Ex: Sussurro do Abismo"></div>
+        <div class="field"><label>${m.alvoTipo==="item" ? "Item/Arma Amaldiçoada" : "Manifestação no Corpo"}</label><input type="text" data-field="alvoNome" value="${esc(m.alvoNome)}" placeholder="${m.alvoTipo==="item" ? "Ex: Revólver do avô" : "Ex: Olhos, mãos, voz..."}"></div>
+      </div>
+      <div class="field"><label>Origem da Maldição</label><input type="text" data-field="origem" value="${esc(m.origem)}" placeholder="Ex: Falha crítica no ritual X / Pacto com NPC Y / Voluntária"></div>
+      <div class="field-grid-2">
+        <div class="field"><label>Efeito Positivo (se houver)</label><textarea data-field="efeitoPositivo" rows="2" placeholder="Ex: +15% em Intimidação">${esc(m.efeitoPositivo)}</textarea></div>
+        <div class="field"><label>Efeito Negativo</label><textarea data-field="efeitoNegativo" rows="2" placeholder="Ex: -10% em testes sociais permanente">${esc(m.efeitoNegativo)}</textarea></div>
+      </div>
+      <div class="field"><label>Condição de Remoção</label><input type="text" data-field="remocao" value="${esc(m.remocao)}" placeholder="Ritual de purificação necessário (remove também os buffs)"></div>
+      <div class="field"><label>Custo de Ativação (se houver)</label><input type="text" data-field="custo" value="${esc(m.custo||"")}" placeholder="Ex: 1 de Resiliência (deixe em branco se não houver custo)"></div>
+      ${buffFieldsHTML(m)}
+      ${turnControlHTML(m, "maldicao", i)}
+    </div>`).join("");
+}
+
+function wireEntryList(containerId, arrGetter, renderFn, onPreset){
+  const el = document.getElementById(containerId);
+  el.addEventListener("click", e=>{
+    if(e.target.classList.contains("btn-remove")){
+      const idx = +e.target.closest(".entry-card").dataset.idx;
+      arrGetter().splice(idx,1);
+      renderFn(); onChange();
+    }
+  });
+  el.addEventListener("input", e=>{
+    const card = e.target.closest(".entry-card"); if(!card) return;
+    const field = e.target.dataset.field; if(!field || field==="preset") return;
+    const idx = +card.dataset.idx;
+    arrGetter()[idx][field] = e.target.value;
+    onChange();
+  });
+  el.addEventListener("change", e=>{
+    const field = e.target.dataset.field;
+    if(field === "preset" && onPreset){
+      const card = e.target.closest(".entry-card");
+      const idx = +card.dataset.idx;
+      onPreset(idx, e.target.value);
+      renderFn(); onChange();
+      return;
+    }
+    if(field === "alvoTipo"){
+      const card = e.target.closest(".entry-card");
+      const idx = +card.dataset.idx;
+      arrGetter()[idx][field] = e.target.value;
+      renderFn(); onChange();
+    }
+    if(field === "buffTipo"){
+      const card = e.target.closest(".entry-card");
+      const idx = +card.dataset.idx;
+      arrGetter()[idx].buffTipo = e.target.value;
+      arrGetter()[idx].buffAlvo = "";
+      if(!arrGetter()[idx].buffValor) arrGetter()[idx].buffValor = 0;
+      renderFn(); onChange();
+    }
+    if(field === "buffAlvo"){
+      const card = e.target.closest(".entry-card");
+      const idx = +card.dataset.idx;
+      arrGetter()[idx].buffAlvo = e.target.value;
+      onChange();
+    }
+  });
+}
+
+/* =====================================================================
+   HYDRATE (state -> form)
+   ===================================================================== */
+function hydrateFormFromState(){
+  $("#f-nome").value = state.meta.nome;
+  $("#f-origem").value = state.meta.origem;
+  $("#f-idade").value = state.meta.idade;
+  $("#f-sexo").value = state.meta.sexo;
+  $("#f-na").value = state.meta.na;
+  $("#f-pm").value = state.meta.pm;
+  $("#f-pe").value = state.meta.pe;
+  $("#f-descfisica").value = state.meta.descFisica;
+  $("#f-historia").value = state.meta.historia;
+
+  $("#a-for").value = state.atributos.for;
+  $("#a-agi").value = state.atributos.agi;
+  $("#a-int").value = state.atributos.int;
+  $("#a-car").value = state.atributos.car;
+  $("#a-von").value = state.atributos.von;
+  $("#a-vit").value = state.atributos.vit;
+
+  SKILLS.forEach(s => { const el = document.getElementById("f-per-" + s.key); if(el) el.value = state.pericias[s.key] ?? 0; });
+
+  $("#f-traumaTipo").value = state.trauma.tipo;
+  $("#f-traumaDesc").value = state.trauma.desc;
+
+  $("#f-sanAtual").value = state.sanidade.atual;
+  $("#f-sanMax").value = state.sanidade.max;
+  $("#f-resAtual").value = state.resiliencia.atual;
+
+  $("#f-pvAtual").value = state.pv.atual;
+
+  $("#s-cabeca").value = state.strikes.cabeca;
+  $("#s-tronco").value = state.strikes.tronco;
+  $("#s-membros").value = state.strikes.membros;
+
+  if(!state.marcas) state.marcas = [];
+  if(!state.maldicoes) state.maldicoes = [];
+
+  renderOriginCard();
+  renderCaminhoArea();
+  renderChagas();
+  renderRituais();
+  renderMarcas();
+  renderMaldicoes();
+  renderArmas();
+  renderInventario();
+  renderAll();
+}
+
+function onChange(){
+  state.updatedAt = Date.now();
+  renderAll();
+  scheduleSave();
+}
+
+/* =====================================================================
+   ARMAZENAMENTO (localStorage)
+   ===================================================================== */
+const LS_PREFIX = "";
+function lsSet(key, value){
+  localStorage.setItem(LS_PREFIX + key, value);
+  return { key, value, shared:false };
+}
+function lsGet(key){
+  const v = localStorage.getItem(LS_PREFIX + key);
+  if(v === null) return null;
+  return { key, value:v, shared:false };
+}
+function lsDelete(key){
+  localStorage.removeItem(LS_PREFIX + key);
+  return { key, deleted:true, shared:false };
+}
+function setStatus(text, isError){
+  const el = $("#saveStatus");
+  el.textContent = text;
+  el.classList.toggle("error", !!isError);
+}
+function scheduleSave(){
+  setStatus("Alterações não salvas…");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveCurrent, 1100);
+}
+async function saveCurrent(){
+  try{
+    state.updatedAt = Date.now();
+    const res = lsSet("veu-char:" + state.id, JSON.stringify(state));
+    if(!res) throw new Error("sem resposta do armazenamento");
+    await updateIndex();
+    setStatus("Salvo às " + new Date(state.updatedAt).toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"}));
+  }catch(err){
+    console.error(err);
+    setStatus("Erro ao salvar — tente novamente", true);
+  }
+}
+async function loadIndex(){
+  try{
+    const r = lsGet("veu-index");
+    if(r && r.value) return JSON.parse(r.value);
+  }catch(e){ /* chave ainda não existe */ }
+  return {};
+}
+async function updateIndex(){
+  const idx = await loadIndex();
+  idx[state.id] = { nome: state.meta.nome || "Agente sem nome", updatedAt: state.updatedAt };
+  try{ lsSet("veu-index", JSON.stringify(idx)); }catch(e){ console.error(e); }
+}
+async function loadChar(id){
+  try{
+    const r = lsGet("veu-char:" + id);
+    if(r && r.value) return JSON.parse(r.value);
+  }catch(e){ /* não encontrado */ }
+  return null;
+}
+async function deleteChar(id){
+  try{ lsDelete("veu-char:" + id); }catch(e){ /* já não existe */ }
+  const idx = await loadIndex();
+  delete idx[id];
+  try{ lsSet("veu-index", JSON.stringify(idx)); }catch(e){ console.error(e); }
+}
+async function populateCharSelect(selectedId){
+  const idx = await loadIndex();
+  const entries = Object.entries(idx).sort((a,b) => (b[1].updatedAt||0) - (a[1].updatedAt||0));
+  const sel = $("#charSelect");
+  if(!entries.length){ sel.innerHTML = `<option value="">Nenhum agente salvo</option>`; return; }
+  sel.innerHTML = entries.map(([id,info]) => `<option value="${id}" ${id===selectedId?"selected":""}>${esc(info.nome || "Sem nome")}</option>`).join("");
+}
+
+/* =====================================================================
+   UI ESTÁTICA
+   ===================================================================== */
+function buildStaticUI(){
+  $("#f-origem").innerHTML = `<option value="">— Selecione —</option>` + Object.entries(ORIGENS).map(([k,o]) => `<option value="${k}">${esc(o.nome)}</option>`).join("");
+  $("#f-traumaTipo").innerHTML = `<option value="">— Selecione ou role —</option>` + TRAUMAS.map(t => `<option value="${t.key}">${esc(t.nome)}</option>`).join("");
+  $("#attrGrid").innerHTML = ATTRS.map(a => `
+    <div class="attr-box" data-attr="${a.key}">
+      <label for="${a.id}">${esc(a.nome)}</label>
+      <input type="number" id="${a.id}" min="${a.min}" max="${a.max}">
+      ${a.rollable ? `<div class="attr-total" id="attrTotal-${a.key}"></div>` : ``}
+    </div>`).join("");
+
+  $("#skillsGrid").innerHTML = SKILLS.map(s => `
+    <div class="skill-box" data-skill="${s.key}">
+      <div class="skill-main">
+        <label for="f-per-${s.key}">${esc(s.nome)}</label>
+        <input type="number" min="0" max="100" id="f-per-${s.key}">
+      </div>
+      <div class="skill-total" id="skillTotal-${s.key}"></div>
+    </div>`).join("");
+
+  $("#refNA").innerHTML = `
+    <table class="ref-table">
+      <thead><tr><th class="num">N.A.</th><th class="num">PM p/ subir</th><th>Benefícios principais</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td class="num">—</td><td>Acesso básico a rituais simples e armas de Fogo Simples.</td></tr>
+        <tr><td class="num">2</td><td class="num">10</td><td>Acesso a armas táticas e rituais médios.</td></tr>
+        <tr><td class="num">3</td><td class="num">20</td><td>Armas de fogo táticas liberadas.</td></tr>
+        <tr><td class="num">4</td><td class="num">35</td><td>Equipamentos especiais liberados.</td></tr>
+        <tr><td class="num">5</td><td class="num">50</td><td>Rituais avançados (com estojo).</td></tr>
+        <tr><td class="num">6</td><td class="num">70</td><td>Pode criar 1 arma especial personalizada.</td></tr>
+        <tr><td class="num">7</td><td class="num">95</td><td>Pode adquirir uma Chaga sem penalidade.</td></tr>
+        <tr><td class="num">8</td><td class="num">125</td><td>Acesso à tecnologia experimental.</td></tr>
+        <tr><td class="num">9</td><td class="num">160</td><td>+5% em todas as Perícias, ultrapassando o limite máximo de 80% (máx. 85%).</td></tr>
+        <tr><td class="num">10</td><td class="num">200</td><td>Título de "Agente Sênior": item exclusivo, símbolo personalizado da V.E.U., pode treinar/liderar recrutas e tem prioridade no uso de relíquias e rituais proibidos.</td></tr>
+      </tbody>
+    </table>`;
+
+  $("#refPE").innerHTML = `
+    <table class="ref-table">
+      <thead><tr><th>Evolução</th><th class="num">Custo</th></tr></thead>
+      <tbody>
+        <tr><td>Aumentar Perícia (+1%)</td><td class="num">2 PE</td></tr>
+        <tr><td>Aumentar Atributo (+1)</td><td class="num">10 PE</td></tr>
+        <tr><td>Adquirir nova Chaga</td><td class="num">15 PE</td></tr>
+        <tr><td>Aprender novo Ritual</td><td class="num">15 PE</td></tr>
+        <tr><td>Caminho da Origem (Nível 1)</td><td class="num">15 PE</td></tr>
+        <tr><td>Proficiência da Origem (Nível 2)</td><td class="num">25 PE</td></tr>
+        <tr><td>Mestre da Origem (Nível 3)</td><td class="num">35 PE</td></tr>
+      </tbody>
+    </table>
+    <table class="ref-table">
+      <caption>Proficiência de Perícias</caption>
+      <thead><tr><th class="num">%</th><th>Nível</th></tr></thead>
+      <tbody>
+        <tr><td class="num">20</td><td>Iniciante — sucesso apenas em condições ideais.</td></tr>
+        <tr><td class="num">40</td><td>Aprendiz — pode falhar sob estresse ou pressão.</td></tr>
+        <tr><td class="num">50</td><td>Competente — eficaz, pode improvisar com risco moderado.</td></tr>
+        <tr><td class="num">60</td><td>Experiente — consistente em situações difíceis.</td></tr>
+        <tr><td class="num">65</td><td>Especialista — ações complexas com confiança.</td></tr>
+        <tr><td class="num">70</td><td>Mestre — sucesso quase certo, até em cenários extremos.</td></tr>
+      </tbody>
+    </table>`;
+
+  $("#refArmas").innerHTML = `<p class="hint" style="margin-top:0;">Clique em "+ Adicionar" para lançar o item direto na lista de Armas e Proteções Equipadas, sem digitar nada.</p>` +
+    WEAPON_TABLES.map(renderWeaponCatalogTable).join("");
+
+  $("#refEquip").innerHTML = `<p class="hint" style="margin-top:0;">Clique em "+ Adicionar" para lançar o item direto no Inventário, sem digitar nada.</p>` +
+    EQUIP_TABLES.map(renderEquipCatalogTable).join("");
+}
+
+function renderWeaponCatalogTable(t){
+  const rows = t.rows.map(r => `
+    <tr>
+      <td>${esc(r.nome)}</td>
+      <td class="num">${esc(r.dano)}</td>
+      <td class="num">${esc(r.espaco)}</td>
+      <td>${esc(r.extra)}</td>
+      <td class="add-col"><button type="button" class="btn-add-row" data-add-arma
+        data-nome="${esc(r.nome)}" data-dano="${esc(r.dano)}" data-espaco="${esc(r.espaco)}" data-notas="${esc(r.extra)}">+ Adicionar</button></td>
+    </tr>`).join("");
+  return `<table class="ref-table"><caption>${esc(t.caption)}</caption>
+    <thead><tr><th>Item</th><th class="num">Dano</th><th class="num">Espaço</th><th>Detalhes</th><th class="add-col">Ação</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+function renderEquipCatalogTable(t){
+  const rows = t.rows.map(r => `
+    <tr>
+      <td>${esc(r.nome)}</td>
+      <td class="num">${esc(r.espacos)}</td>
+      <td>${esc(r.extra)}</td>
+      <td class="add-col"><button type="button" class="btn-add-row" data-add-item
+        data-nome="${esc(r.nome)}" data-espacos="${esc(r.espacos)}">+ Adicionar</button></td>
+    </tr>`).join("");
+  return `<table class="ref-table"><caption>${esc(t.caption)}</caption>
+    <thead><tr><th>Item</th><th class="num">Espaço</th><th>Efeito</th><th class="add-col">Ação</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+/* =====================================================================
+   EVENTOS
+   ===================================================================== */
+function bindEvents(){
+  $("#f-nome").addEventListener("input", e => { state.meta.nome = e.target.value; onChange(); });
+  $("#f-origem").addEventListener("change", e => {
+    state.meta.origem = e.target.value;
+    state.caminho = { pathIndex:null, n1:false, n2:false, n3:false };
+    state.buffChoices = { origem:"", caminho:"" };
+    renderOriginCard(); renderCaminhoArea();
+    maybeTopUp();
+    onChange();
+  });
+  $("#f-idade").addEventListener("input", e => { state.meta.idade = e.target.value; onChange(); });
+  $("#f-sexo").addEventListener("input", e => { state.meta.sexo = e.target.value; onChange(); });
+  $("#f-na").addEventListener("input", e => { state.meta.na = clampInt(e.target.value,0,10); onChange(); });
+  $("#f-pm").addEventListener("input", e => { state.meta.pm = Math.max(0, Number(e.target.value)||0); onChange(); });
+  $("#f-pe").addEventListener("input", e => { state.meta.pe = Math.max(0, Number(e.target.value)||0); onChange(); });
+  $("#f-descfisica").addEventListener("input", e => { state.meta.descFisica = e.target.value; onChange(); });
+  $("#f-historia").addEventListener("input", e => { state.meta.historia = e.target.value; onChange(); });
+
+  $("#a-for").addEventListener("input", e => { state.atributos.for = clampInt(e.target.value,1,20); onChange(); });
+  $("#a-agi").addEventListener("input", e => { state.atributos.agi = clampInt(e.target.value,1,20); onChange(); });
+  $("#a-int").addEventListener("input", e => { state.atributos.int = clampInt(e.target.value,1,20); onChange(); });
+  $("#a-car").addEventListener("input", e => { state.atributos.car = clampInt(e.target.value,1,20); onChange(); });
+  $("#a-von").addEventListener("input", e => { state.atributos.von = clampInt(e.target.value,1,20); maybeTopUp(); onChange(); });
+  $("#a-vit").addEventListener("input", e => { state.atributos.vit = clampInt(e.target.value,0,5); maybeTopUp(); onChange(); });
+
+  SKILLS.forEach(s => {
+    document.getElementById("f-per-" + s.key).addEventListener("input", e => {
+      state.pericias[s.key] = clampInt(e.target.value,0,100); onChange();
+    });
+  });
+
+  $("#f-traumaTipo").addEventListener("change", e => {
+    state.trauma.tipo = e.target.value;
+    const t = TRAUMAS.find(t => t.key === e.target.value);
+    if(t){ state.trauma.desc = t.desc; $("#f-traumaDesc").value = t.desc; }
+    onChange();
+  });
+  $("#btnRollTrauma").addEventListener("click", () => {
+    const t = TRAUMAS[Math.floor(Math.random()*TRAUMAS.length)];
+    state.trauma.tipo = t.key; state.trauma.desc = t.desc;
+    $("#f-traumaTipo").value = t.key; $("#f-traumaDesc").value = t.desc;
+    onChange();
+  });
+  $("#f-traumaDesc").addEventListener("input", e => { state.trauma.desc = e.target.value; onChange(); });
+
+  $("#f-sanAtual").addEventListener("input", e => { state.sanidade.atual = Number(e.target.value)||0; onChange(); });
+  $("#f-sanMax").addEventListener("input", e => { state.sanidade.max = Number(e.target.value)||0; onChange(); });
+  $("#f-resAtual").addEventListener("input", e => { state.resiliencia.atual = Number(e.target.value)||0; onChange(); });
+
+  $("#f-pvAtual").addEventListener("input", e => { state.pv.atual = Number(e.target.value)||0; onChange(); });
+  $("#btnRestorePV").addEventListener("click", () => { state.pv.atual = pvMax(); $("#f-pvAtual").value = state.pv.atual; onChange(); });
+
+  $("#s-cabeca").addEventListener("input", e => { state.strikes.cabeca = Math.max(0, Number(e.target.value)||0); onChange(); });
+  $("#s-tronco").addEventListener("input", e => { state.strikes.tronco = Math.max(0, Number(e.target.value)||0); onChange(); });
+  $("#s-membros").addEventListener("input", e => { state.strikes.membros = Math.max(0, Number(e.target.value)||0); onChange(); });
+
+  $("#pathSelect").addEventListener("change", e => {
+    if(e.target.name === "pathRadio"){
+      state.caminho.pathIndex = +e.target.value;
+      state.caminho.n1 = false; state.caminho.n2 = false; state.caminho.n3 = false;
+      renderPathLevels();
+      onChange();
+    }
+  });
+
+  $("#btnAddChaga").addEventListener("click", () => { state.chagas.push({nome:"",efeito:"",custo:"",colateral:"",presetKey:"",buffTipo:"",buffAlvo:"",buffValor:0,ativa:false,turnos:0,turnosRestantes:0}); renderChagas(); onChange(); });
+  wireEntryList("chagasList", () => state.chagas, renderChagas, (idx,val) => {
+    if(!val){ state.chagas[idx].presetKey = ""; return; }
+    const [cat,i] = val.split("|");
+    const item = CHAGAS[cat][+i];
+    state.chagas[idx] = { nome:item.nome, efeito:item.efeito, custo:item.custo, colateral:item.colateral, presetKey:val, buffTipo:"", buffAlvo:"", buffValor:0, ativa:false, turnos:0, turnosRestantes:0 };
+  });
+
+  $("#btnAddRitual").addEventListener("click", () => { state.rituais.push({nome:"",descricao:"",componentes:"",efeito:"",tempo:"",falha:"",presetKey:"",buffTipo:"",buffAlvo:"",buffValor:0,ativa:false,turnos:0,turnosRestantes:0}); renderRituais(); onChange(); });
+  wireEntryList("rituaisList", () => state.rituais, renderRituais, (idx,val) => {
+    if(!val){ state.rituais[idx].presetKey = ""; return; }
+    const [cat,i] = val.split("|");
+    const item = RITUAIS[cat][+i];
+    state.rituais[idx] = { nome:item.nome, descricao:item.descricao, componentes:item.componentes, efeito:item.efeito, tempo:item.tempo, falha:item.falha, presetKey:val, buffTipo:"", buffAlvo:"", buffValor:0, ativa:false, turnos:0, turnosRestantes:0 };
+    autoAddComponentsToInventory(item.componentes);
+  });
+
+  $("#btnAddArma").addEventListener("click", () => { state.armas.push({nome:"",dano:"",espaco:"",notas:""}); renderArmas(); onChange(); });
+  wireEntryList("armasList", () => state.armas, renderArmas, null);
+
+  $("#btnAddItem").addEventListener("click", () => { state.inventario.push({nome:"",espacos:1}); renderInventario(); onChange(); });
+  wireEntryList("invList", () => state.inventario, renderInventario, null);
+
+  $("#btnAddMarca").addEventListener("click", () => {
+    state.marcas.push({nome:"", alvoTipo:"corpo", alvoNome:"", efeito:"", ritual:"", teste:"", custo:"2 de Resiliência", buffTipo:"", buffAlvo:"", buffValor:0});
+    renderMarcas(); onChange();
+  });
+  wireEntryList("marcasList", () => state.marcas, renderMarcas, null);
+
+  $("#btnAddMaldicao").addEventListener("click", () => {
+    state.maldicoes.push({nome:"", alvoTipo:"corpo", alvoNome:"", origem:"", efeitoPositivo:"", efeitoNegativo:"", remocao:"", custo:"", buffTipo:"", buffAlvo:"", buffValor:0, ativa:false, turnos:0, turnosRestantes:0});
+    renderMaldicoes(); onChange();
+  });
+  wireEntryList("maldicoesList", () => state.maldicoes, renderMaldicoes, null);
+
+  $("#marcasList").addEventListener("click", e => {
+    const btn = e.target.closest("[data-use-marca]");
+    if(!btn) return;
+    const idx = +btn.dataset.useMarca;
+    const m = state.marcas[idx];
+    if(!m) return;
+    spendResiliencia(parseResilienciaCost(m.custo), "Marca: " + (m.nome || "sem nome"));
+  });
+
+  wireTurnControls("chagasList", "chaga", c => "Chaga: " + (c.nome || "sem nome"));
+  wireTurnControls("rituaisList", "ritual", r => "Ritual: " + (r.nome || "sem nome"));
+  wireTurnControls("maldicoesList", "maldicao", m => "Maldição: " + (m.nome || "sem nome"));
+
+  $("#refArmas").addEventListener("click", e => {
+    const btn = e.target.closest("[data-add-arma]");
+    if(!btn) return;
+    state.armas.push({ nome: btn.dataset.nome || "", dano: btn.dataset.dano || "", espaco: Number(btn.dataset.espaco)||0, notas: btn.dataset.notas || "" });
+    renderArmas();
+    flashAdded(btn);
+    pushRoll({ text: "Combate: \"" + (btn.dataset.nome||"item") + "\" adicionado às Armas equipadas." });
+    onChange();
+  });
+  $("#refEquip").addEventListener("click", e => {
+    const btn = e.target.closest("[data-add-item]");
+    if(!btn) return;
+    state.inventario.push({ nome: btn.dataset.nome || "", espacos: Number(btn.dataset.espacos)||0 });
+    renderInventario();
+    flashAdded(btn);
+    pushRoll({ text: "Inventário: \"" + (btn.dataset.nome||"item") + "\" adicionado." });
+    onChange();
+  });
+
+  $("#btnToggleRollLog").addEventListener("click", () => {
+    $("#rollHistory").classList.toggle("open");
+  });
+
+  $$(".tab-btn").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+
+  $("#btnNew").addEventListener("click", async () => {
+    if(!confirm("Criar um novo agente? Certifique-se de que a ficha atual já foi salva.")) return;
+    state = blankState();
+    hydrateFormFromState();
+    await saveCurrent();
+    await populateCharSelect(state.id);
+    switchTab("identificacao");
+  });
+  $("#btnSave").addEventListener("click", saveCurrent);
+  $("#btnDelete").addEventListener("click", async () => {
+    if(!state.id) return;
+    if(!confirm("Excluir esta ficha permanentemente? Esta ação não pode ser desfeita.")) return;
+    await deleteChar(state.id);
+    const idx = await loadIndex();
+    const ids = Object.keys(idx);
+    if(ids.length){
+      ids.sort((a,b) => (idx[b].updatedAt||0) - (idx[a].updatedAt||0));
+      state = await loadChar(ids[0]) || blankState();
+    } else {
+      state = blankState();
+      await saveCurrent();
+    }
+    hydrateFormFromState();
+    await populateCharSelect(state.id);
+  });
+  $("#btnDuplicate").addEventListener("click", async () => {
+    const copy = JSON.parse(JSON.stringify(state));
+    copy.id = uid();
+    copy.meta.nome = (copy.meta.nome || "Agente") + " (cópia)";
+    state = copy;
+    hydrateFormFromState();
+    await saveCurrent();
+    await populateCharSelect(state.id);
+  });
+  $("#charSelect").addEventListener("change", async e => {
+    const id = e.target.value;
+    if(!id) return;
+    const loaded = await loadChar(id);
+    if(loaded){ state = loaded; hydrateFormFromState(); }
+  });
+  $("#btnPrint").addEventListener("click", () => window.print());
+}
+
+function switchTab(tab){
+  $$(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  $$(".tab-panel").forEach(p => p.classList.toggle("active", p.dataset.panel === tab));
+}
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+async function init(){
+  buildStaticUI();
+  bindEvents();
+
+  const idx = await loadIndex();
+  const ids = Object.keys(idx);
+  if(ids.length){
+    ids.sort((a,b) => (idx[b].updatedAt||0) - (idx[a].updatedAt||0));
+    state = await loadChar(ids[0]) || blankState();
+  } else {
+    state = blankState();
+  }
+  await populateCharSelect(state.id);
+  hydrateFormFromState();
+  if(!ids.length){ await saveCurrent(); }
+}
+init();
+
+})();
+</script>
+</body>
+</html>
