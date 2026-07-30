@@ -771,13 +771,6 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
           <div class="field"><label for="f-sanMax">Sanidade Máxima</label><input type="number" id="f-sanMax"></div>
         </div>
         <p class="hint" id="sanHint"></p>
-
-        <h2 class="panel-title">Resiliência</h2>
-        <div class="field-grid">
-          <div class="field"><label for="f-resAtual">Resiliência Atual</label><input type="number" id="f-resAtual"></div>
-          <div class="field"><label for="f-resMax">Resiliência Máxima (VON ÷ 2)</label><input type="number" id="f-resMax" readonly></div>
-        </div>
-        <p class="hint">Restaurada ao máximo ao final de toda sessão. Gasta para resistir a Ecos ou ativar Chagas.</p>
       </section>
 
       <!-- V. CHAGAS -->
@@ -786,6 +779,13 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
         <p class="hint">Toda Chaga corrompe, desgasta ou atrai a atenção dos Ecos. Com 2+ Chagas: debuff narrativo em testes sociais. Com 3+: atrai atenção instintiva de Ecos. A cada nova Chaga, a Sanidade máxima reduz em 10. Se a Chaga conceder um bônus (ou penalidade) mecânico a um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
         <div id="chagasList"></div>
         <button type="button" class="btn-add" id="btnAddChaga">+ Adicionar Chaga</button>
+
+        <h2 class="panel-title">Resiliência</h2>
+        <div class="field-grid">
+          <div class="field"><label for="f-resAtual">Resiliência Atual</label><input type="number" id="f-resAtual"></div>
+          <div class="field"><label for="f-resMax">Resiliência Máxima (VON ÷ 2)</label><input type="number" id="f-resMax" readonly></div>
+        </div>
+        <p class="hint">Restaurada ao máximo ao final de toda sessão. Gasta para resistir a Ecos ou ativar Chagas.</p>
       </section>
 
       <!-- VI. RITUAIS -->
@@ -854,6 +854,20 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
           <div class="field"><label for="f-pvMax">PV Máximo (calculado)</label><input type="number" id="f-pvMax" readonly></div>
           <div class="field"><button type="button" id="btnRestorePV" class="btn-secondary">Restaurar ao Máximo</button></div>
         </div>
+
+        <h2 class="panel-title">Sanidade</h2>
+        <div class="field-grid">
+          <div class="field"><label for="f-sanAtual2">Sanidade Atual</label><input type="number" id="f-sanAtual2"></div>
+          <div class="field"><label for="f-sanMax2">Sanidade Máxima</label><input type="number" id="f-sanMax2"></div>
+        </div>
+        <p class="hint" id="sanHint2"></p>
+
+        <h2 class="panel-title">Resiliência</h2>
+        <div class="field-grid">
+          <div class="field"><label for="f-resAtual2">Resiliência Atual</label><input type="number" id="f-resAtual2"></div>
+          <div class="field"><label for="f-resMax2">Resiliência Máxima (VON ÷ 2)</label><input type="number" id="f-resMax2" readonly></div>
+        </div>
+        <p class="hint">Restaurada ao máximo ao final de toda sessão. Gasta para resistir a Ecos ou ativar Chagas.</p>
 
         <h2 class="panel-title">Strikes (Sistema de Dano por Localização)</h2>
         <p class="hint">A cada 4 strikes acumulados (qualquer região): −1 em todos os testes. Dano crítico: +2 strikes na mesma região. Mesma região 3x: efeito narrativo específico (ex: membro inutilizado). Total de 9 strikes: colapso físico / inconsciência.</p>
@@ -1327,6 +1341,23 @@ function resilienciaMax(){
   return m;
 }
 function sanidadeSugestao(){ return 100 - state.chagas.length*10; }
+
+/* ---------- SINCRONIA: Sanidade (Trauma&Mente ⇄ Combate) e Resiliência (Chagas ⇄ Combate) ---------- */
+function setSanidadeAtual(v){
+  state.sanidade.atual = v;
+  const a = $("#f-sanAtual"); if(a) a.value = v;
+  const b = $("#f-sanAtual2"); if(b) b.value = v;
+}
+function setSanidadeMax(v){
+  state.sanidade.max = v;
+  const a = $("#f-sanMax"); if(a) a.value = v;
+  const b = $("#f-sanMax2"); if(b) b.value = v;
+}
+function setResilienciaAtual(v){
+  state.resiliencia.atual = v;
+  const a = $("#f-resAtual"); if(a) a.value = v;
+  const b = $("#f-resAtual2"); if(b) b.value = v;
+}
 function strikesInfo(){
   const total = (Number(state.strikes.cabeca)||0) + (Number(state.strikes.tronco)||0) + (Number(state.strikes.membros)||0);
   return { total, penalty: Math.floor(total/4), unconscious: total >= 9 };
@@ -1582,7 +1613,7 @@ function needsCaminhoChoice(){
 
 function maybeTopUp(){
   if(!state.pv.atual){ state.pv.atual = pvMax(); const el=$("#f-pvAtual"); if(el) el.value = state.pv.atual; }
-  if(!state.resiliencia.atual){ state.resiliencia.atual = resilienciaMax(); const el=$("#f-resAtual"); if(el) el.value = state.resiliencia.atual; }
+  if(!state.resiliencia.atual){ setResilienciaAtual(resilienciaMax()); }
 }
 
 /* =====================================================================
@@ -1630,8 +1661,7 @@ function spendResiliencia(cost, label){
     return false;
   }
   if(cost > 0){
-    state.resiliencia.atual -= cost;
-    const el = $("#f-resAtual"); if(el) el.value = state.resiliencia.atual;
+    setResilienciaAtual(state.resiliencia.atual - cost);
   }
   pushRoll({ text: cost > 0 ? `${label}: usado (-${cost} Resiliência, restam ${state.resiliencia.atual}).` : `${label}: usado (sem custo de Resiliência).` });
   onChange();
@@ -1650,7 +1680,9 @@ function renderAll(){
 
   $("#f-pvMax").value = pvMax();
   $("#f-resMax").value = resilienciaMax();
+  const resMax2 = $("#f-resMax2"); if(resMax2) resMax2.value = resilienciaMax();
   $("#sanHint").textContent = "Sugestão com base nas Chagas atuais: " + sanidadeSugestao() + " (cada nova Chaga reduz a Sanidade máxima em 10).";
+  const sanHint2 = $("#sanHint2"); if(sanHint2) sanHint2.textContent = $("#sanHint").textContent;
 
   const si = strikesInfo();
   const strikesEl = $("#strikesSummary");
@@ -2223,9 +2255,9 @@ function hydrateFormFromState(){
   $("#f-traumaNome").value = state.trauma.nomeCustom || "";
   $("#traumaNomeField").hidden = state.trauma.tipo !== "custom";
 
-  $("#f-sanAtual").value = state.sanidade.atual;
-  $("#f-sanMax").value = state.sanidade.max;
-  $("#f-resAtual").value = state.resiliencia.atual;
+  setSanidadeAtual(state.sanidade.atual);
+  setSanidadeMax(state.sanidade.max);
+  setResilienciaAtual(state.resiliencia.atual);
 
   $("#f-pvAtual").value = state.pv.atual;
 
@@ -2607,9 +2639,12 @@ function bindEvents(){
   });
   $("#f-traumaDesc").addEventListener("input", e => { state.trauma.desc = e.target.value; onChange(); });
 
-  $("#f-sanAtual").addEventListener("input", e => { state.sanidade.atual = Number(e.target.value)||0; onChange(); });
-  $("#f-sanMax").addEventListener("input", e => { state.sanidade.max = Number(e.target.value)||0; onChange(); });
-  $("#f-resAtual").addEventListener("input", e => { state.resiliencia.atual = Number(e.target.value)||0; onChange(); });
+  $("#f-sanAtual").addEventListener("input", e => { state.sanidade.atual = Number(e.target.value)||0; const m=$("#f-sanAtual2"); if(m) m.value = e.target.value; onChange(); });
+  $("#f-sanAtual2").addEventListener("input", e => { state.sanidade.atual = Number(e.target.value)||0; const m=$("#f-sanAtual"); if(m) m.value = e.target.value; onChange(); });
+  $("#f-sanMax").addEventListener("input", e => { state.sanidade.max = Number(e.target.value)||0; const m=$("#f-sanMax2"); if(m) m.value = e.target.value; onChange(); });
+  $("#f-sanMax2").addEventListener("input", e => { state.sanidade.max = Number(e.target.value)||0; const m=$("#f-sanMax"); if(m) m.value = e.target.value; onChange(); });
+  $("#f-resAtual").addEventListener("input", e => { state.resiliencia.atual = Number(e.target.value)||0; const m=$("#f-resAtual2"); if(m) m.value = e.target.value; onChange(); });
+  $("#f-resAtual2").addEventListener("input", e => { state.resiliencia.atual = Number(e.target.value)||0; const m=$("#f-resAtual"); if(m) m.value = e.target.value; onChange(); });
 
   $("#f-pvAtual").addEventListener("input", e => { state.pv.atual = Number(e.target.value)||0; onChange(); });
   $("#btnRestorePV").addEventListener("click", () => { state.pv.atual = pvMax(); $("#f-pvAtual").value = state.pv.atual; onChange(); });
