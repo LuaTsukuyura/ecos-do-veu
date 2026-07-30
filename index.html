@@ -1883,7 +1883,7 @@ function renderNpcs(){
 function wireEntryList(containerId, arrGetter, renderFn, onPreset){
   const el = document.getElementById(containerId);
   el.addEventListener("click", e=>{
-    if(e.target.classList.contains("btn-remove")){
+    if(e.target.classList.contains("btn-remove") && !e.target.hasAttribute("data-remove-buff") && !e.target.hasAttribute("data-remove-debuff")){
       const idx = +e.target.closest(".entry-card").dataset.idx;
       arrGetter().splice(idx,1);
       renderFn(); onChange();
