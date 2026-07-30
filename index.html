@@ -214,6 +214,14 @@ button:active{ transform:translateY(1px); }
 .btn-add-mini:hover{ background:rgba(184,147,90,.12); }
 .debuff-choice .btn-add-mini{ color:var(--blood-bright); }
 .debuff-choice .btn-add-mini:hover{ background:rgba(140,58,52,.12); }
+.passive-buff-choice{ margin-top:12px; padding-top:10px; border-top:1px dashed var(--border-light); }
+.passive-buff-choice > label{ color:var(--arcane-bright); }
+.passive-buff-choice.debuff-choice > label{ color:var(--blood-bright); }
+.passive-buff-choice .btn-add-mini{ color:var(--arcane-bright); border-color:var(--arcane); }
+.passive-buff-choice .btn-add-mini:hover{ background:rgba(107,85,144,.14); }
+.passive-buff-note{ font-size:11px; color:var(--text-dim); font-style:italic; margin:0 0 6px; }
+.falha-critica-field textarea{ border-color:#5c2b27; }
+.falha-critica-field label{ color:var(--blood-bright); }
 .buff-fixed-note{ margin-top:6px; font-size:12.5px; color:var(--brass-bright); font-style:italic; }
 
 /* ---------- USE / SPEND BUTTONS ---------- */
@@ -1439,7 +1447,35 @@ function entryBasedBuffs(){
     ...entryBuffs(state.rituais, "Ritual", true),
     // Marcas são permanentes — o buff está sempre ligado enquanto a Marca existir.
     ...entryBuffs(state.marcas, "Marca", false),
+    // Buffs/Debuffs Passivos da Maldição: valem o tempo inteiro, independente de estar ativa.
+    ...entryPassiveBuffs(state.maldicoes, "Maldição"),
   ];
+}
+function entryPassiveBuffs(list, sourceLabel){
+  const out = [];
+  (list||[]).forEach(entry => {
+    (entry.buffsPassivos||[]).forEach(b => {
+      if(b.tipo && b.alvo && Number(b.valor)){
+        out.push({
+          type: b.tipo === "atributo" ? "attr" : "skill",
+          key: b.alvo,
+          amount: Math.abs(Number(b.valor)) || 0,
+          source: sourceLabel + (entry.nome ? ": " + entry.nome : "") + " (passivo)"
+        });
+      }
+    });
+    (entry.debuffsPassivos||[]).forEach(d => {
+      if(d.tipo && d.alvo && Number(d.valor)){
+        out.push({
+          type: d.tipo === "atributo" ? "attr" : "skill",
+          key: d.alvo,
+          amount: -(Math.abs(Number(d.valor)) || 0),
+          source: sourceLabel + (entry.nome ? ": " + entry.nome : "") + " (debuff passivo)"
+        });
+      }
+    });
+  });
+  return out;
 }
 function entryBuffs(list, sourceLabel, gateByActive){
   const out = [];
@@ -1722,6 +1758,93 @@ function posDebuffFieldsHTML(entry){
       ${posDebuffs.map((d,i)=>posDebuffRowHTML(d,i)).join("")}
       ${posDebuffs.length < 5 ? `<button type="button" class="btn-add-mini" data-add-posdebuff>+ Adicionar Debuff Pós-Uso</button>` : ``}
     </div>`;
+}
+
+/* ---------- BUFFS/DEBUFFS PASSIVOS (Maldições) ----------
+   Diferente dos buffs/debuffs normais (que só valem enquanto a Maldição
+   está ATIVA), estes valem o tempo inteiro, mesmo com a Maldição inativa —
+   representam a marca permanente que o Véu deixou no agente. */
+function passiveBuffRowHTML(b, i, isDebuff){
+  const tipo = b.tipo || "";
+  const idxAttr = isDebuff ? `data-pdebuff-idx="${i}"` : `data-pbuff-idx="${i}"`;
+  const fieldAttr = isDebuff ? "data-pdebuff-field" : "data-pbuff-field";
+  const removeAttr = isDebuff ? `data-remove-pdebuff="${i}"` : `data-remove-pbuff="${i}"`;
+  return `
+    <div class="${isDebuff?"debuff-row":"buff-row"}" ${idxAttr}>
+      <select ${fieldAttr}="tipo">
+        <option value="" ${tipo===""?"selected":""}>Nenhum</option>
+        <option value="atributo" ${tipo==="atributo"?"selected":""}>Atributo</option>
+        <option value="pericia" ${tipo==="pericia"?"selected":""}>Perícia</option>
+      </select>
+      ${tipo ? `<select ${fieldAttr}="alvo">${buffOptionsHTML(tipo, b.alvo)}</select>
+      <input type="number" min="0" ${fieldAttr}="valor" value="${esc(Math.abs(Number(b.valor)||0))}" style="width:70px;" placeholder="valor">` : ``}
+      <button type="button" class="btn-remove" ${removeAttr} title="Remover">✕</button>
+    </div>`;
+}
+function passiveBuffFieldsHTML(entry){
+  const buffs = entry.buffsPassivos || [];
+  const debuffs = entry.debuffsPassivos || [];
+  return `
+    <div class="buff-choice passive-buff-choice">
+      <label>Buffs Passivos (máx. 5)</label>
+      <p class="passive-buff-note">Sempre ativos — não é preciso ativar a Maldição para que valham.</p>
+      ${buffs.map((b,i)=>passiveBuffRowHTML(b,i,false)).join("")}
+      ${buffs.length < 5 ? `<button type="button" class="btn-add-mini" data-add-pbuff>+ Adicionar Buff Passivo</button>` : ``}
+    </div>
+    <div class="buff-choice debuff-choice passive-buff-choice">
+      <label>Debuffs Passivos (máx. 10)</label>
+      <p class="passive-buff-note">Sempre ativos — não é preciso ativar a Maldição para que valham.</p>
+      ${debuffs.map((d,i)=>passiveBuffRowHTML(d,i,true)).join("")}
+      ${debuffs.length < 10 ? `<button type="button" class="btn-add-mini" data-add-pdebuff>+ Adicionar Debuff Passivo</button>` : ``}
+    </div>`;
+}
+function wirePassiveBuffControls(containerId, arrGetter, renderFn){
+  const el = document.getElementById(containerId);
+  el.addEventListener("click", e => {
+    const addBuffBtn = e.target.closest("[data-add-pbuff]");
+    const addDebuffBtn = e.target.closest("[data-add-pdebuff]");
+    const removeBuffBtn = e.target.closest("[data-remove-pbuff]");
+    const removeDebuffBtn = e.target.closest("[data-remove-pdebuff]");
+    if(!addBuffBtn && !addDebuffBtn && !removeBuffBtn && !removeDebuffBtn) return;
+    const card = e.target.closest(".entry-card"); if(!card) return;
+    const entry = arrGetter()[+card.dataset.idx]; if(!entry) return;
+    if(addBuffBtn){
+      if(!entry.buffsPassivos) entry.buffsPassivos = [];
+      if(entry.buffsPassivos.length < 5) entry.buffsPassivos.push({tipo:"", alvo:"", valor:0});
+    } else if(addDebuffBtn){
+      if(!entry.debuffsPassivos) entry.debuffsPassivos = [];
+      if(entry.debuffsPassivos.length < 10) entry.debuffsPassivos.push({tipo:"", alvo:"", valor:0});
+    } else if(removeBuffBtn){
+      entry.buffsPassivos.splice(+removeBuffBtn.dataset.removePbuff, 1);
+    } else if(removeDebuffBtn){
+      entry.debuffsPassivos.splice(+removeDebuffBtn.dataset.removePdebuff, 1);
+    }
+    renderFn(); onChange();
+  });
+  function handleFieldEvent(e, isChange){
+    const isDebuff = !!e.target.dataset.pdebuffField;
+    const field = isDebuff ? e.target.dataset.pdebuffField : e.target.dataset.pbuffField;
+    if(!field) return;
+    const card = e.target.closest(".entry-card"); if(!card) return;
+    const entry = arrGetter()[+card.dataset.idx]; if(!entry) return;
+    const row = e.target.closest(isDebuff ? "[data-pdebuff-idx]" : "[data-pbuff-idx]"); if(!row) return;
+    const arr = isDebuff ? entry.debuffsPassivos : entry.buffsPassivos;
+    const rowIdx = isDebuff ? +row.dataset.pdebuffIdx : +row.dataset.pbuffIdx;
+    if(!arr || !arr[rowIdx]) return;
+    if(field === "valor"){
+      arr[rowIdx].valor = e.target.value;
+      onChange();
+    } else if(field === "alvo"){
+      arr[rowIdx].alvo = e.target.value;
+      onChange();
+    } else if(field === "tipo" && isChange){
+      arr[rowIdx].tipo = e.target.value;
+      arr[rowIdx].alvo = "";
+      renderFn(); onChange();
+    }
+  }
+  el.addEventListener("input", e => handleFieldEvent(e, false));
+  el.addEventListener("change", e => handleFieldEvent(e, true));
 }
 function skillCap(){ return (Number(state.meta.na)||0) >= 9 ? 85 : 80; }
 function skillBonus(key){ return activeBuffs().filter(b=>b.type==="skill" && b.key===key).reduce((s,b)=>s+b.amount,0); }
@@ -2111,6 +2234,7 @@ function renderChagas(){
       <div class="field"><label>Efeito</label><textarea data-field="efeito" rows="2">${esc(c.efeito)}</textarea></div>
       <div class="field"><label>Custo</label><input type="text" data-field="custo" value="${esc(c.custo)}"></div>
       <div class="field"><label>Colateral</label><textarea data-field="colateral" rows="2">${esc(c.colateral)}</textarea></div>
+      <div class="field falha-critica-field"><label>Falha Crítica</label><textarea data-field="falhaCritica" rows="2" placeholder="O que acontece se o teste para usar/ativar esta Chaga falhar criticamente">${esc(c.falhaCritica||"")}</textarea></div>
       ${buffFieldsHTML(c)}
       ${turnControlHTML(c, "chaga", i)}
       ${posDebuffFieldsHTML(c)}
@@ -2138,7 +2262,7 @@ function renderRituais(){
         <div class="field"><label>Tempo de Execução</label><input type="text" data-field="tempo" value="${esc(r.tempo)}"></div>
       </div>
       <div class="field"><label>Efeito</label><textarea data-field="efeito" rows="2">${esc(r.efeito)}</textarea></div>
-      <div class="field"><label>Falha</label><textarea data-field="falha" rows="2">${esc(r.falha)}</textarea></div>
+      <div class="field falha-critica-field"><label>Falha Crítica</label><textarea data-field="falha" rows="2" placeholder="O que acontece se o ritual falhar criticamente">${esc(r.falha)}</textarea></div>
       ${buffFieldsHTML(r)}
       ${turnControlHTML(r, "ritual", i)}
     </div>`).join("");
@@ -2233,10 +2357,12 @@ function renderMaldicoes(){
         <div class="field"><label>Efeito Positivo (se houver)</label><textarea data-field="efeitoPositivo" rows="2" placeholder="Ex: +15% em Intimidação">${esc(m.efeitoPositivo)}</textarea></div>
         <div class="field"><label>Efeito Negativo</label><textarea data-field="efeitoNegativo" rows="2" placeholder="Ex: -10% em testes sociais permanente">${esc(m.efeitoNegativo)}</textarea></div>
       </div>
+      <div class="field falha-critica-field"><label>Falha Crítica</label><textarea data-field="falhaCritica" rows="2" placeholder="O que acontece se o teste ligado a esta Maldição falhar criticamente">${esc(m.falhaCritica||"")}</textarea></div>
       <div class="field"><label>Condição de Remoção</label><input type="text" data-field="remocao" value="${esc(m.remocao)}" placeholder="Ritual de purificação necessário (remove também os buffs)"></div>
       <div class="field"><label>Custo de Ativação (se houver)</label><input type="text" data-field="custo" value="${esc(m.custo||"")}" placeholder="Ex: 1 de Resiliência (deixe em branco se não houver custo)"></div>
       ${buffFieldsHTML(m)}
       ${turnControlHTML(m, "maldicao", i)}
+      ${passiveBuffFieldsHTML(m)}
       ${posDebuffFieldsHTML(m)}
       ${postUseControlHTML(m, "maldicao", i)}
     </div>`).join("");
@@ -2377,6 +2503,9 @@ function migrateEntryBuffs(list){
     if(entry.posAtiva === undefined) entry.posAtiva = false;
     if(entry.posTurnos === undefined) entry.posTurnos = 1;
     if(entry.posTurnosRestantes === undefined) entry.posTurnosRestantes = 0;
+    if(!entry.buffsPassivos) entry.buffsPassivos = [];
+    if(!entry.debuffsPassivos) entry.debuffsPassivos = [];
+    if(entry.falhaCritica === undefined) entry.falhaCritica = "";
   });
 }
 
@@ -2823,12 +2952,12 @@ function bindEvents(){
     ];
   }, () => renderPathLevels());
 
-  $("#btnAddChaga").addEventListener("click", () => { state.chagas.push({nome:"",efeito:"",custo:"",colateral:"",presetKey:"",buffs:[],debuffs:[],ativa:false,turnos:0,turnosRestantes:0,posDebuffs:[],posAtiva:false,posTurnos:1,posTurnosRestantes:0}); renderChagas(); onChange(); });
+  $("#btnAddChaga").addEventListener("click", () => { state.chagas.push({nome:"",efeito:"",custo:"",colateral:"",falhaCritica:"",presetKey:"",buffs:[],debuffs:[],ativa:false,turnos:0,turnosRestantes:0,posDebuffs:[],posAtiva:false,posTurnos:1,posTurnosRestantes:0}); renderChagas(); onChange(); });
   wireEntryList("chagasList", () => state.chagas, renderChagas, (idx,val) => {
     if(!val){ state.chagas[idx].presetKey = ""; return; }
     const [cat,i] = val.split("|");
     const item = CHAGAS[cat][+i];
-    state.chagas[idx] = { nome:item.nome, efeito:item.efeito, custo:item.custo, colateral:item.colateral, presetKey:val, buffs:[], debuffs:[], ativa:false, turnos:0, turnosRestantes:0, posDebuffs:[], posAtiva:false, posTurnos:1, posTurnosRestantes:0 };
+    state.chagas[idx] = { nome:item.nome, efeito:item.efeito, custo:item.custo, colateral:item.colateral, falhaCritica:item.falhaCritica||"", presetKey:val, buffs:[], debuffs:[], ativa:false, turnos:0, turnosRestantes:0, posDebuffs:[], posAtiva:false, posTurnos:1, posTurnosRestantes:0 };
   });
   wireBuffDebuffControls("chagasList", () => state.chagas, renderChagas);
 
@@ -2856,11 +2985,12 @@ function bindEvents(){
   wireBuffDebuffControls("marcasList", () => state.marcas, renderMarcas);
 
   $("#btnAddMaldicao").addEventListener("click", () => {
-    state.maldicoes.push({nome:"", alvoTipo:"corpo", alvoNome:"", origem:"", efeitoPositivo:"", efeitoNegativo:"", remocao:"", custo:"", buffs:[], debuffs:[], ativa:false, turnos:0, turnosRestantes:0, posDebuffs:[], posAtiva:false, posTurnos:1, posTurnosRestantes:0});
+    state.maldicoes.push({nome:"", alvoTipo:"corpo", alvoNome:"", origem:"", efeitoPositivo:"", efeitoNegativo:"", falhaCritica:"", remocao:"", custo:"", buffs:[], debuffs:[], buffsPassivos:[], debuffsPassivos:[], ativa:false, turnos:0, turnosRestantes:0, posDebuffs:[], posAtiva:false, posTurnos:1, posTurnosRestantes:0});
     renderMaldicoes(); onChange();
   });
   wireEntryList("maldicoesList", () => state.maldicoes, renderMaldicoes, null);
   wireBuffDebuffControls("maldicoesList", () => state.maldicoes, renderMaldicoes);
+  wirePassiveBuffControls("maldicoesList", () => state.maldicoes, renderMaldicoes);
 
   /* --- NPCs Relacionados --- */
   $("#btnAddNpc").addEventListener("click", () => {
