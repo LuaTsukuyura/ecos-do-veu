@@ -1400,18 +1400,23 @@ function activeBuffs(){
     }
   }
 
-  if(state.caminho.n1 && state.caminho.pathIndex === "custom" && state.caminho.custom){
+  if(state.caminho.pathIndex === "custom" && state.caminho.custom){
     const c = state.caminho.custom;
-    (c.buffs||[]).forEach(b => {
-      if(b.tipo && b.alvo && Number(b.valor)){
-        out.push({ type:b.tipo==="atributo"?"attr":"skill", key:b.alvo, amount:Math.abs(Number(b.valor))||0, source:"Caminho Personalizado" + (c.nome?": "+c.nome:"") });
-      }
-    });
-    (c.debuffs||[]).forEach(d => {
-      if(d.tipo && d.alvo && Number(d.valor)){
-        out.push({ type:d.tipo==="atributo"?"attr":"skill", key:d.alvo, amount:-(Math.abs(Number(d.valor))||0), source:"Caminho Personalizado" + (c.nome?": "+c.nome:"") + " (debuff)" });
-      }
-    });
+    const applyCustomLevelBuffs = (buffs, debuffs, levelLabel) => {
+      (buffs||[]).forEach(b => {
+        if(b.tipo && b.alvo && Number(b.valor)){
+          out.push({ type:b.tipo==="atributo"?"attr":"skill", key:b.alvo, amount:Math.abs(Number(b.valor))||0, source:"Caminho Personalizado" + (c.nome?": "+c.nome:"") + levelLabel });
+        }
+      });
+      (debuffs||[]).forEach(d => {
+        if(d.tipo && d.alvo && Number(d.valor)){
+          out.push({ type:d.tipo==="atributo"?"attr":"skill", key:d.alvo, amount:-(Math.abs(Number(d.valor))||0), source:"Caminho Personalizado" + (c.nome?": "+c.nome:"") + levelLabel + " (debuff)" });
+        }
+      });
+    };
+    if(state.caminho.n1) applyCustomLevelBuffs(c.buffs, c.debuffs, " (Nível 1)");
+    if(state.caminho.n2) applyCustomLevelBuffs(c.buffs2, c.debuffs2, " (Nível 2)");
+    if(state.caminho.n3) applyCustomLevelBuffs(c.buffs3, c.debuffs3, " (Nível 3)");
   }
 
   return out.concat(entryBasedBuffs());
@@ -1462,6 +1467,8 @@ function turnControlHTML(entry, kind, idx){
   const ativa = isEntryEffectActive(entry);
   const turnos = Number(entry.turnos) || 0;
   const restantes = Number(entry.turnosRestantes) || 0;
+  const resCost = parseResilienciaCost(entry.custo);
+  const custoLabel = resCost ? ` (-${resCost} Resiliência)` : "";
   return `
     <div class="duration-box">
       <div class="field">
@@ -1477,8 +1484,9 @@ function turnControlHTML(entry, kind, idx){
         ${ativa
           ? `<button type="button" class="btn-turn btn-secondary" data-turn-minus="${kind}:${idx}">-1 Turno</button>
              <button type="button" class="btn-turn btn-turn-off" data-turn-off="${kind}:${idx}">Desligar agora</button>`
-          : `<button type="button" class="btn-turn btn-secondary" data-turn-on="${kind}:${idx}">Ativar (${turnos || 1} turno${(turnos||1)===1?"":"s"})</button>`}
+          : `<button type="button" class="btn-turn btn-secondary" data-turn-on="${kind}:${idx}">Ativar (${turnos || 1} turno${(turnos||1)===1?"":"s"})${custoLabel}</button>`}
       </div>
+      ${resCost ? `<p class="hint" style="margin-top:6px;">Ao ativar, ${resCost} de Resiliência ${resCost===1?"será descontado":"serão descontados"} automaticamente do total atual (só se houver Resiliência suficiente).</p>` : ``}
     </div>`;
 }
 function getEntryList(kind){
@@ -1795,9 +1803,13 @@ function renderOriginCard(){
 }
 
 function ensureCustomCaminho(){
-  if(!state.caminho.custom) state.caminho.custom = { nome:"", descricao:"", n1:"", n2:"", n3:"", buffs:[], debuffs:[] };
+  if(!state.caminho.custom) state.caminho.custom = { nome:"", descricao:"", n1:"", n2:"", n3:"", buffs:[], debuffs:[], buffs2:[], debuffs2:[], buffs3:[], debuffs3:[] };
   if(!state.caminho.custom.buffs) state.caminho.custom.buffs = [];
   if(!state.caminho.custom.debuffs) state.caminho.custom.debuffs = [];
+  if(!state.caminho.custom.buffs2) state.caminho.custom.buffs2 = [];
+  if(!state.caminho.custom.debuffs2) state.caminho.custom.debuffs2 = [];
+  if(!state.caminho.custom.buffs3) state.caminho.custom.buffs3 = [];
+  if(!state.caminho.custom.debuffs3) state.caminho.custom.debuffs3 = [];
   return state.caminho.custom;
 }
 function renderCaminhoArea(){
@@ -1876,23 +1888,23 @@ function renderPathLevels(){
 function renderCustomPathLevels(wrap){
   const c = ensureCustomCaminho();
   wrap.innerHTML = `
-    <div class="entry-card" data-idx="0">
-      <div class="field field-full"><label>Nome do Caminho Personalizado</label><input type="text" id="f-caminhoCustomNome" value="${esc(c.nome)}" placeholder="Ex: Exorcista de Campo"></div>
-      <div class="field field-full"><label>Descrição / Sabor</label><textarea id="f-caminhoCustomDesc" rows="3" placeholder="Do que se trata esse caminho, sua filosofia, seu estilo...">${esc(c.descricao)}</textarea></div>
+    <div class="field field-full"><label>Nome do Caminho Personalizado</label><input type="text" id="f-caminhoCustomNome" value="${esc(c.nome)}" placeholder="Ex: Exorcista de Campo"></div>
+    <div class="field field-full"><label>Descrição / Sabor</label><textarea id="f-caminhoCustomDesc" rows="3" placeholder="Do que se trata esse caminho, sua filosofia, seu estilo...">${esc(c.descricao)}</textarea></div>
 
-      <div class="level-card">
-        <label class="level-check"><input type="checkbox" id="chk-n1" ${state.caminho.n1?"checked":""}> <strong>Caminho</strong> — 15 PE</label>
-        <div class="field field-full"><label>Habilidade de Nível 1</label><textarea id="f-caminhoCustomN1" rows="2" placeholder="Descreva a habilidade concedida neste nível...">${esc(c.n1)}</textarea></div>
-        ${buffFieldsHTML(c)}
-      </div>
-      <div class="level-card">
-        <label class="level-check"><input type="checkbox" id="chk-n2" ${state.caminho.n2?"checked":""}> <strong>Proficiência</strong> — 25 PE</label>
-        <div class="field field-full"><label>Habilidade de Nível 2</label><textarea id="f-caminhoCustomN2" rows="2" placeholder="Descreva a habilidade concedida neste nível...">${esc(c.n2)}</textarea></div>
-      </div>
-      <div class="level-card">
-        <label class="level-check"><input type="checkbox" id="chk-n3" ${state.caminho.n3?"checked":""}> <strong>Mestre da Origem</strong> — 35 PE</label>
-        <div class="field field-full"><label>Habilidade de Nível 3</label><textarea id="f-caminhoCustomN3" rows="2" placeholder="Descreva a habilidade concedida neste nível...">${esc(c.n3)}</textarea></div>
-      </div>
+    <div class="entry-card level-card" data-idx="0">
+      <label class="level-check"><input type="checkbox" id="chk-n1" ${state.caminho.n1?"checked":""}> <strong>Caminho</strong> — 15 PE</label>
+      <div class="field field-full"><label>Habilidade de Nível 1</label><textarea id="f-caminhoCustomN1" rows="2" placeholder="Descreva a habilidade concedida neste nível...">${esc(c.n1)}</textarea></div>
+      ${buffFieldsHTML({ buffs:c.buffs, debuffs:c.debuffs })}
+    </div>
+    <div class="entry-card level-card" data-idx="1">
+      <label class="level-check"><input type="checkbox" id="chk-n2" ${state.caminho.n2?"checked":""}> <strong>Proficiência</strong> — 25 PE</label>
+      <div class="field field-full"><label>Habilidade de Nível 2</label><textarea id="f-caminhoCustomN2" rows="2" placeholder="Descreva a habilidade concedida neste nível...">${esc(c.n2)}</textarea></div>
+      ${buffFieldsHTML({ buffs:c.buffs2, debuffs:c.debuffs2 })}
+    </div>
+    <div class="entry-card level-card" data-idx="2">
+      <label class="level-check"><input type="checkbox" id="chk-n3" ${state.caminho.n3?"checked":""}> <strong>Mestre da Origem</strong> — 35 PE</label>
+      <div class="field field-full"><label>Habilidade de Nível 3</label><textarea id="f-caminhoCustomN3" rows="2" placeholder="Descreva a habilidade concedida neste nível...">${esc(c.n3)}</textarea></div>
+      ${buffFieldsHTML({ buffs:c.buffs3, debuffs:c.debuffs3 })}
     </div>`;
   $("#chk-n1").addEventListener("change", e=>{ state.caminho.n1 = e.target.checked; updatePeOrigem(); onChange(); });
   $("#chk-n2").addEventListener("change", e=>{ state.caminho.n2 = e.target.checked; updatePeOrigem(); onChange(); });
@@ -2661,7 +2673,14 @@ function bindEvents(){
       onChange();
     }
   });
-  wireBuffDebuffControls("pathLevels", () => [ensureCustomCaminho()], () => renderPathLevels());
+  wireBuffDebuffControls("pathLevels", () => {
+    const c = ensureCustomCaminho();
+    return [
+      { buffs:c.buffs, debuffs:c.debuffs },
+      { buffs:c.buffs2, debuffs:c.debuffs2 },
+      { buffs:c.buffs3, debuffs:c.debuffs3 },
+    ];
+  }, () => renderPathLevels());
 
   $("#btnAddChaga").addEventListener("click", () => { state.chagas.push({nome:"",efeito:"",custo:"",colateral:"",presetKey:"",buffs:[],debuffs:[],ativa:false,turnos:0,turnosRestantes:0}); renderChagas(); onChange(); });
   wireEntryList("chagasList", () => state.chagas, renderChagas, (idx,val) => {
