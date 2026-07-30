@@ -2404,11 +2404,21 @@ function renderNpcs(){
 function wireEntryList(containerId, arrGetter, renderFn, onPreset){
   const el = document.getElementById(containerId);
   el.addEventListener("click", e=>{
-    if(e.target.classList.contains("btn-remove") && !e.target.hasAttribute("data-remove-buff") && !e.target.hasAttribute("data-remove-debuff")){
-      const idx = +e.target.closest(".entry-card").dataset.idx;
-      arrGetter().splice(idx,1);
-      renderFn(); onChange();
-    }
+    const btn = e.target.closest(".btn-remove");
+    if(!btn) return;
+    // Só remove o item inteiro se o botão não pertencer a um buff/debuff (normal,
+    // pós-uso ou passivo) — esses têm seu próprio botão de remoção tratado em
+    // wireBuffDebuffControls / wirePassiveBuffControls, cada um só apaga sua linha.
+    const isSubRemove = btn.hasAttribute("data-remove-buff")
+      || btn.hasAttribute("data-remove-debuff")
+      || btn.hasAttribute("data-remove-posdebuff")
+      || btn.hasAttribute("data-remove-pbuff")
+      || btn.hasAttribute("data-remove-pdebuff");
+    if(isSubRemove) return;
+    const card = btn.closest(".entry-card"); if(!card) return;
+    const idx = +card.dataset.idx;
+    arrGetter().splice(idx,1);
+    renderFn(); onChange();
   });
   el.addEventListener("input", e=>{
     const card = e.target.closest(".entry-card"); if(!card) return;
