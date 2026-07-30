@@ -184,8 +184,10 @@ button:active{ transform:translateY(1px); }
 .skill-box .skill-main{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
 .skill-box .skill-total{ font-family:var(--font-mono); font-size:11px; color:var(--text-dim); flex-basis:100%; padding-left:2px; }
 .skill-box .skill-total.has-bonus{ color:var(--brass-bright); }
+.skill-box .skill-total.over-cap{ color:var(--blood-bright); font-weight:700; }
 .attr-box .attr-total{ font-family:var(--font-mono); font-size:11px; color:var(--text-dim); margin-top:4px; }
 .attr-box .attr-total.has-bonus{ color:var(--brass-bright); }
+.attr-box .attr-total.over-cap{ color:var(--blood-bright); font-weight:700; }
 
 /* ---------- BUFF / DEBUFF CHOICE ---------- */
 .buff-choice{ margin-top:10px; display:flex; flex-direction:column; gap:6px; }
@@ -1149,7 +1151,7 @@ function blankState(){
     ownerId: currentUid,
     meta:{ nome:"", origem:"", idade:"", sexo:"", descFisica:"", na:1, pm:0, pe:0, historia:"", foto:"" },
     atributos:{ for:1, agi:1, int:1, car:1, von:1, vit:0 },
-    pericias: Object.fromEntries(SKILLS.map(s=>[s.key,0])),
+    pericias: Object.fromEntries(SKILLS.map(s=>[s.key,20])),
     caminho:{ pathIndex:null, n1:false, n2:false, n3:false },
     buffChoices:{ origem:"", caminho:"" },
     rollLog:[],
@@ -1396,10 +1398,16 @@ function buffFieldsHTML(entry){
       ${debuffs.length < 10 ? `<button type="button" class="btn-add-mini" data-add-debuff>+ Adicionar Debuff</button>` : ``}
     </div>`;
 }
+function skillCap(){ return (Number(state.meta.na)||0) >= 9 ? 85 : 80; }
 function skillBonus(key){ return activeBuffs().filter(b=>b.type==="skill" && b.key===key).reduce((s,b)=>s+b.amount,0); }
-function skillTotal(key){ return clampInt((Number(state.pericias[key])||0) + skillBonus(key), 0, 200); }
+function skillRawTotal(key){ return (Number(state.pericias[key])||0) + skillBonus(key); }
+function skillTotal(key){ return clampInt(skillRawTotal(key), 0, skillCap()); }
+function skillOverCap(key){ return skillRawTotal(key) > skillCap(); }
+function attrCap(key){ return key === "vit" ? 5 : 20; }
 function attrBonus(key){ return activeBuffs().filter(b=>b.type==="attr" && b.key===key).reduce((s,b)=>s+b.amount,0); }
-function attrTotal(key){ return (Number(state.atributos[key])||0) + attrBonus(key); }
+function attrRawTotal(key){ return (Number(state.atributos[key])||0) + attrBonus(key); }
+function attrTotal(key){ return Math.min(attrRawTotal(key), attrCap(key)); }
+function attrOverCap(key){ return attrRawTotal(key) > attrCap(key); }
 function needsOrigemChoice(){
   const rules = BUFF_RULES[state.meta.origem];
   return !!(rules && rules.origem && rules.origem.options.length > 1);
@@ -1507,24 +1515,32 @@ function renderBuffBadges(){
     const el = document.getElementById("skillTotal-" + s.key);
     if(!el) return;
     const bonus = skillBonus(s.key);
-    if(bonus){
+    const overCap = skillOverCap(s.key);
+    if(overCap){
+      el.textContent = "⚠ " + skillRawTotal(s.key) + "% ultrapassa o limite de " + skillCap() + "% — capado em " + skillTotal(s.key) + "% (base " + (Number(state.pericias[s.key])||0) + "%" + (bonus?" +"+bonus+"%":"") + ")";
+      el.classList.add("over-cap"); el.classList.remove("has-bonus");
+    } else if(bonus){
       el.textContent = "Total: " + skillTotal(s.key) + "% (base " + (Number(state.pericias[s.key])||0) + "% +" + bonus + "%)";
-      el.classList.add("has-bonus");
+      el.classList.add("has-bonus"); el.classList.remove("over-cap");
     } else {
       el.textContent = "";
-      el.classList.remove("has-bonus");
+      el.classList.remove("has-bonus"); el.classList.remove("over-cap");
     }
   });
-  ATTRS.filter(a=>a.rollable).forEach(a => {
+  ATTRS.forEach(a => {
     const el = document.getElementById("attrTotal-" + a.key);
     if(!el) return;
     const bonus = attrBonus(a.key);
-    if(bonus){
+    const overCap = attrOverCap(a.key);
+    if(overCap){
+      el.textContent = "⚠ " + attrRawTotal(a.key) + " ultrapassa o limite de " + attrCap(a.key) + " — capado em " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + (bonus?" +"+bonus:"") + ")";
+      el.classList.add("over-cap"); el.classList.remove("has-bonus");
+    } else if(bonus){
       el.textContent = "Total: " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + " +" + bonus + ")";
-      el.classList.add("has-bonus");
+      el.classList.add("has-bonus"); el.classList.remove("over-cap");
     } else {
       el.textContent = "";
-      el.classList.remove("has-bonus");
+      el.classList.remove("has-bonus"); el.classList.remove("over-cap");
     }
   });
 }
@@ -2152,14 +2168,14 @@ function buildStaticUI(){
     <div class="attr-box" data-attr="${a.key}">
       <label for="${a.id}">${esc(a.nome)}</label>
       <input type="number" id="${a.id}" min="${a.min}" max="${a.max}">
-      ${a.rollable ? `<div class="attr-total" id="attrTotal-${a.key}"></div>` : ``}
+      <div class="attr-total" id="attrTotal-${a.key}"></div>
     </div>`).join("");
 
   $("#skillsGrid").innerHTML = SKILLS.map(s => `
     <div class="skill-box" data-skill="${s.key}">
       <div class="skill-main">
         <label for="f-per-${s.key}">${esc(s.nome)}</label>
-        <input type="number" min="0" max="100" id="f-per-${s.key}">
+        <input type="number" min="0" max="85" id="f-per-${s.key}">
       </div>
       <div class="skill-total" id="skillTotal-${s.key}"></div>
     </div>`).join("");
@@ -2274,7 +2290,7 @@ function bindEvents(){
 
   SKILLS.forEach(s => {
     document.getElementById("f-per-" + s.key).addEventListener("input", e => {
-      state.pericias[s.key] = clampInt(e.target.value,0,100); onChange();
+      state.pericias[s.key] = clampInt(e.target.value,0,skillCap()); onChange();
     });
   });
 
