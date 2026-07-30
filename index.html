@@ -1687,10 +1687,10 @@ function wireTurnControls(containerId, kind, labelFn){
 }
 function buffOptionsHTML(tipo, selected){
   if(tipo === "atributo"){
-    return `<option value="">— Selecione —</option>` + ATTRS.map(a => `<option value="${a.key}" ${selected===a.key?"selected":""}>${esc(a.nome)}</option>`).join("");
+    return `<option value="">— Selecione —</option>` + `<option value="todos" ${selected==="todos"?"selected":""}>Todos os Atributos</option>` + ATTRS.map(a => `<option value="${a.key}" ${selected===a.key?"selected":""}>${esc(a.nome)}</option>`).join("");
   }
   if(tipo === "pericia"){
-    return `<option value="">— Selecione —</option>` + SKILLS.map(s => `<option value="${s.key}" ${selected===s.key?"selected":""}>${esc(s.nome)}</option>`).join("");
+    return `<option value="">— Selecione —</option>` + `<option value="todos" ${selected==="todos"?"selected":""}>Todas as Perícias</option>` + SKILLS.map(s => `<option value="${s.key}" ${selected===s.key?"selected":""}>${esc(s.nome)}</option>`).join("");
   }
   return "";
 }
@@ -1822,12 +1822,12 @@ function wirePassiveBuffControls(containerId, arrGetter, renderFn){
   el.addEventListener("change", e => handleFieldEvent(e, true));
 }
 function skillCap(){ return (Number(state.meta.na)||0) >= 9 ? 85 : 80; }
-function skillBonus(key){ return activeBuffs().filter(b=>b.type==="skill" && b.key===key).reduce((s,b)=>s+b.amount,0); }
+function skillBonus(key){ return activeBuffs().filter(b=>b.type==="skill" && (b.key===key || b.key==="todos")).reduce((s,b)=>s+b.amount,0); }
 function skillRawTotal(key){ return (Number(state.pericias[key])||0) + skillBonus(key); }
 function skillTotal(key){ return clampInt(skillRawTotal(key), 0, skillCap()); }
 function skillOverCap(key){ return skillRawTotal(key) > skillCap(); }
 function attrCap(key){ return key === "vit" ? 5 : 20; }
-function attrBonus(key){ return activeBuffs().filter(b=>b.type==="attr" && b.key===key).reduce((s,b)=>s+b.amount,0); }
+function attrBonus(key){ return activeBuffs().filter(b=>b.type==="attr" && (b.key===key || b.key==="todos")).reduce((s,b)=>s+b.amount,0); }
 function attrRawTotal(key){ return (Number(state.atributos[key])||0) + attrBonus(key); }
 function attrTotal(key){ return Math.min(attrRawTotal(key), attrCap(key)); }
 function attrOverCap(key){ return attrRawTotal(key) > attrCap(key); }
