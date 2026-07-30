@@ -2,8 +2,9 @@
 <html lang="pt-BR">
 <head>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" href="favicon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="apple-touch-icon" href="favicon-192.png">
+    <meta charset="UTF-8">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ecos do Véu — Ficha de Agente</title>
@@ -245,6 +246,12 @@ button:active{ transform:translateY(1px); }
 .btn-turn-off:hover{ border-color:var(--blood-bright); background:rgba(140,58,52,.12); }
 .entry-card.is-inactive-effect{ opacity:.82; }
 .entry-card.is-active-effect{ border-left:3px solid var(--brass); }
+.entry-card.is-postuse-active{ border-left:3px solid var(--blood-bright); }
+
+/* ---------- DEBUFF PÓS-USO (Chagas/Maldições) ---------- */
+.post-use-box{ border-color:#5c2b27; background:rgba(140,58,52,.06); }
+.post-use-box .post-use-title{ font-family:var(--font-display); font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--blood-bright); flex-basis:100%; }
+.post-use-hint{ flex-basis:100%; margin:0; font-size:11.5px; color:var(--text-dim); }
 
 /* ---------- CATALOG "ADD TO INVENTORY" BUTTONS ---------- */
 .ref-table td.add-col{ text-align:right; white-space:nowrap; }
@@ -1437,27 +1444,41 @@ function entryBasedBuffs(){
 function entryBuffs(list, sourceLabel, gateByActive){
   const out = [];
   (list||[]).forEach(entry => {
-    if(gateByActive && !isEntryEffectActive(entry)) return;
-    (entry.buffs||[]).forEach(b => {
-      if(b.tipo && b.alvo && Number(b.valor)){
-        out.push({
-          type: b.tipo === "atributo" ? "attr" : "skill",
-          key: b.alvo,
-          amount: Math.abs(Number(b.valor)) || 0,
-          source: sourceLabel + (entry.nome ? ": " + entry.nome : "")
-        });
-      }
-    });
-    (entry.debuffs||[]).forEach(d => {
-      if(d.tipo && d.alvo && Number(d.valor)){
-        out.push({
-          type: d.tipo === "atributo" ? "attr" : "skill",
-          key: d.alvo,
-          amount: -(Math.abs(Number(d.valor)) || 0),
-          source: sourceLabel + (entry.nome ? ": " + entry.nome : "") + " (debuff)"
-        });
-      }
-    });
+    if(!gateByActive || isEntryEffectActive(entry)){
+      (entry.buffs||[]).forEach(b => {
+        if(b.tipo && b.alvo && Number(b.valor)){
+          out.push({
+            type: b.tipo === "atributo" ? "attr" : "skill",
+            key: b.alvo,
+            amount: Math.abs(Number(b.valor)) || 0,
+            source: sourceLabel + (entry.nome ? ": " + entry.nome : "")
+          });
+        }
+      });
+      (entry.debuffs||[]).forEach(d => {
+        if(d.tipo && d.alvo && Number(d.valor)){
+          out.push({
+            type: d.tipo === "atributo" ? "attr" : "skill",
+            key: d.alvo,
+            amount: -(Math.abs(Number(d.valor)) || 0),
+            source: sourceLabel + (entry.nome ? ": " + entry.nome : "") + " (debuff)"
+          });
+        }
+      });
+    }
+    // Debuff pós-uso: independente do efeito principal — só depende de ter sido ativado.
+    if(isPostUseActive(entry)){
+      (entry.posDebuffs||[]).forEach(d => {
+        if(d.tipo && d.alvo && Number(d.valor)){
+          out.push({
+            type: d.tipo === "atributo" ? "attr" : "skill",
+            key: d.alvo,
+            amount: -(Math.abs(Number(d.valor)) || 0),
+            source: sourceLabel + (entry.nome ? ": " + entry.nome : "") + " (debuff pós-uso)"
+          });
+        }
+      });
+    }
   });
   return out;
 }
@@ -1527,6 +1548,84 @@ function renderEntryKind(kind){
   if(kind === "chaga") renderChagas();
   else if(kind === "ritual") renderRituais();
   else if(kind === "maldicao") renderMaldicoes();
+}
+
+/* ---------- DEBUFF PÓS-USO (Chagas / Maldições) ----------
+   Efeito colateral que só passa a valer DEPOIS que o efeito ativo
+   (buffs/debuffs normais) da chaga ou maldição terminar. A duração,
+   em turnos, é escolhida pelo jogador no momento em que ele aplica. */
+function isPostUseActive(entry){
+  return !!entry.posAtiva && (Number(entry.posTurnosRestantes) || 0) > 0;
+}
+function activatePostUseEffect(kind, idx, turnos){
+  const list = getEntryList(kind); if(!list) return;
+  const entry = list[idx]; if(!entry) return;
+  const t = Math.max(1, Number(turnos) || 1);
+  entry.posAtiva = true;
+  entry.posTurnos = t;
+  entry.posTurnosRestantes = t;
+  renderEntryKind(kind); onChange();
+}
+function decrementPostUseTurn(kind, idx){
+  const list = getEntryList(kind); if(!list) return;
+  const entry = list[idx]; if(!entry) return;
+  const restantes = Math.max(0, (Number(entry.posTurnosRestantes) || 0) - 1);
+  entry.posTurnosRestantes = restantes;
+  if(restantes <= 0){ entry.posAtiva = false; entry.posTurnosRestantes = 0; }
+  renderEntryKind(kind); onChange();
+}
+function deactivatePostUseEffect(kind, idx){
+  const list = getEntryList(kind); if(!list) return;
+  const entry = list[idx]; if(!entry) return;
+  entry.posAtiva = false;
+  entry.posTurnosRestantes = 0;
+  renderEntryKind(kind); onChange();
+}
+function postUseControlHTML(entry, kind, idx){
+  const ativo = isPostUseActive(entry);
+  const restantes = Number(entry.posTurnosRestantes) || 0;
+  const inputTurnos = Number(entry.posTurnos) || 1;
+  return `
+    <div class="duration-box post-use-box">
+      <span class="post-use-title">Debuff pós-uso</span>
+      <p class="post-use-hint">Só passa a valer depois que o efeito ativo acima terminar (ou for desligado). Escolha por quantos turnos ele dura e aplique quando quiser.</p>
+      ${ativo
+        ? `<div class="duration-status"><span class="st-on" style="color:var(--blood-bright);">🔴 Ativo — ${restantes} turno${restantes===1?"":"s"} restante${restantes===1?"":"s"}</span></div>
+           <div class="duration-actions">
+             <button type="button" class="btn-turn btn-secondary" data-post-turn-minus="${kind}:${idx}">-1 Turno</button>
+             <button type="button" class="btn-turn btn-turn-off" data-post-turn-off="${kind}:${idx}">Encerrar agora</button>
+           </div>`
+        : `<div class="field">
+             <label>Turnos</label>
+             <input type="number" min="1" max="99" data-field="posTurnos" value="${esc(inputTurnos)}">
+           </div>
+           <div class="duration-actions">
+             <button type="button" class="btn-turn btn-secondary" data-post-turn-on="${kind}:${idx}">Aplicar debuff pós-uso</button>
+           </div>`}
+    </div>`;
+}
+function wirePostUseControls(containerId, kind){
+  const el = document.getElementById(containerId);
+  el.addEventListener("click", e => {
+    const onBtn = e.target.closest("[data-post-turn-on]");
+    const minusBtn = e.target.closest("[data-post-turn-minus]");
+    const offBtn = e.target.closest("[data-post-turn-off]");
+    const btn = onBtn || minusBtn || offBtn;
+    if(!btn) return;
+    const raw = (onBtn ? onBtn.dataset.postTurnOn : minusBtn ? minusBtn.dataset.postTurnMinus : offBtn.dataset.postTurnOff);
+    const [, idxStr] = raw.split(":");
+    const idx = +idxStr;
+    const list = getEntryList(kind);
+    const entry = list && list[idx];
+    if(!entry) return;
+    if(onBtn){
+      activatePostUseEffect(kind, idx, entry.posTurnos);
+    } else if(minusBtn){
+      decrementPostUseTurn(kind, idx);
+    } else if(offBtn){
+      deactivatePostUseEffect(kind, idx);
+    }
+  });
 }
 function flashAdded(btn){
   const original = btn.textContent;
@@ -1599,6 +1698,29 @@ function buffFieldsHTML(entry){
       <label>Debuffs concedidos (máx. 10)</label>
       ${debuffs.map((d,i)=>buffRowHTML(d,i,true)).join("")}
       ${debuffs.length < 10 ? `<button type="button" class="btn-add-mini" data-add-debuff>+ Adicionar Debuff</button>` : ``}
+    </div>`;
+}
+function posDebuffRowHTML(d, i){
+  const tipo = d.tipo || "";
+  return `
+    <div class="debuff-row post-debuff-row" data-posdebuff-idx="${i}">
+      <select data-posdebuff-field="tipo">
+        <option value="" ${tipo===""?"selected":""}>Nenhum</option>
+        <option value="atributo" ${tipo==="atributo"?"selected":""}>Atributo</option>
+        <option value="pericia" ${tipo==="pericia"?"selected":""}>Perícia</option>
+      </select>
+      ${tipo ? `<select data-posdebuff-field="alvo">${buffOptionsHTML(tipo, d.alvo)}</select>
+      <input type="number" min="0" data-posdebuff-field="valor" value="${esc(Math.abs(Number(d.valor)||0))}" style="width:70px;" placeholder="valor">` : ``}
+      <button type="button" class="btn-remove" data-remove-posdebuff="${i}" title="Remover">✕</button>
+    </div>`;
+}
+function posDebuffFieldsHTML(entry){
+  const posDebuffs = entry.posDebuffs || [];
+  return `
+    <div class="buff-choice debuff-choice post-debuff-choice">
+      <label>Debuff(s) do pós-uso (máx. 5) — só se aplicam quando ativados no bloco "Debuff pós-uso" abaixo</label>
+      ${posDebuffs.map((d,i)=>posDebuffRowHTML(d,i)).join("")}
+      ${posDebuffs.length < 5 ? `<button type="button" class="btn-add-mini" data-add-posdebuff>+ Adicionar Debuff Pós-Uso</button>` : ``}
     </div>`;
 }
 function skillCap(){ return (Number(state.meta.na)||0) >= 9 ? 85 : 80; }
@@ -1977,7 +2099,7 @@ function renderChagas(){
   const el = $("#chagasList");
   if(!list.length){ el.innerHTML = `<p class="empty-note">Nenhuma Chaga adquirida ainda.</p>`; return; }
   el.innerHTML = list.map((c,i) => `
-    <div class="entry-card ${isEntryEffectActive(c)?"is-active-effect":"is-inactive-effect"}" data-idx="${i}">
+    <div class="entry-card ${isEntryEffectActive(c)?"is-active-effect":(isPostUseActive(c)?"is-postuse-active":"is-inactive-effect")}" data-idx="${i}">
       <div class="entry-card-head">
         <select class="entry-select" data-field="preset">
           <option value="">— Personalizada —</option>
@@ -1991,6 +2113,8 @@ function renderChagas(){
       <div class="field"><label>Colateral</label><textarea data-field="colateral" rows="2">${esc(c.colateral)}</textarea></div>
       ${buffFieldsHTML(c)}
       ${turnControlHTML(c, "chaga", i)}
+      ${posDebuffFieldsHTML(c)}
+      ${postUseControlHTML(c, "chaga", i)}
     </div>`).join("");
 }
 
@@ -2091,7 +2215,7 @@ function renderMaldicoes(){
   const el = $("#maldicoesList");
   if(!list.length){ el.innerHTML = `<p class="empty-note">Nenhuma Maldição ativa.</p>`; return; }
   el.innerHTML = list.map((m,i) => `
-    <div class="entry-card maldicao-card ${isEntryEffectActive(m)?"is-active-effect":"is-inactive-effect"}" data-idx="${i}">
+    <div class="entry-card maldicao-card ${isEntryEffectActive(m)?"is-active-effect":(isPostUseActive(m)?"is-postuse-active":"is-inactive-effect")}" data-idx="${i}">
       <div class="entry-card-head">
         <div class="entry-select" style="font-family:var(--font-display); color:var(--blood-bright); letter-spacing:.04em; font-size:14px;">Maldição #${i+1}</div>
         <button type="button" class="btn-remove" title="Remover">✕</button>
@@ -2113,6 +2237,8 @@ function renderMaldicoes(){
       <div class="field"><label>Custo de Ativação (se houver)</label><input type="text" data-field="custo" value="${esc(m.custo||"")}" placeholder="Ex: 1 de Resiliência (deixe em branco se não houver custo)"></div>
       ${buffFieldsHTML(m)}
       ${turnControlHTML(m, "maldicao", i)}
+      ${posDebuffFieldsHTML(m)}
+      ${postUseControlHTML(m, "maldicao", i)}
     </div>`).join("");
 }
 
@@ -2188,9 +2314,11 @@ function wireBuffDebuffControls(containerId, arrGetter, renderFn){
   el.addEventListener("click", e => {
     const addBuffBtn = e.target.closest("[data-add-buff]");
     const addDebuffBtn = e.target.closest("[data-add-debuff]");
+    const addPosDebuffBtn = e.target.closest("[data-add-posdebuff]");
     const removeBuffBtn = e.target.closest("[data-remove-buff]");
     const removeDebuffBtn = e.target.closest("[data-remove-debuff]");
-    if(!addBuffBtn && !addDebuffBtn && !removeBuffBtn && !removeDebuffBtn) return;
+    const removePosDebuffBtn = e.target.closest("[data-remove-posdebuff]");
+    if(!addBuffBtn && !addDebuffBtn && !addPosDebuffBtn && !removeBuffBtn && !removeDebuffBtn && !removePosDebuffBtn) return;
     const card = e.target.closest(".entry-card"); if(!card) return;
     const entry = arrGetter()[+card.dataset.idx]; if(!entry) return;
     if(addBuffBtn){
@@ -2199,22 +2327,28 @@ function wireBuffDebuffControls(containerId, arrGetter, renderFn){
     } else if(addDebuffBtn){
       if(!entry.debuffs) entry.debuffs = [];
       if(entry.debuffs.length < 10) entry.debuffs.push({tipo:"", alvo:"", valor:0});
+    } else if(addPosDebuffBtn){
+      if(!entry.posDebuffs) entry.posDebuffs = [];
+      if(entry.posDebuffs.length < 5) entry.posDebuffs.push({tipo:"", alvo:"", valor:0});
     } else if(removeBuffBtn){
       entry.buffs.splice(+removeBuffBtn.dataset.removeBuff, 1);
     } else if(removeDebuffBtn){
       entry.debuffs.splice(+removeDebuffBtn.dataset.removeDebuff, 1);
+    } else if(removePosDebuffBtn){
+      entry.posDebuffs.splice(+removePosDebuffBtn.dataset.removePosdebuff, 1);
     }
     renderFn(); onChange();
   });
   function handleFieldEvent(e, isChange){
-    const isDebuff = !!e.target.dataset.debuffField;
-    const field = isDebuff ? e.target.dataset.debuffField : e.target.dataset.buffField;
+    const isPosDebuff = !!e.target.dataset.posdebuffField;
+    const isDebuff = !isPosDebuff && !!e.target.dataset.debuffField;
+    const field = isPosDebuff ? e.target.dataset.posdebuffField : (isDebuff ? e.target.dataset.debuffField : e.target.dataset.buffField);
     if(!field) return;
     const card = e.target.closest(".entry-card"); if(!card) return;
     const entry = arrGetter()[+card.dataset.idx]; if(!entry) return;
-    const row = e.target.closest(isDebuff ? "[data-debuff-idx]" : "[data-buff-idx]"); if(!row) return;
-    const arr = isDebuff ? entry.debuffs : entry.buffs;
-    const rowIdx = isDebuff ? +row.dataset.debuffIdx : +row.dataset.buffIdx;
+    const row = e.target.closest(isPosDebuff ? "[data-posdebuff-idx]" : (isDebuff ? "[data-debuff-idx]" : "[data-buff-idx]")); if(!row) return;
+    const arr = isPosDebuff ? entry.posDebuffs : (isDebuff ? entry.debuffs : entry.buffs);
+    const rowIdx = isPosDebuff ? +row.dataset.posdebuffIdx : (isDebuff ? +row.dataset.debuffIdx : +row.dataset.buffIdx);
     if(!arr || !arr[rowIdx]) return;
     if(field === "valor"){
       arr[rowIdx].valor = e.target.value;
@@ -2239,6 +2373,10 @@ function migrateEntryBuffs(list){
       entry.buffs = (entry.buffTipo && entry.buffAlvo) ? [{tipo:entry.buffTipo, alvo:entry.buffAlvo, valor:Math.abs(Number(entry.buffValor)||0)}] : [];
     }
     if(!entry.debuffs) entry.debuffs = [];
+    if(!entry.posDebuffs) entry.posDebuffs = [];
+    if(entry.posAtiva === undefined) entry.posAtiva = false;
+    if(entry.posTurnos === undefined) entry.posTurnos = 1;
+    if(entry.posTurnosRestantes === undefined) entry.posTurnosRestantes = 0;
   });
 }
 
@@ -2685,12 +2823,12 @@ function bindEvents(){
     ];
   }, () => renderPathLevels());
 
-  $("#btnAddChaga").addEventListener("click", () => { state.chagas.push({nome:"",efeito:"",custo:"",colateral:"",presetKey:"",buffs:[],debuffs:[],ativa:false,turnos:0,turnosRestantes:0}); renderChagas(); onChange(); });
+  $("#btnAddChaga").addEventListener("click", () => { state.chagas.push({nome:"",efeito:"",custo:"",colateral:"",presetKey:"",buffs:[],debuffs:[],ativa:false,turnos:0,turnosRestantes:0,posDebuffs:[],posAtiva:false,posTurnos:1,posTurnosRestantes:0}); renderChagas(); onChange(); });
   wireEntryList("chagasList", () => state.chagas, renderChagas, (idx,val) => {
     if(!val){ state.chagas[idx].presetKey = ""; return; }
     const [cat,i] = val.split("|");
     const item = CHAGAS[cat][+i];
-    state.chagas[idx] = { nome:item.nome, efeito:item.efeito, custo:item.custo, colateral:item.colateral, presetKey:val, buffs:[], debuffs:[], ativa:false, turnos:0, turnosRestantes:0 };
+    state.chagas[idx] = { nome:item.nome, efeito:item.efeito, custo:item.custo, colateral:item.colateral, presetKey:val, buffs:[], debuffs:[], ativa:false, turnos:0, turnosRestantes:0, posDebuffs:[], posAtiva:false, posTurnos:1, posTurnosRestantes:0 };
   });
   wireBuffDebuffControls("chagasList", () => state.chagas, renderChagas);
 
@@ -2718,7 +2856,7 @@ function bindEvents(){
   wireBuffDebuffControls("marcasList", () => state.marcas, renderMarcas);
 
   $("#btnAddMaldicao").addEventListener("click", () => {
-    state.maldicoes.push({nome:"", alvoTipo:"corpo", alvoNome:"", origem:"", efeitoPositivo:"", efeitoNegativo:"", remocao:"", custo:"", buffs:[], debuffs:[], ativa:false, turnos:0, turnosRestantes:0});
+    state.maldicoes.push({nome:"", alvoTipo:"corpo", alvoNome:"", origem:"", efeitoPositivo:"", efeitoNegativo:"", remocao:"", custo:"", buffs:[], debuffs:[], ativa:false, turnos:0, turnosRestantes:0, posDebuffs:[], posAtiva:false, posTurnos:1, posTurnosRestantes:0});
     renderMaldicoes(); onChange();
   });
   wireEntryList("maldicoesList", () => state.maldicoes, renderMaldicoes, null);
@@ -2786,6 +2924,8 @@ function bindEvents(){
   wireTurnControls("chagasList", "chaga", c => "Chaga: " + (c.nome || "sem nome"));
   wireTurnControls("rituaisList", "ritual", r => "Ritual: " + (r.nome || "sem nome"));
   wireTurnControls("maldicoesList", "maldicao", m => "Maldição: " + (m.nome || "sem nome"));
+  wirePostUseControls("chagasList", "chaga");
+  wirePostUseControls("maldicoesList", "maldicao");
 
   $("#refArmas").addEventListener("click", e => {
     const btn = e.target.closest("[data-add-arma]");
