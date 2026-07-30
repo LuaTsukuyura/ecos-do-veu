@@ -112,6 +112,13 @@ button, input, select, textarea{ font-family:inherit; }
 .char-bar-status{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-dim); flex-basis:100%; text-align:right; }
 @media (min-width:641px){ .char-bar-status{ flex-basis:auto; margin-left:10px; } }
 .char-bar-status.error{ color:var(--blood-bright); }
+.char-bar-mesa{ display:flex; align-items:baseline; gap:8px; font-size:12.5px; color:var(--text-muted); }
+.char-bar-mesa .mesa-eyebrow{ font-size:10.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--text-dim); }
+.char-bar-mesa strong{ font-family:var(--font-display); font-size:14px; letter-spacing:.03em; color:var(--brass-bright); font-weight:600; }
+.btn-link-mesa{ background:none; border:none; padding:0; margin:0; color:var(--brass); text-decoration:underline; text-underline-offset:2px; font-size:11.5px; letter-spacing:.03em; }
+.btn-link-mesa:hover{ color:var(--brass-bright); background:none; border-color:transparent; }
+
+.is-hidden{ display:none !important; }
 
 button{
   cursor:pointer;
@@ -440,10 +447,48 @@ details.reference summary::-webkit-details-marker{ display:none; }
 
 footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; margin-top:22px; letter-spacing:.04em; }
 
+/* ---------- MESA SELECT OVERLAY ---------- */
+.mesa-overlay{
+  position:fixed; inset:0; z-index:999;
+  display:flex; align-items:center; justify-content:center;
+  padding:26px 20px;
+  background:
+    radial-gradient(ellipse at 18% 12%, rgba(139,58,52,0.10), transparent 55%),
+    radial-gradient(ellipse at 82% 88%, rgba(107,85,144,0.13), transparent 55%),
+    var(--bg);
+  overflow-y:auto;
+}
+.mesa-overlay-inner{ max-width:660px; width:100%; text-align:center; }
+.mesa-emblem{ width:60px; height:60px; color:var(--brass); margin:0 auto 16px; filter:drop-shadow(0 0 8px rgba(184,147,90,.28)); }
+.mesa-overlay-title{ font-family:var(--font-display); text-transform:uppercase; letter-spacing:.14em; font-size:clamp(22px,5vw,32px); color:var(--text); font-weight:700; }
+.mesa-overlay-sub{ color:var(--text-muted); font-style:italic; margin:8px 0 32px; font-size:14.5px; }
+.mesa-cards{ display:grid; gap:14px; grid-template-columns:1fr; }
+@media (min-width:680px){ .mesa-cards{ grid-template-columns:repeat(3,1fr); } }
+.mesa-card{
+  position:relative;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:28px 16px 24px;
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-alt));
+  border:1px solid var(--border); border-radius:var(--radius);
+  text-align:center; overflow:hidden;
+  transition:border-color .15s, transform .15s, box-shadow .15s;
+}
+.mesa-card::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--mesa-accent, var(--brass)); opacity:.8;
+}
+.mesa-card:hover{ border-color:var(--mesa-accent, var(--brass)); transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.35); }
+.mesa-card:active{ transform:translateY(0); }
+.mesa-card-eyebrow{ font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--text-dim); }
+.mesa-card-title{ font-family:var(--font-display); font-size:16.5px; letter-spacing:.03em; color:var(--mesa-accent, var(--brass-bright)); margin-top:6px; line-height:1.3; }
+.mesa-card-tag{ margin-top:12px; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--brass-bright); border:1px solid var(--border-bright); border-radius:20px; padding:3px 10px; }
+.mesa-overlay-close{ margin-top:28px; background:none; border:1px solid var(--border-bright); color:var(--text-muted); }
+.mesa-overlay-close:hover{ color:var(--text); }
+
 /* ---------- PRINT ---------- */
 @media print{
   body{ background:#fff !important; color:#111 !important; }
-  .char-bar, .tabs, .masthead-stamp, .btn-add, .btn-remove, details.reference, footer.appfoot{ display:none !important; }
+  .char-bar, .tabs, .masthead-stamp, .btn-add, .btn-remove, details.reference, footer.appfoot, .mesa-overlay{ display:none !important; }
   .app{ max-width:100%; padding:0; }
   .masthead{ border:1px solid #999; background:#fff !important; }
   .masthead-title h1, .masthead-title p{ color:#111 !important; }
@@ -457,7 +502,74 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
 </style>
 </head>
 <body>
-<div class="app">
+
+<div id="mesaOverlay" class="mesa-overlay" aria-hidden="false">
+  <div class="mesa-overlay-inner">
+    <svg class="mesa-emblem" viewBox="0 0 100 100" aria-hidden="true">
+      <g fill="currentColor" opacity="0.95">
+      <polygon points="48.98,82.78 53.20,63.83 58.32,42.94 55.10,63.90 51.02,83.22"/>
+      <polygon points="49.14,82.33 61.19,60.68 76.00,35.72 65.81,61.32 50.86,83.67"/>
+      <polygon points="49.26,81.87 71.88,64.24 94.94,44.83 73.12,66.16 50.74,84.13"/>
+      <polygon points="49.60,81.66 76.16,71.94 100.85,61.10 76.85,73.06 50.40,84.34"/>
+      <polygon points="48.98,83.22 44.90,63.90 41.68,42.94 46.80,63.83 51.02,82.78"/>
+      <polygon points="49.14,83.67 38.81,61.32 24.00,35.72 38.19,60.68 50.86,82.33"/>
+      <polygon points="49.26,84.13 28.88,66.16 5.06,44.83 28.12,64.24 50.74,81.87"/>
+      <polygon points="49.60,84.34 23.15,73.06 -0.85,61.10 23.84,71.94 50.40,81.66"/>
+      </g>
+      <circle cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <g stroke="currentColor" stroke-width="1.3" fill="none" opacity="0.9" stroke-linecap="round">
+        <path d="M50,50 Q42,42 33,32"/>
+        <path d="M50,50 Q58,42 67,32"/>
+        <path d="M50,50 Q39,50 25,50"/>
+        <path d="M50,50 Q61,50 75,50"/>
+        <path d="M50,50 Q42,58 33,68"/>
+        <path d="M50,50 Q58,58 67,68"/>
+      </g>
+      <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <line x1="30" y1="28" x2="36" y2="34"/>
+        <line x1="30" y1="34" x2="36" y2="28"/>
+        <line x1="70" y1="28" x2="64" y2="34"/>
+        <line x1="70" y1="34" x2="64" y2="28"/>
+        <line x1="20" y1="47" x2="20" y2="53"/>
+        <line x1="17" y1="50" x2="23" y2="50"/>
+        <line x1="80" y1="47" x2="80" y2="53"/>
+        <line x1="77" y1="50" x2="83" y2="50"/>
+        <line x1="30" y1="66" x2="36" y2="72"/>
+        <line x1="30" y1="72" x2="36" y2="66"/>
+        <line x1="70" y1="66" x2="64" y2="72"/>
+        <line x1="70" y1="72" x2="64" y2="66"/>
+      </g>
+      <g fill="currentColor">
+        <polygon points="50,6 46,17 54,17"/>
+        <rect x="48.4" y="16" width="3.2" height="9" rx="0.5"/>
+        <rect x="35" y="24" width="30" height="3.4" rx="1.2"/>
+        <polygon points="45.5,27 54.5,27 50.6,90 49.4,90"/>
+      </g>
+    </svg>
+    <h1 class="mesa-overlay-title">Ecos do Véu</h1>
+    <p class="mesa-overlay-sub">Selecione a mesa em que você está jogando</p>
+    <div class="mesa-cards">
+      <button type="button" class="mesa-card" data-mesa="inicio-do-caos" style="--mesa-accent:var(--arcane-bright)">
+        <span class="mesa-card-eyebrow">Ecos do Véu</span>
+        <span class="mesa-card-title">Início do Caos</span>
+        <span class="mesa-card-tag" data-last-tag hidden>Última mesa</span>
+      </button>
+      <button type="button" class="mesa-card" data-mesa="sob-o-banhar-do-luar" style="--mesa-accent:var(--brass-bright)">
+        <span class="mesa-card-eyebrow">Ecos do Véu</span>
+        <span class="mesa-card-title">Sob o Banhar do Luar</span>
+        <span class="mesa-card-tag" data-last-tag hidden>Última mesa</span>
+      </button>
+      <button type="button" class="mesa-card" data-mesa="circo-de-sangue" style="--mesa-accent:var(--blood-bright)">
+        <span class="mesa-card-eyebrow">Ecos do Véu</span>
+        <span class="mesa-card-title">Circo de Sangue</span>
+        <span class="mesa-card-tag" data-last-tag hidden>Última mesa</span>
+      </button>
+    </div>
+    <button type="button" id="btnFecharMesaOverlay" class="mesa-overlay-close" hidden>Cancelar</button>
+  </div>
+</div>
+
+<div id="appRoot" class="app is-hidden">
 
   <header class="masthead">
     <svg class="emblem-svg" viewBox="0 0 100 100" aria-hidden="true">
@@ -509,6 +621,11 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
   </header>
 
   <div class="char-bar">
+    <div class="char-bar-mesa">
+      <span class="mesa-eyebrow">Mesa</span>
+      <strong id="mesaAtualLabel">—</strong>
+      <button type="button" id="btnTrocarMesa" class="btn-link-mesa">Trocar mesa</button>
+    </div>
     <div class="char-bar-select">
       <label for="charSelect">Agente</label>
       <select id="charSelect"></select>
@@ -1176,6 +1293,7 @@ function blankState(){
   return {
     id: uid(),
     ownerId: currentUid,
+    mesa: currentMesa,
     meta:{ nome:"", origem:"", idade:"", sexo:"", descFisica:"", na:1, pm:0, pe:0, historia:"", foto:"" },
     atributos:{ for:1, agi:1, int:1, car:1, von:1, vit:0 },
     pericias: Object.fromEntries(SKILLS.map(s=>[s.key,20])),
@@ -2175,6 +2293,88 @@ function ensureAuth(){
   });
 }
 
+/* =====================================================================
+   MESAS
+   Cada mesa é uma "sala" separada: as fichas criadas numa mesa só
+   aparecem para quem está naquela mesma mesa. O campo "mesa" é gravado
+   em cada ficha e todas as consultas ao Firestore são filtradas por ele.
+   ===================================================================== */
+const MESAS = [
+  { id:"inicio-do-caos",        titulo:"Ecos do Véu", subtitulo:"Início do Caos" },
+  { id:"sob-o-banhar-do-luar",  titulo:"Ecos do Véu", subtitulo:"Sob o Banhar do Luar" },
+  { id:"circo-de-sangue",       titulo:"Ecos do Véu", subtitulo:"Circo de Sangue" },
+];
+const MESA_STORAGE_KEY = "veu_mesa_atual";
+let currentMesa = null;
+let unsubscribeFichas = null;
+
+function mesaInfo(id){ return MESAS.find(m => m.id === id) || null; }
+
+function showMesaOverlay(cancellable){
+  const overlay = $("#mesaOverlay");
+  const last = localStorage.getItem(MESA_STORAGE_KEY);
+  $$(".mesa-card [data-last-tag]").forEach(t => t.hidden = true);
+  if(last){
+    const tag = overlay.querySelector(`.mesa-card[data-mesa="${last}"] [data-last-tag]`);
+    if(tag) tag.hidden = false;
+  }
+  $("#btnFecharMesaOverlay").hidden = !cancellable;
+  overlay.classList.remove("is-hidden");
+  $("#appRoot").classList.add("is-hidden");
+}
+function hideMesaOverlay(){
+  $("#mesaOverlay").classList.add("is-hidden");
+  $("#appRoot").classList.remove("is-hidden");
+}
+
+// Assina (em tempo real) apenas as fichas da mesa atualmente selecionada.
+// Sempre que a mesa muda, cancela a assinatura anterior antes de criar outra.
+function attachRealtimeListener(){
+  if(unsubscribeFichas){ unsubscribeFichas(); unsubscribeFichas = null; }
+  if(!currentMesa) return;
+  unsubscribeFichas = fichasRef.where("mesa","==",currentMesa).onSnapshot(() => {
+    populateCharSelect($("#charSelect") ? $("#charSelect").value : undefined);
+  }, err => console.error(err));
+}
+
+async function loadMesaData(){
+  const idx = await loadIndex();
+  const myIds = Object.keys(idx).filter(id => idx[id].ownerId === currentUid);
+  if(myIds.length){
+    myIds.sort((a,b) => (idx[b].updatedAt||0) - (idx[a].updatedAt||0));
+    state = await loadChar(myIds[0]) || blankState();
+  } else {
+    state = blankState();
+  }
+  await populateCharSelect(state.id);
+  hydrateFormFromState();
+  if(!myIds.length){ await saveCurrent(); }
+}
+
+async function enterMesa(mesaId){
+  const info = mesaInfo(mesaId);
+  if(!info) return;
+  currentMesa = mesaId;
+  localStorage.setItem(MESA_STORAGE_KEY, mesaId);
+  $("#mesaAtualLabel").textContent = info.subtitulo;
+  hideMesaOverlay();
+  attachRealtimeListener();
+  await loadMesaData();
+}
+
+function bindMesaEvents(){
+  $$(".mesa-card").forEach(card => {
+    card.addEventListener("click", () => enterMesa(card.dataset.mesa));
+  });
+  $("#btnFecharMesaOverlay").addEventListener("click", () => {
+    if(currentMesa) hideMesaOverlay();
+  });
+  $("#btnTrocarMesa").addEventListener("click", async () => {
+    if(state && (!state.ownerId || state.ownerId === currentUid)){ await saveCurrent(); }
+    showMesaOverlay(true);
+  });
+}
+
 // Mostra a ficha como "somente leitura" quando o usuário atual não é o dono
 function applyOwnershipUI(){
   const isOwner = !state.ownerId || state.ownerId === currentUid;
@@ -2203,6 +2403,7 @@ function scheduleSave(){
 async function saveCurrent(){
   try{
     state.updatedAt = Date.now();
+    if(!state.mesa) state.mesa = currentMesa;
     await fichasRef.doc(state.id).set(state);
     setStatus("Salvo às " + new Date(state.updatedAt).toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"}));
   }catch(err){
@@ -2210,9 +2411,12 @@ async function saveCurrent(){
     setStatus("Erro ao salvar — verifique sua conexão e a configuração do Firebase", true);
   }
 }
+// Só traz as fichas da mesa atualmente selecionada — é isso que garante
+// que cada mesa só veja seus próprios personagens.
 async function loadIndex(){
+  if(!currentMesa) return {};
   try{
-    const snap = await fichasRef.get();
+    const snap = await fichasRef.where("mesa","==",currentMesa).get();
     const idx = {};
     snap.forEach(doc => {
       const d = doc.data();
@@ -2242,10 +2446,6 @@ async function populateCharSelect(selectedId){
   if(!entries.length){ sel.innerHTML = `<option value="">Nenhum agente salvo</option>`; return; }
   sel.innerHTML = entries.map(([id,info]) => `<option value="${id}" ${id===selectedId?"selected":""}>${esc(info.nome || "Sem nome")}</option>`).join("");
 }
-// Mantém a lista de fichas atualizada em tempo real para todo mundo
-fichasRef.onSnapshot(() => {
-  populateCharSelect($("#charSelect") ? $("#charSelect").value : undefined);
-}, err => console.error(err));
 
 /* =====================================================================
    UI ESTÁTICA
@@ -2611,18 +2811,9 @@ async function init(){
   await ensureAuth();
   buildStaticUI();
   bindEvents();
-
-  const idx = await loadIndex();
-  const myIds = Object.keys(idx).filter(id => idx[id].ownerId === currentUid);
-  if(myIds.length){
-    myIds.sort((a,b) => (idx[b].updatedAt||0) - (idx[a].updatedAt||0));
-    state = await loadChar(myIds[0]) || blankState();
-  } else {
-    state = blankState();
-  }
-  await populateCharSelect(state.id);
-  hydrateFormFromState();
-  if(!myIds.length){ await saveCurrent(); }
+  bindMesaEvents();
+  // Ninguém entra direto na ficha: primeiro escolhe em qual mesa está jogando.
+  showMesaOverlay(false);
 }
 init();
 
