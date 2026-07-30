@@ -378,6 +378,19 @@ details.reference summary::-webkit-details-marker{ display:none; }
 .entry-card .field{ margin-bottom:10px; }
 .entry-card .field:last-child{ margin-bottom:0; }
 .empty-note{ color:var(--text-dim); font-style:italic; font-size:13.5px; padding:10px 2px; }
+.photo-upload{ display:flex; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap; }
+.photo-preview{
+  width:96px; height:96px; border-radius:4px; overflow:hidden; flex-shrink:0;
+  background:var(--bg-input); border:1px solid var(--border-light);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text-dim); font-size:10.5px; text-align:center; text-transform:uppercase; letter-spacing:.06em;
+}
+.photo-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
+.photo-preview.npc-photo-preview{ width:64px; height:64px; }
+.photo-upload-actions{ display:flex; flex-direction:column; gap:8px; }
+.photo-upload-actions .btn-row{ display:flex; gap:8px; }
+.npc-card-head-row{ display:flex; gap:14px; align-items:flex-start; }
+.npc-card-fields{ flex:1; display:flex; flex-direction:column; gap:10px; }
 
 /* ---------- STRIKES / COMBAT ---------- */
 .strikes-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:10px; }
@@ -510,6 +523,16 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
       <!-- I. IDENTIFICAÇÃO -->
       <section class="tab-panel active" data-panel="identificacao">
         <h2 class="panel-title">Identificação do Agente</h2>
+        <div class="photo-upload">
+          <div class="photo-preview" id="agentePhotoPreview">Sem foto</div>
+          <div class="photo-upload-actions">
+            <div class="btn-row">
+              <button type="button" class="btn-secondary" id="btnAgentePhoto">Escolher foto</button>
+              <button type="button" class="btn-secondary btn-danger" id="btnRemoveAgentePhoto">Remover</button>
+            </div>
+            <input type="file" id="f-foto" accept="image/*" hidden>
+          </div>
+        </div>
         <div class="field-grid">
           <div class="field field-full"><label for="f-nome">Nome / Codinome</label><input type="text" id="f-nome" placeholder="Nome completo ou codinome de campo"></div>
           <div class="field"><label for="f-origem">Origem</label><select id="f-origem"></select></div>
@@ -538,6 +561,11 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
 
         <h2 class="panel-title">História &amp; Antecedentes</h2>
         <div class="field field-full"><textarea id="f-historia" rows="7" placeholder="O que trouxe este agente até a V.E.U.? Que cicatrizes carrega do encontro com o inexplicável?"></textarea></div>
+
+        <h2 class="panel-title" style="margin-top:22px;">NPCs Relacionados</h2>
+        <p class="hint" style="margin-top:0;">Contatos, aliados, familiares ou inimigos ligados à história deste agente.</p>
+        <div id="npcsList"></div>
+        <button type="button" class="btn-secondary" id="btnAddNpc" style="margin-top:8px;">+ Adicionar NPC</button>
       </section>
 
       <!-- II. ATRIBUTOS & PERÍCIAS -->
@@ -721,6 +749,31 @@ function esc(v){
 }
 function clampInt(v,min,max){ let n = parseInt(v,10); if(isNaN(n)) n = min; return Math.max(min, Math.min(max, n)); }
 function uid(){ return "char_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,8); }
+
+/* Lê um arquivo de imagem e devolve uma versão redimensionada em base64,
+   para caber com folga no limite de tamanho de um documento do Firestore. */
+function fileToResizedDataURL(file, maxSize){
+  return new Promise((resolve, reject) => {
+    if(!file || !file.type.startsWith("image/")){ reject(new Error("Arquivo não é uma imagem")); return; }
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Falha ao ler o arquivo"));
+    reader.onload = () => {
+      img.onerror = () => reject(new Error("Falha ao carregar a imagem"));
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if(w > h && w > maxSize){ h = Math.round(h * (maxSize / w)); w = maxSize; }
+        else if(h > maxSize){ w = Math.round(w * (maxSize / h)); h = maxSize; }
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", 0.78));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 /* =====================================================================
    DADOS DO SISTEMA (extraídos dos livros de regras enviados)
@@ -1083,7 +1136,7 @@ function blankState(){
   return {
     id: uid(),
     ownerId: currentUid,
-    meta:{ nome:"", origem:"", idade:"", sexo:"", descFisica:"", na:1, pm:0, pe:0, historia:"" },
+    meta:{ nome:"", origem:"", idade:"", sexo:"", descFisica:"", na:1, pm:0, pe:0, historia:"", foto:"" },
     atributos:{ for:1, agi:1, int:1, car:1, von:1, vit:0 },
     pericias: Object.fromEntries(SKILLS.map(s=>[s.key,0])),
     caminho:{ pathIndex:null, n1:false, n2:false, n3:false },
@@ -1096,6 +1149,7 @@ function blankState(){
     rituais:[],
     marcas:[],
     maldicoes:[],
+    npcs:[],
     pv:{ atual:0 },
     strikes:{ cabeca:0, tronco:0, membros:0 },
     armas:[],
@@ -1752,6 +1806,39 @@ function renderMaldicoes(){
     </div>`).join("");
 }
 
+function updateAgentePhotoPreview(){
+  const el = $("#agentePhotoPreview");
+  if(!el) return;
+  el.innerHTML = state.meta.foto ? `<img src="${state.meta.foto}" alt="Foto do agente">` : "Sem foto";
+}
+
+/* --- NPCs Relacionados --- */
+function renderNpcs(){
+  const list = state.npcs || [];
+  const el = $("#npcsList");
+  if(!list.length){ el.innerHTML = `<p class="empty-note">Nenhum NPC cadastrado ainda.</p>`; return; }
+  el.innerHTML = list.map((n,i) => `
+    <div class="entry-card npc-card" data-idx="${i}">
+      <div class="entry-card-head">
+        <div class="entry-select" style="font-family:var(--font-display); color:var(--arcane-bright); letter-spacing:.04em; font-size:14px;">${esc(n.nome) || ("NPC #" + (i+1))}</div>
+        <button type="button" class="btn-remove" title="Remover">✕</button>
+      </div>
+      <div class="npc-card-head-row">
+        <div class="photo-preview npc-photo-preview" data-npc-photo="${i}">${n.foto ? `<img src="${n.foto}" alt="Foto de ${esc(n.nome)}">` : "Sem foto"}</div>
+        <div class="npc-card-fields">
+          <div class="btn-row">
+            <button type="button" class="btn-secondary" data-npc-photo-btn="${i}">Escolher foto</button>
+            <button type="button" class="btn-secondary btn-danger" data-npc-photo-remove="${i}">Remover foto</button>
+            <input type="file" accept="image/*" data-npc-photo-input="${i}" hidden>
+          </div>
+          <div class="field"><label>Nome</label><input type="text" data-field="nome" value="${esc(n.nome)}" placeholder="Nome do NPC"></div>
+        </div>
+      </div>
+      <div class="field"><label>Lore</label><textarea data-field="lore" rows="3" placeholder="Quem é, de onde veio, o que sabe...">${esc(n.lore)}</textarea></div>
+      <div class="field"><label>Personalidade</label><textarea data-field="personalidade" rows="2" placeholder="Traços marcantes, jeito de agir e falar...">${esc(n.personalidade)}</textarea></div>
+    </div>`).join("");
+}
+
 function wireEntryList(containerId, arrGetter, renderFn, onPreset){
   const el = document.getElementById(containerId);
   el.addEventListener("click", e=>{
@@ -1838,6 +1925,9 @@ function hydrateFormFromState(){
 
   if(!state.marcas) state.marcas = [];
   if(!state.maldicoes) state.maldicoes = [];
+  if(!state.npcs) state.npcs = [];
+  if(state.meta.foto === undefined) state.meta.foto = "";
+  updateAgentePhotoPreview();
 
   renderOriginCard();
   renderCaminhoArea();
@@ -1845,6 +1935,7 @@ function hydrateFormFromState(){
   renderRituais();
   renderMarcas();
   renderMaldicoes();
+  renderNpcs();
   renderArmas();
   renderInventario();
   renderAll();
@@ -2161,6 +2252,56 @@ function bindEvents(){
     renderMaldicoes(); onChange();
   });
   wireEntryList("maldicoesList", () => state.maldicoes, renderMaldicoes, null);
+
+  /* --- NPCs Relacionados --- */
+  $("#btnAddNpc").addEventListener("click", () => {
+    if(!state.npcs) state.npcs = [];
+    state.npcs.push({nome:"", lore:"", personalidade:"", foto:""});
+    renderNpcs(); onChange();
+  });
+  wireEntryList("npcsList", () => state.npcs, renderNpcs, null);
+  $("#npcsList").addEventListener("click", e => {
+    const photoBtn = e.target.closest("[data-npc-photo-btn]");
+    if(photoBtn){
+      const idx = photoBtn.dataset.npcPhotoBtn;
+      $(`[data-npc-photo-input="${idx}"]`).click();
+      return;
+    }
+    const removeBtn = e.target.closest("[data-npc-photo-remove]");
+    if(removeBtn){
+      const idx = +removeBtn.dataset.npcPhotoRemove;
+      state.npcs[idx].foto = "";
+      renderNpcs(); onChange();
+    }
+  });
+  $("#npcsList").addEventListener("change", async e => {
+    const input = e.target.closest("[data-npc-photo-input]");
+    if(!input || !input.files || !input.files[0]) return;
+    const idx = +input.dataset.npcPhotoInput;
+    try{
+      const dataUrl = await fileToResizedDataURL(input.files[0], 300);
+      state.npcs[idx].foto = dataUrl;
+      renderNpcs(); onChange();
+    }catch(err){ console.error(err); alert("Não foi possível carregar essa imagem."); }
+  });
+
+  /* --- Foto do Agente --- */
+  $("#btnAgentePhoto").addEventListener("click", () => $("#f-foto").click());
+  $("#btnRemoveAgentePhoto").addEventListener("click", () => {
+    state.meta.foto = "";
+    updateAgentePhotoPreview();
+    onChange();
+  });
+  $("#f-foto").addEventListener("change", async e => {
+    if(!e.target.files || !e.target.files[0]) return;
+    try{
+      const dataUrl = await fileToResizedDataURL(e.target.files[0], 400);
+      state.meta.foto = dataUrl;
+      updateAgentePhotoPreview();
+      onChange();
+    }catch(err){ console.error(err); alert("Não foi possível carregar essa imagem."); }
+    e.target.value = "";
+  });
 
   $("#marcasList").addEventListener("click", e => {
     const btn = e.target.closest("[data-use-marca]");
