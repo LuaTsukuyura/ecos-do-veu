@@ -223,6 +223,7 @@ button:active{ transform:translateY(1px); }
 .falha-critica-field textarea{ border-color:#5c2b27; }
 .falha-critica-field label{ color:var(--blood-bright); }
 .buff-fixed-note{ margin-top:6px; font-size:12.5px; color:var(--brass-bright); font-style:italic; }
+.buff-fixed-note.buff-pending-note{ color:var(--text-dim); }
 
 /* ---------- USE / SPEND BUTTONS ---------- */
 .btn-use{
@@ -2015,7 +2016,19 @@ function renderOriginCard(){
     box.innerHTML = `<p class="buff-fixed-note">Bônus automático aplicado: +${r.amount}${r.type==="skill"?"%":""} em ${esc(nome||k)}.</p>`;
   }
   const sel = $("#f-buffOrigem");
-  if(sel) sel.addEventListener("change", e=>{ state.buffChoices.origem = e.target.value; onChange(); });
+  if(sel){
+    sel.addEventListener("change", e=>{
+      state.buffChoices.origem = e.target.value;
+      renderOriginCard();
+      onChange();
+    });
+    if(state.buffChoices.origem){
+      const nomeEsc = SKILLS.find(s=>s.key===state.buffChoices.origem) || ATTRS.find(a=>a.key===state.buffChoices.origem) || {};
+      box.innerHTML += `<p class="buff-fixed-note">✓ Bônus aplicado: +${r.amount}${r.type==="skill"?"%":""} em ${esc(nomeEsc.nome||state.buffChoices.origem)}.</p>`;
+    } else {
+      box.innerHTML += `<p class="buff-fixed-note buff-pending-note">Escolha uma opção acima para aplicar o bônus.</p>`;
+    }
+  }
 
   if(rules.origemAttr){
     const ra = rules.origemAttr;
