@@ -743,7 +743,7 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
       <!-- II. ATRIBUTOS & PERÍCIAS -->
       <section class="tab-panel" data-panel="atributos">
         <h2 class="panel-title">Atributos</h2>
-        <p class="hint">Distribua 20 pontos. FOR / AGI / INT / CAR começam em 1 (máx. 12, custo 1 ponto cada). VON começa em 1 e VIT começa em 0 — ambos com máx. 5, custo 2 pontos cada (VON concede +2 SAN por ponto, até +10; VIT concede +2 PV por ponto, até +10).</p>
+        <p class="hint">Distribua 30 pontos. FOR / AGI / INT / CAR / VON começam em 1 (máx. 20, custo 1 ponto cada). VIT começa em 0 (máx. 5, custo 2 pontos cada — concede +2 PV por ponto, até +10).</p>
         <div class="points-tracker">
           <span>Pontos usados: <strong id="ptsUsed">0</strong> / 30</span>
           <span id="ptsRemaining" class="pts-remaining">30 restantes</span>
@@ -752,7 +752,7 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
         <p class="hint">O campo "Total" abaixo de cada atributo mostra o valor base somado a bônus vindos de Origem, Caminho, Chagas, Marcas, Maldições e Rituais.</p>
 
         <h2 class="panel-title">Perícias</h2>
-        <p class="hint">Valores em pontos (4 a 12, até 14 com N.A. 9 ou habilidade/Origem específica). Cada nível usa um dado diferente no teste: 4 Iniciante (d4) · 6 Aprendiz (d6) · 8 Competente (d8) · 10 Experiente (d10) · 12 Mestre (d12) · 14 (d14).</p>
+        <p class="hint">Valores em %. Referência de proficiência: 20 Iniciante · 40 Aprendiz · 50 Competente · 60 Experiente · 65 Especialista · 70 Mestre.</p>
         <div class="skills-grid" id="skillsGrid"></div>
 
         <details class="reference">
@@ -771,41 +771,6 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
           <div class="path-levels" id="pathLevels"></div>
           <div class="pe-tracker">PE investidos nesta progressão: <span id="peOrigemSpent">0</span></div>
         </div>
-
-        <details class="reference">
-          <summary>Consultar Pactos &amp; Fragmentado (Primordiais)</summary>
-          <div class="reference-inner">
-            <p style="font-size:13.5px; color:var(--text-muted); line-height:1.6; margin:0 0 10px;">
-              <strong>Fragmentado</strong> é o personagem escolhido por um dos 5 Primordiais, carregando um fragmento dele para sempre (caminho Fractus da Origem Filhos do Véu). Junto com o Mestre, crie o Fragmento com nome, efeito, custo (de acordo com o Primordial) e falha.<br><br>
-              <strong>Pactos</strong> trocam humanidade por poder. Exigem N.A. 3+, um item marcado por um Primordial e um Ocultista de alto nível para firmar o Pacto. Cada item concede 2 Pactos possíveis (escolha 1 por item); um personagem pode ter no máximo <strong>2 Pactos</strong>, do mesmo Primordial ou de Primordiais diferentes — uma vez aprendidos, não podem ser trocados ou removidos.
-            </p>
-            <table class="ref-table">
-              <thead><tr><th>Primordial</th><th>Tema</th><th>Custo do Fragmento</th><th>Modificação Corporal (1 / 2 Pactos)</th></tr></thead>
-              <tbody>
-                <tr><td class="num">Morte</td><td>Habilidades que brincam com a vida humana ou não humana.</td><td>Usa primariamente o PV do personagem.</td><td>Pele perde a cor e fica fria / Olheiras profundas, respiração e batimentos quase imperceptíveis.</td></tr>
-                <tr><td class="num">Medo</td><td>Manipula o sobrenatural como se fosse parte de si mesmo.</td><td>Usa primariamente a SAN do personagem.</td><td>Cabelo perde pigmentação (mescla de branco) / Pele pálida, olhos acinzentados e sobrenaturais.</td></tr>
-                <tr><td class="num">Angústia</td><td>Manipula a percepção e a mente de outros como brinquedos.</td><td>Usa primariamente a RES do personagem.</td><td>Pequenas rachaduras pelo corpo (olhos e articulações) / Íris avermelhada, ouve vozes do além.</td></tr>
-                <tr><td class="num">Sofrimento</td><td>O próprio sofrimento e o alheio alimentam corpo e mente.</td><td>Autoinflige strikes ao custo de poder.</td><td>Olhos e cabelo vermelho-sangue / Pele avermelhada, veias dilatadas.</td></tr>
-                <tr><td class="num">Caos</td><td>A energia caótica intensifica o corpo como uma máquina.</td><td>Dissociação (vê a si e aos outros como objetos/máquinas).</td><td>Corpo cada vez menos carne, mente cada vez menos humana / Partes de metal substituem partes do corpo.</td></tr>
-              </tbody>
-            </table>
-            <table class="ref-table" style="margin-top:10px;">
-              <thead><tr><th>Primordial</th><th>Pacto</th><th>Efeito</th></tr></thead>
-              <tbody>
-                <tr><td class="num">Angústia</td><td>Olhos Carmesim</td><td>2x/sessão cria uma ilusão poderosa: 2d4 de dano de SAN (Espiritual em Ecos) e prende o alvo por 1d4 turnos com -4 em todos os Atributos e Perícias dentro da ilusão.</td></tr>
-                <tr><td class="num">Angústia</td><td>Rei dos Pesadelos</td><td>Ilusões causam +3 de dano de sanidade e duram 1 turno a mais; imune a ilusões.</td></tr>
-                <tr><td class="num">Sofrimento</td><td>Canhão de Vidro</td><td>Ataques causam +2d4 de dano extra, mas você recebe 1d4 de dano extra.</td></tr>
-                <tr><td class="num">Sofrimento</td><td>Berserk</td><td>A cada ataque recebido, -1 de dano recebido e +1 de dano causado (acumula na sessão, reinicia ao final dela).</td></tr>
-                <tr><td class="num">Morte</td><td>Decadência</td><td>Ganha o ritual exclusivo "Decadência" (material adicional de Chagas e Rituais).</td></tr>
-                <tr><td class="num">Morte</td><td>Último Suspiro</td><td>2x/sessão pode agarrar o oponente e drenar 2d4 de PV, curando o valor drenado.</td></tr>
-                <tr><td class="num">Medo</td><td>Mestre dos Rituais</td><td>Rituais simples sem dano dispensam teste; rituais médios/avançados têm DT reduzida; aprende rituais simples só de observá-los.</td></tr>
-                <tr><td class="num">Medo</td><td>Pavor Absoluto</td><td>Sua presença inflige Medo mesmo em criaturas sobrenaturais; 2x/sessão faz um alvo perder um turno, paralisado.</td></tr>
-                <tr><td class="num">Caos</td><td>Máquina de Combate</td><td>Ataques corpo a corpo contra você causam -4 de dano físico e -3 se forem de arma branca.</td></tr>
-                <tr><td class="num">Caos</td><td>Controle do Caos</td><td>1x/sessão desvia de qualquer ataque que não seja de arma de fogo e garante uma ação crítica em seguida.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </details>
       </section>
 
       <!-- IV. TRAUMA & MENTE -->
@@ -829,14 +794,14 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
       <!-- V. CHAGAS -->
       <section class="tab-panel" data-panel="chagas">
         <h2 class="panel-title">Chagas — Fragmentos do Além</h2>
-        <p class="hint">Toda Chaga corrompe, desgasta ou atrai a atenção dos Ecos. Com 2+ Chagas: debuff narrativo em testes sociais. Com 3+: atrai atenção instintiva de Ecos. A cada nova Chaga, a Sanidade máxima reduz em 5. Chaga Passiva: buff e colateral ficam sempre ativos ao mesmo tempo (não é possível ter uma Chaga passiva e ativa na mesma Chaga — use duas Chagas separadas). Se a Chaga conceder um bônus (ou penalidade) mecânico a um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
+        <p class="hint">Toda Chaga corrompe, desgasta ou atrai a atenção dos Ecos. Com 2+ Chagas: debuff narrativo em testes sociais. Com 3+: atrai atenção instintiva de Ecos. A cada nova Chaga, a Sanidade máxima reduz em 10. Se a Chaga conceder um bônus (ou penalidade) mecânico a um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
         <div id="chagasList"></div>
         <button type="button" class="btn-add" id="btnAddChaga">+ Adicionar Chaga</button>
 
         <h2 class="panel-title">Resiliência</h2>
         <div class="field-grid">
           <div class="field"><label for="f-resAtual">Resiliência Atual</label><input type="number" id="f-resAtual"></div>
-          <div class="field"><label for="f-resMax">Resiliência Máxima (= VON)</label><input type="number" id="f-resMax" readonly></div>
+          <div class="field"><label for="f-resMax">Resiliência Máxima (VON ÷ 2)</label><input type="number" id="f-resMax" readonly></div>
         </div>
         <p class="hint">Restaurada ao máximo ao final de toda sessão. Gasta para resistir a Ecos ou ativar Chagas.</p>
       </section>
@@ -847,30 +812,15 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
         <p class="hint">Todo ritual exige teste de Rituais ou Ocultismo. Rituais Simples: até 1 turno em combate. Médios: 1+ turno, podem ser interrompidos. Avançados: até 2 turnos, alta exigência de concentração. Se o ritual conceder um bônus temporário a um Atributo ou Perícia enquanto ativo, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
         <div id="rituaisList"></div>
         <button type="button" class="btn-add" id="btnAddRitual">+ Adicionar Ritual</button>
-
-        <details class="reference">
-          <summary>Consultar Tempo de Execução, N.A. e Conjuração Forçada</summary>
-          <div class="reference-inner">
-            <p style="font-size:13.5px; color:var(--text-muted); line-height:1.6; margin:0 0 10px;">
-              Todo personagem começa com 1 ritual simples. Rituais médios exigem N.A. 2+; rituais avançados exigem N.A. 5+ (sem Estojo de Rituais Avançados, sofrem -5 no teste e maior risco de falha crítica). Fora de combate, o tempo de conjuração é narrativo; em combate, cada 5 minutos narrativos equivalem a 1 turno (10 minutos = 2 turnos). Ação rápida: o efeito é aplicado no mesmo turno em que foi usado. Sucesso Crítico intensifica o efeito; Falha aplica as consequências descritas no ritual; Falha Crítica pode voltar-se contra o conjurador ou atrair atenção paranormal.
-            </p>
-            <table class="ref-table">
-              <thead><tr><th class="num">Pré-requisito</th><th>Conjuração Forçada — "Rasgar o Véu"</th></tr></thead>
-              <tbody>
-                <tr><td class="num">12+ em Rituais e 8+ em INT</td><td>Rituais Simples/Médios são ativados instantaneamente (mesmo turno), ignorando o tempo padrão — mas o personagem fica debilitado nesse turno (só pode se mover ou fazer ações menores). Rituais Avançados passam a levar 1 turno inteiro. Todo teste é forçado a DT 12, e falhar é sempre falha crítica. Custo: perde 5 de Sanidade imediatamente e fica incapaz de usar qualquer ritual por 2 turnos.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </details>
       </section>
 
       <!-- VII. MARCAS & MALDIÇÕES -->
       <section class="tab-panel" data-panel="marcas">
         <h2 class="panel-title">Marcas — Runas Permanentes</h2>
-        <p class="hint">Gravuras aplicadas a itens/armas/equipamentos ou ao próprio corpo, concedendo melhorias <strong>permanentes</strong>. Custo: 2 de Resiliência + Ritual específico (teste de Ocultismo ou Rituais, recomendado 10+ pontos na perícia) — ajuste ou deixe em branco o campo de Custo caso a Marca não exija gastar Resiliência. Limite: Armas simples até 1 Marca · Armas táticas até 2 Marcas · Corpo até 5 Marcas (2 marcas: debuff narrativo em testes e interações sociais · 3-4 marcas: chama atenção de Ecos e sensíveis ao sobrenatural · 5 marcas: Ecos agem de forma mais agressiva contra você). Se a Marca conceder um bônus mecânico, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
+        <p class="hint">Gravuras aplicadas a itens/armas/equipamentos ou ao próprio corpo, concedendo melhorias <strong>permanentes</strong>. Custo sugerido: 2 de Resiliência + Ritual específico (teste de Ocultismo ou Rituais, recomendado 50%+) — ajuste ou deixe em branco o campo de Custo caso a Marca não exija gastar Resiliência. Limite: Armas simples até 1 Marca · Armas táticas até 2 Marcas · Corpo sem limite fixo, mas com risco. Se a Marca conceder um bônus mecânico, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
         <div class="marca-count-bar">
           <span>Total de Marcas: <strong id="marcasCount">0</strong></span>
-          <span id="marcasStatus" class="ok-text">Sem efeitos negativos (0–1 marca)</span>
+          <span id="marcasStatus" class="ok-text">Sem efeitos negativos (1–2 marcas)</span>
         </div>
         <div id="marcasList"></div>
         <button type="button" class="btn-add" id="btnAddMarca">+ Adicionar Marca</button>
@@ -881,17 +831,16 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
             <table class="ref-table">
               <thead><tr><th class="num">Marcas</th><th>Efeito</th></tr></thead>
               <tbody>
-                <tr><td class="num">0–1</td><td>Nenhum efeito negativo.</td></tr>
-                <tr><td class="num">2</td><td>Debuff narrativo em testes e interações sociais.</td></tr>
-                <tr><td class="num">3–4</td><td>Chama atenção de Ecos e pessoas sensíveis ao sobrenatural.</td></tr>
-                <tr><td class="num">5</td><td>Ecos focam em você e agem de forma mais agressiva que o normal (limite máximo no corpo).</td></tr>
+                <tr><td class="num">1–2</td><td>Nenhum efeito negativo.</td></tr>
+                <tr><td class="num">3–4</td><td>Debuff narrativo em testes e interações sociais.</td></tr>
+                <tr><td class="num">5+</td><td>Chama atenção de Ecos e pessoas sensíveis ao sobrenatural.</td></tr>
               </tbody>
             </table>
           </div>
         </details>
 
         <h2 class="panel-title">Maldições — O Preço do Abismo</h2>
-        <p class="hint">Mais fortes que Marcas, sempre vêm com efeitos colaterais. Impostas por falha crítica em rituais, pactos ou por escolha própria (com preço). Carregam efeito permanente positivo <em>e</em> negativo — ou apenas negativo. <strong>Só é possível começar com uma Maldição que dê bônus/habilidades tendo a Origem Filhos do Véu com o caminho Amaldiçoado; caso contrário, a Maldição só pode ter efeitos negativos.</strong> Só podem ser removidas por rituais de purificação, o que também remove os buffs. Armas/itens/equipamentos: apenas 1 maldição por vez. O corpo pode ter mais de uma. Se a Maldição alterar um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias (use valores negativos para penalidades).</p>
+        <p class="hint">Mais fortes que Marcas, sempre vêm com efeitos colaterais. Impostas por falha crítica em rituais, pactos ou por escolha própria (com preço). Carregam efeito permanente positivo <em>e</em> negativo — ou apenas negativo. Só podem ser removidas por rituais de purificação, o que também remove os buffs. Armas/itens/equipamentos: apenas 1 maldição por vez. O corpo pode ter mais de uma. Se a Maldição alterar um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias (use valores negativos para penalidades).</p>
         <div id="maldicoesList"></div>
         <button type="button" class="btn-add" id="btnAddMaldicao">+ Adicionar Maldição</button>
 
@@ -923,14 +872,6 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
           <div class="field"><label for="f-pvMax">PV Máximo (calculado)</label><input type="number" id="f-pvMax" readonly></div>
           <div class="field"><button type="button" id="btnRestorePV" class="btn-secondary">Restaurar ao Máximo</button></div>
         </div>
-        <details class="reference">
-          <summary>Consultar Regras de Morte</summary>
-          <div class="reference-inner">
-            <p style="font-size:13.5px; color:var(--text-muted); line-height:1.6; margin:0;">
-              Existem dois estágios: <strong>caído</strong> e <strong>morto</strong>. Quando o PV chega a 0, o personagem cai. A partir do turno seguinte, ele faz testes de 1d20 para se manter vivo (as falhas não são acumulativas de resultado — são contadas em número de tentativas): pode falhar até <strong>3 vezes</strong> antes de morrer. Tirando <strong>20</strong>, levanta-se com 1d4 de PV; tirando <strong>1</strong>, é morte instantânea. Outros jogadores podem ajudar a estabilizar o aliado usando um kit médico, ou improvisando sem kit com um teste de Medicina ou Sobrevivência.
-            </p>
-          </div>
-        </details>
 
         <h2 class="panel-title">Sanidade</h2>
         <div class="field-grid">
@@ -942,12 +883,12 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
         <h2 class="panel-title">Resiliência</h2>
         <div class="field-grid">
           <div class="field"><label for="f-resAtual2">Resiliência Atual</label><input type="number" id="f-resAtual2"></div>
-          <div class="field"><label for="f-resMax2">Resiliência Máxima (= VON)</label><input type="number" id="f-resMax2" readonly></div>
+          <div class="field"><label for="f-resMax2">Resiliência Máxima (VON ÷ 2)</label><input type="number" id="f-resMax2" readonly></div>
         </div>
         <p class="hint">Restaurada ao máximo ao final de toda sessão. Gasta para resistir a Ecos ou ativar Chagas.</p>
 
         <h2 class="panel-title">Strikes (Sistema de Dano por Localização)</h2>
-        <p class="hint">A cada 3 strikes acumulados (qualquer região): −1 em todos os testes até receber tratamento adequado (ritual, descanso ou kit médico), e os ataques passam a causar +2 de dano extra. Dano crítico: +2 strikes de uma vez na mesma região. Mesma região 3x: efeito narrativo específico (ex: membro inutilizado, visão comprometida). Total de 5 strikes: colapso físico / inconsciência.</p>
+        <p class="hint">A cada 4 strikes acumulados (qualquer região): −1 em todos os testes. Dano crítico: +2 strikes na mesma região. Mesma região 3x: efeito narrativo específico (ex: membro inutilizado). Total de 9 strikes: colapso físico / inconsciência.</p>
         <div class="strikes-grid">
           <div class="strike-box"><label>Cabeça</label><input type="number" min="0" id="s-cabeca"></div>
           <div class="strike-box"><label>Tronco</label><input type="number" min="0" id="s-tronco"></div>
@@ -1026,50 +967,42 @@ function fileToResizedDataURL(file, maxSize){
    ===================================================================== */
 
 const ATTRS = [
-  {key:"for", nome:"Força (FOR)", id:"a-for", min:1, max:12, rollable:true},
-  {key:"agi", nome:"Agilidade (AGI)", id:"a-agi", min:1, max:12, rollable:true},
-  {key:"int", nome:"Intelecto (INT)", id:"a-int", min:1, max:12, rollable:true},
-  {key:"car", nome:"Carisma (CAR)", id:"a-car", min:1, max:12, rollable:true},
-  {key:"von", nome:"Vontade (VON)", id:"a-von", min:1, max:5, rollable:true},
+  {key:"for", nome:"Força (FOR)", id:"a-for", min:1, max:20, rollable:true},
+  {key:"agi", nome:"Agilidade (AGI)", id:"a-agi", min:1, max:20, rollable:true},
+  {key:"int", nome:"Intelecto (INT)", id:"a-int", min:1, max:20, rollable:true},
+  {key:"car", nome:"Carisma (CAR)", id:"a-car", min:1, max:20, rollable:true},
+  {key:"von", nome:"Vontade (VON)", id:"a-von", min:1, max:20, rollable:true},
   {key:"vit", nome:"Vitalidade (VIT)", id:"a-vit", min:0, max:5, rollable:false},
 ];
-const ATTR_DICE = {4:"d4",6:"d6",8:"d8",10:"d10",12:"d12",14:"d14"};
-function dieForPoints(pts){
-  const n = Number(pts)||0;
-  if(n>=14) return "d14"; if(n>=12) return "d12"; if(n>=10) return "d10";
-  if(n>=8) return "d8"; if(n>=6) return "d6"; return "d4";
-}
 
 const SKILLS = [
   {key:"armasFogo", nome:"Armas de Fogo"},
   {key:"armasBrancas", nome:"Armas Brancas"},
+  {key:"briga", nome:"Briga"},
   {key:"ocultismo", nome:"Ocultismo"},
   {key:"medicina", nome:"Medicina"},
   {key:"tecnologia", nome:"Tecnologia"},
   {key:"investigacao", nome:"Investigação"},
   {key:"intimidacao", nome:"Intimidação"},
+  {key:"intuicao", nome:"Intuição"},
+  {key:"sobrevivencia", nome:"Sobrevivência"},
   {key:"rituais", nome:"Rituais"},
   {key:"atletismo", nome:"Atletismo"},
   {key:"erudicao", nome:"Erudição"},
-  {key:"pontaria", nome:"Pontaria"},
+  {key:"percepcao", nome:"Percepção"},
+  {key:"ciencias", nome:"Ciências"},
   {key:"sagacidade", nome:"Sagacidade"},
   {key:"oficios", nome:"Ofícios"},
   {key:"ladroagem", nome:"Ladroagem"},
   {key:"furtividade", nome:"Furtividade"},
-  {key:"briga", nome:"Briga"},
-  {key:"intuicao", nome:"Intuição"},
-  {key:"sobrevivencia", nome:"Sobrevivência"},
-  {key:"percepcao", nome:"Percepção"},
-  {key:"persuasao", nome:"Persuasão"},
-  {key:"enganacao", nome:"Enganação"},
 ];
 
 const TRAUMAS = [
-  {key:"fobia", nome:"Fobia", desc:`Medo irracional e paralisante de algo específico. Ao confrontar o objeto da fobia, teste de VON ou entra em pânico por 1d4 turnos, sofrendo -2 em todas as ações durante esse tempo.`},
+  {key:"fobia", nome:"Fobia", desc:`Medo irracional e paralisante de algo específico. Ao confrontar o objeto da fobia, teste de VON ou entra em pânico por 1d4 turnos, sofrendo -20% em todas as ações durante esse tempo.`},
   {key:"alucinacoes", nome:"Alucinações Leves", desc:`Vê ou ouve coisas que não estão lá. A cada cena estressante, teste de VON; em falha, uma alucinação se manifesta e pode interferir em decisões, testes sociais ou de percepção.`},
   {key:"compulsao", nome:"Compulsão", desc:`Comportamento obsessivo que precisa repetir (contar objetos, limpar as mãos, checar trancas). Resistir exige teste de VON; em falha, é forçado a executar a ação, perdendo tempo e foco.`},
-  {key:"culpa", nome:"Culpa Obsessiva", desc:`Sente-se responsável por uma perda, falha ou morte do passado. Ao falhar em proteger aliados ou falhar criticamente, perde 1d4 de Sanidade e pode entrar em retraimento (-1 em ações sociais e mentais até superar a situação).`},
-  {key:"apatia", nome:"Apatia Emocional", desc:`Dificuldade em demonstrar ou sentir emoções fortes. Sofre -2 em testes sociais relacionados à empatia, mas recebe +1 para resistir a manipulações emocionais ou possessões.`},
+  {key:"culpa", nome:"Culpa Obsessiva", desc:`Sente-se responsável por uma perda, falha ou morte do passado. Ao falhar em proteger aliados ou falhar criticamente, perde 1d4 de Sanidade e pode entrar em retraimento (-10% em ações sociais e mentais).`},
+  {key:"apatia", nome:"Apatia Emocional", desc:`Dificuldade em demonstrar ou sentir emoções fortes. Sofre -20% em testes sociais relacionados à empatia, mas recebe +10% para resistir a manipulações emocionais ou possessões.`},
   {key:"memoria", nome:"Memória Reprimida", desc:`Há lacunas na memória de eventos importantes. Flashes podem surgir em sonhos ou sob estresse, trazendo confusão ou revelando pistas ocultas ao longo da campanha.`},
 ];
 
@@ -1077,89 +1010,79 @@ const ORIGENS = {
   militar:{
     nome:"Militar", vidaBase:60,
     descricao:`Você foi moldado pelo conflito. Seja como soldado, policial de elite, segurança privada ou membro de uma força especial, aprendeu a manter a calma sob fogo cruzado e a agir com precisão. Agora, a guerra é contra o invisível.`,
-    bonus:`+1 ponto em Armas de Fogo, Armas Brancas ou Briga. Pode realizar Contra-Ataques. Em combate, pode agir primeiro no turno independente do resultado do teste (1x por sessão).`,
+    bonus:`+5% em Armas de Fogo ou Armas Brancas. +1 ponto de Resiliência inicial. Em combate, pode agir primeiro no turno independente do resultado do teste (1x por missão).`,
     caminhos:[
-      {nome:"Atirador", n1:`+2 no dado de Percepção para detectar inimigos à distância.`, n2:`2x por sessão, pode transformar um dano em dano crítico (gasta 1 de Resiliência).`, n3:`Ataques à distância ignoram cobertura leve e armaduras dos inimigos.`},
-      {nome:"Forças Especiais", n1:`+1 ponto em Furtividade ou Atletismo.`, n2:`Pode realizar duas ações no mesmo turno (2x por sessão).`, n3:`Pode escolher entre Armas de Fogo/Branca, Furtividade ou Atletismo para receber +1 ponto extra (excedendo o limite de 12).`},
-      {nome:"Guerrilha", n1:`+1 ponto em Armas de Fogo, Armas Brancas ou Briga.`, n2:`Pode criar uma arma improvisada por sessão (essa arma fica com 1d6 de dano).`, n3:`Caso caia em combate ao chegar em 0 de PV, pode se levantar sem necessidade de teste com 5 de PV (1x por sessão).`},
-      {nome:"Demolidor", n1:`+1 ponto em Tecnologia ou Ofícios (armamentos).`, n2:`Pode montar 2 armadilhas improvisadas sem necessidade de teste (1x por sessão).`, n3:`Pode criar uma carga explosiva devastadora (3d16 de dano em área de 5m, 1x por sessão).`},
-      {nome:"Samurai", descricao:`(Caminho adicional desta mesa, fora do livro de regras.) Samurai é um caminho para quem quer seguir um código de honra e quer ser o melhor em armas brancas em geral, porém com foco na katana. O código de honra pode ser diverso, não necessariamente ser bom ou ruim. Samurai é um guerreiro que no campo de batalha sua calma acaba assustando, sempre tendo controle de suas ações e sendo o mais letal possível sem perder a precisão de seus ataques, além disso sua honra vale mais que tudo, então suas promessas equivalem a barras de ouro.`, n1:`Treinamento de Lâmina — +1 ponto em Armas Brancas.`, n2:`Vontade Ardente — 2x por combate, pode ignorar o golpe do inimigo e contra-atacar causando 1d6.`, n3:`Golpe Inabalável — 1x por combate, pode imbuir sua arma com sua vontade e causar +5 de dano adicional. Se o alvo morrer, ficar imobilizado ou incapaz de lutar por causa desse ataque, pode recuperar 1 uso de Vontade Ardente ou usar o Golpe Inabalável novamente contra um alvo diferente (apenas uma vez extra).`},
+      {nome:"Atirador de Elite", n1:`+10% em Percepção para detectar inimigos à distância.`, n2:`2x por missão, pode transformar um ataque em crítico automático (gasta 1 de Resiliência).`, n3:`Ataques à distância ignoram cobertura leve e armaduras dos inimigos.`},
+      {nome:"Forças Especiais", n1:`+5% em Furtividade ou Atletismo.`, n2:`Pode realizar duas ações no mesmo turno (2x por missão).`, n3:`Sua primeira ação de Furtividade da missão é um sucesso automático.`},
+      {nome:"Veterano de Guerrilha", n1:`+5% em Sobrevivência ou Briga.`, n2:`Pode criar uma arma improvisada por missão (1d6 de dano).`, n3:`Ignora penalidades de ambiente hostil (fome, frio, escuridão).`},
+      {nome:"Demolidor", n1:`+5% em Tecnologia ou Ciências (armamentos).`, n2:`Pode montar 2 armadilhas improvisadas por missão.`, n3:`Pode criar uma carga explosiva devastadora (3d16 de dano em área de 5m, 1x por missão).`},
+      {nome:"Samurai", descricao:`Samurai é um caminho para quem quer seguir um código de honra e quer ser o melhor em armas brancas em geral, porém com foco na katana. O código de honra pode ser diverso, não necessariamente ser bom ou ruim. Samurai é um guerreiro que no campo de batalha sua calma acaba assustando, sempre tendo controle de suas ações e sendo o mais letal possível sem perder a precisão de seus ataques, além disso sua honra vale mais que tudo, então suas promessas equivalem a barras de ouro.`, n1:`Treinamento de Lâmina — +5% em Armas Brancas.`, n2:`Vontade Ardente — 2x por combate, pode ignorar o golpe do inimigo e contra-atacar causando 1d6.`, n3:`Golpe Inabalável — 1x por combate, pode imbuir sua arma com sua vontade e causar +5 de dano adicional. Se o alvo morrer, ficar imobilizado ou incapaz de lutar por causa desse ataque, pode recuperar 1 uso de Vontade Ardente ou usar o Golpe Inabalável novamente contra um alvo diferente (apenas uma vez extra).`},
     ]
   },
   ocultista:{
     nome:"Ocultista", vidaBase:40,
     descricao:`Você foi iniciado — por uma ordem esquecida, uma linhagem ancestral ou escolha própria — mas o preço foi alto. Conhece os nomes que não se devem pronunciar e os selos que selam aquilo que nunca dorme.`,
-    bonus:`+1 ponto em Ocultismo ou Rituais. Pode realizar rituais simples sem estojo. Inicia com +10 de SAN extra. Consegue sentir o sobrenatural em até 5 metros, sem necessidade de testes.`,
+    bonus:`+5% em Ocultismo ou Rituais. Pode realizar um ritual simples e médio sem estojo. Consegue sentir distúrbios no Véu até 5 metros, mesmo sem testes.`,
     caminhos:[
-      {nome:"Invocador", n1:`+1 ponto em Rituais, pode sentir presenças sobrenaturais em até +5m.`, n2:`Pode chamar entidades menores como distração ou para conseguir informação (é necessário um teste de Ocultismo).`, n3:`Pode invocar de 1 a 2 aliados espirituais temporários que duram até o final da sessão (teste de Ocultismo; Mestre e jogador definem as estatísticas dos aliados).`},
-      {nome:"Purificador", n1:`+1 ponto em Ocultismo, +2 em Testes de VON para resistir a possessão.`, n2:`Pode reforçar selos ou círculos dos rituais de aprisionamento (bônus de +2 no dado em conjuração de rituais similares).`, n3:`Pode selar um Eco por completo com um teste de Ocultismo — a dificuldade varia de acordo com o nível do Eco (1x por sessão).`},
-      {nome:"Maledicente", n1:`+1 ponto em Intimidação, pode realizar testes para resistir a uma maldição (VON).`, n2:`Pode amaldiçoar um inimigo 2x por sessão (–2 pontos em uma perícia e -3 pontos em um atributo do alvo).`, n3:`Uma vez por sessão, pode lançar uma maldição poderosa (–4 pontos em duas perícias e -5 pontos em um atributo do alvo).`},
-      {nome:"Conjurador Bélico", n1:`+1 no dado em teste de Rituais ofensivos (ataques e maldições).`, n2:`Pode gastar 1 de Resiliência para aumentar o dano de um ritual em +1d8.`, n3:`Uma vez por sessão, pode lançar um ritual avançado como ação rápida, sem tempo de preparação.`},
+      {nome:"Invocador", n1:`+5% em Rituais, pode sentir presenças até 10m.`, n2:`Pode chamar entidades menores como distração ou para conseguir informação (teste de Ocultismo).`, n3:`Pode invocar de 1 a 2 aliados espirituais temporários por missão (teste de Ocultismo).`},
+      {nome:"Selador", n1:`+5% em Ocultismo, +5 em resistir a possessão (teste de VON).`, n2:`Pode reforçar selos ou círculos dos rituais de aprisionamento (+10% em conjuração de rituais similares).`, n3:`Pode fechar portais menores automaticamente (2x por missão).`},
+      {nome:"Maledicente", n1:`+5% em Intimidação. Consegue sussurrar maldições que afetam o psicológico de alvos humanos.`, n2:`Pode amaldiçoar um inimigo 2x por missão (-20% em uma perícia e -3 em um atributo do alvo + a maldição).`, n3:`Uma vez por missão, pode lançar uma maldição poderosa (-30% em duas perícias e -5 em um atributo do alvo + a maldição).`},
+      {nome:"Conjurador Bélico", n1:`+5% em teste de Rituais ofensivos (ataques, maldições).`, n2:`Pode gastar 1 Resiliência para aumentar o dano de um ritual em +1d6.`, n3:`Uma vez por missão, pode lançar um ritual avançado como ação rápida, sem tempo de preparação.`},
     ]
   },
   cetico:{
     nome:"Cético", vidaBase:45,
     descricao:`Você não acredita em demônios, fantasmas ou deuses — não porque não viu, mas porque se recusa. Sua mente racional é um escudo contra o absurdo, o que ironicamente o torna mais resistente ao sobrenatural.`,
-    bonus:`+1 ponto em Tecnologia ou Percepção. +2 em testes de Sanidade. Inicia com +10 de SAN extra. Uma vez por sessão, pode anular um efeito de medo ou ilusão.`,
+    bonus:`+5% em Tecnologia ou Percepção. +3 em testes de Sanidade. Uma vez por missão, pode anular um efeito de medo ou ilusão.`,
     caminhos:[
-      {nome:"Investigador Forense", n1:`+2 pontos em Investigação.`, n2:`Sempre detecta mentiras simples sem testes.`, n3:`Ganha pistas a mais para enigmas complexos.`},
-      {nome:"Tecnólogo", n1:`+1 ponto em Tecnologia, pode criar gambiarras.`, n2:`Pode reparar ou alterar equipamentos improvisadamente.`, n3:`+1 ponto de Tecnologia; pode hackear qualquer sistema (mesmo protegido).`},
-      {nome:"Racionalista", n1:`+2 pontos em VON, pode ignorar efeitos emocionais fracos.`, n2:`2x por sessão, pode ignorar um ataque mental/sobrenatural.`, n3:`Imune a possessões fracas e ilusões fortes.`},
-      {nome:"Executor Lógico", n1:`+1 ponto em Armas de Fogo ou Briga.`, n2:`Pode gastar 1 Resiliência para rolar ataque duas vezes e ficar com o melhor.`, n3:`Duas vezes por sessão, pode negar qualquer bônus defensivo de um inimigo (ignora armadura leve ou resistência sobrenatural).`},
+      {nome:"Investigador Forense", n1:`+10% em Investigação.`, n2:`Sempre detecta mentiras simples sem testes.`, n3:`Ganha pistas a mais para enigmas complexos.`},
+      {nome:"Tecnólogo", n1:`+5% em Tecnologia, pode criar gambiarras.`, n2:`Pode reparar ou alterar equipamentos improvisadamente.`, n3:`+5% de Tecnologia; pode hackear qualquer sistema (mesmo protegido).`},
+      {nome:"Racionalista", n1:`+5 em VON, pode ignorar efeitos emocionais fracos.`, n2:`2x por missão, ignora um ataque mental/sobrenatural.`, n3:`Imune a possessões fracas e ilusões fortes.`},
+      {nome:"Executor Lógico", n1:`+5% em Armas de Fogo ou Briga.`, n2:`Pode gastar 1 Resiliência para rolar ataque duas vezes e ficar com o melhor.`, n3:`Duas vezes por missão, pode negar qualquer bônus defensivo de um inimigo (ignora cobertura, armadura leve ou resistência sobrenatural).`},
     ]
   },
   medium:{
     nome:"Médium", vidaBase:40,
     descricao:`Desde criança, você vê o que não devia. Sente frio em lugares onde o calor deveria reinar. Sua mente é um canal, por vezes aberto demais, para o Outro Lado. Os mortos sabem seu nome, e os Ecos o reconhecem como um espelho.`,
-    bonus:`+1 ponto em Ocultismo ou Intuição. Pode sentir presenças ocultas num raio de 10 metros. Inicia com +10 de SAN extra. Uma vez por sessão, pode canalizar uma visão ou mensagem espiritual involuntária (Mestre decide o conteúdo baseado no resultado do teste de VON).`,
+    bonus:`+5% em Rituais ou Intuição. Pode sentir presenças ocultas num raio de 10 metros. Uma vez por missão, pode canalizar uma visão ou mensagem espiritual involuntária.`,
     caminhos:[
-      {nome:"Canalizador", n1:`+1 ponto em Rituais, espíritos sussurram dicas (mensagens do Mestre).`, n2:`Pode pedir ajuda a 1 espírito aliado (Mestre define o efeito baseado na ação do jogador).`, n3:`Pode "fundir-se" com 1 espírito, ganhando +2 no dado de duas perícias por 1d4 de turnos.`},
-      {nome:"Oráculo", n1:`+1 ponto em Intuição, 1x por sessão pode ter uma premonição (pequenas visões do futuro).`, n2:`Pode gastar 1 de Resiliência para prever 1 perigo imediato.`, n3:`1x por sessão, pode pedir uma revelação narrativa ao Mestre.`},
-      {nome:"Necroempata", n1:`+2 pontos em VON, pode sentir presenças ocultas num raio de +5 metros.`, n2:`Pode absorver a dor de um aliado (cura 1d8 PV, perde igual em Sanidade).`, n3:`Pode proteger um aliado de um ataque mortal em um raio de 10m (1x por sessão).`},
-      {nome:"Flagelo Espiritual", n1:`+1 ponto em Armas Brancas ou Briga.`, n2:`Duas vezes por sessão, pode usar um ataque físico como ataque espiritual (ignora defesa física, atinge entidades incorpóreas).`, n3:`Todo ataque inflige +3 de dano Espiritual extra.`},
+      {nome:"Canalizador", n1:`+5% em Rituais, espíritos sussurram dicas.`, n2:`Pode pedir ajuda a 1 espírito aliado (Mestre define o efeito).`, n3:`Pode "fundir-se" com 1 espírito, ganhando +20% em 2 perícias por cena ou por 1d4 turnos.`},
+      {nome:"Oráculo", n1:`+5% em Intuição, sonhos premonitórios ocasionais.`, n2:`Pode gastar Resiliência para prever 1 perigo imediato.`, n3:`1x por missão, pode pedir uma revelação narrativa ao Mestre.`},
+      {nome:"Necroempata", n1:`+5% em VON, sente emoções dos mortos.`, n2:`Pode absorver a dor de um aliado (cura 1d6 PV, perde igual em Sanidade).`, n3:`Pode absorver ferimentos mortais (pode morrer no lugar de um aliado).`},
+      {nome:"Flagelo Espiritual", n1:`+5% em Intuição ou Briga.`, n2:`Duas vezes por missão, pode usar um ataque físico como ataque espiritual (ignora defesa física, atinge entidades incorpóreas).`, n3:`Ao gastar 2 Resiliência, pode atacar 2 vezes no mesmo turno com bônus de +10% no segundo ataque.`},
     ]
   },
   erudito:{
     nome:"Erudito", vidaBase:50,
     descricao:`Você passou anos mergulhado em arquivos esquecidos, manuscritos empoeirados e símbolos que só aparecem à luz da vela. Você não é um ocultista: você é o que os ocultistas consultam quando têm medo.`,
-    bonus:`+1 ponto em Erudição ou Ocultismo. Começa com 4 pontos em INT em vez de 1. Pode identificar a origem de textos, símbolos ou entidades sem necessidade de testes.`,
+    bonus:`+5% em Erudição ou Ciências. Começa com 5 pontos em INT. Pode identificar a origem de textos, símbolos ou entidades com um único teste de Erudição.`,
     caminhos:[
-      {nome:"Linguista", n1:`+1 ponto em Erudição.`, n2:`Pode traduzir línguas mortas ou códigos instantaneamente.`, n3:`Pode conversar com entidades através de linguagem esquecida.`},
-      {nome:"Historiador Arcano", n1:`+1 ponto em Ocultismo.`, n2:`Reconhece rituais antigos com apenas uma olhada.`, n3:`Consegue prever efeitos de um ritual só de vê-lo.`},
-      {nome:"Mestre dos Textos", n1:`+1 ponto em Investigação.`, n2:`Pode se especializar em Ecos Físicos ou Espirituais para ter informações extras sobre suas formas de agir (Mestre disponibiliza informações úteis extras).`, n3:`Uma vez por sessão, pode criar um ritual de ilusão que engana até o sobrenatural.`},
-      {nome:"Caçador Arcanista", n1:`+1 no dado de Percepção quando usado de forma ofensiva (ex: identificar fraquezas para atacar).`, n2:`Pode gastar 1 Resiliência para dar +1d8 de dano extra ao ataque de um aliado, ao apontar o ponto fraco da criatura.`, n3:`Uma vez por sessão, pode "nomear" uma entidade em combate — todos os ataques contra ela recebem +1d6 de dano até o fim da cena.`},
+      {nome:"Linguista", n1:`+5% em Erudição.`, n2:`Pode traduzir línguas mortas ou códigos instantaneamente.`, n3:`Pode conversar com entidades através de linguagem esquecida.`},
+      {nome:"Historiador Arcano", n1:`+5% em Ocultismo.`, n2:`Reconhece rituais antigos com apenas uma olhada.`, n3:`Consegue prever efeitos de um ritual só de vê-lo.`},
+      {nome:"Mestre dos Textos", n1:`+5% em Investigação.`, n2:`Pode criar falsificações convincentes de escritos arcanos.`, n3:`Uma vez por missão, pode criar um ritual falso que engana até o sobrenatural.`},
+      {nome:"Caçador Arcanista", n1:`+5% em Ocultismo quando usado de forma ofensiva (ex: identificar fraquezas para atacar).`, n2:`Pode gastar 1 Resiliência para dar +1d6 de dano extra ao ataque de um aliado, apontando o ponto fraco da criatura.`, n3:`Uma vez por missão, pode "nomear" uma entidade em combate — todos os ataques contra ela recebem +1d4 de dano até o fim da cena.`},
     ]
   },
   medico:{
-    nome:"Médico", vidaBase:35,
-    descricao:`Como médico, cirurgião ou paramédico, você aprendeu a lidar com corpos partidos, gritos abafados e decisões que precisam ser tomadas em segundos — assim como a utilizar o sobrenatural em suas técnicas médicas.`,
-    bonus:`+1 ponto em Medicina ou Sobrevivência. Você pode estabilizar um aliado à beira da morte (0 PV) sem rolagem, uma vez por sessão. Itens de cura recebem +1 uso extra.`,
+    nome:"Médico", vidaBase:30,
+    descricao:`Você já esteve entre a vida e a morte — e nem sempre no papel que esperava. Aprendeu a lidar com corpos partidos e decisões tomadas em segundos. Mas os Ecos não sangram como os humanos.`,
+    bonus:`+5% em Medicina ou Sobrevivência. Pode estabilizar um aliado à beira da morte (0 PV) sem rolagem, uma vez por sessão. Pode identificar estruturas anatômicas humanas e anômalas com um teste de INT simples.`,
     caminhos:[
-      {nome:"Cirurgião de Campo", n1:`+1 ponto em Medicina.`, n2:`Pode curar 1d8 de PV extras ao usar kits.`, n3:`Pode salvar alguém morto há até 1 turno (1x por sessão).`},
-      {nome:"Alquimista", n1:`+1 ponto em INT (misturas/compostos).`, n2:`Pode preparar 1 tônico (1d6 de cura ou 2 de Resiliência, 2 usos por sessão).`, n3:`Pode criar 1 frasco especial 1x por sessão (cura total ou Resiliência total).`},
-      {nome:"Exorcista Clínico", n1:`+2 pontos em VIT e +1 ponto em Ocultismo.`, n2:`Pode infundir seus utensílios de medicina com o sobrenatural, curando +5 de SAN extra ao curar aliados diretamente.`, n3:`Pode utilizar o próprio sangue e esfregá-lo em um aliado — durante 1 cena inflige +5 de dano Espiritual extra (2x por sessão).`},
-      {nome:"Cirurgião Letal", n1:`+1 ponto em Armas Brancas.`, n2:`Uma vez por sessão, pode declarar um ataque como golpe preciso; se acertar, causa dano dobrado.`, n3:`Pode focar pontos vitais no corpo do inimigo — todo ataque seu inflige +1d4 de sangramento.`},
+      {nome:"Cirurgião de Campo", n1:`+5% em Medicina.`, n2:`Pode curar 1d6 PV extras ao usar kits.`, n3:`Pode salvar alguém morto há até 1 turno.`},
+      {nome:"Alquimista", n1:`+5% em Ciências (misturas/compostos).`, n2:`Pode preparar 1 tônico (1d4 de cura ou 2 de resistência, 2 usos por missão).`, n3:`Pode criar 1 frasco especial 1x por missão (cura total ou resistência total).`},
+      {nome:"Exorcista Clínico", n1:`+5% em VON.`, n2:`Pode "diagnosticar" possessões como doenças e purificá-las.`, n3:`Pode expulsar espíritos fracos apenas com contato físico.`},
+      {nome:"Cirurgião Letal", n1:`+5% em Armas Brancas (uso de bisturis, lâminas, serras improvisadas).`, n2:`Uma vez por missão, pode declarar um ataque como golpe preciso; se acertar, causa dano dobrado.`, n3:`Pode gastar 1 Resiliência para ignorar resistência física do alvo em um ataque corpo a corpo.`},
     ]
   },
   amigoanimais:{
     nome:"Amigo dos Animais", vidaBase:45,
     descricao:`Você sempre teve uma conexão instintiva com os animais — selvagens, domésticos ou até aqueles que os outros não conseguem ver de maneira comum. Talvez um trauma, ou um dom inexplicável, o aproximou das criaturas do mundo natural e sobrenatural.`,
-    bonus:`+1 ponto em Intuição ou Sobrevivência. Pode se comunicar com animais. Inicia com um companheiro animal fiel (Mestre e jogador definem as estatísticas do animal).`,
+    bonus:`+5% em Intuição ou Sobrevivência. Pode se comunicar com animais. Inicia com um companheiro animal fiel (estatísticas definidas com o Mestre).`,
     caminhos:[
-      {nome:"Domador Espiritual", n1:`+1 ponto em Rituais, companheiro animal ganha resistência sobrenatural.`, n2:`Animal ganha uma habilidade sobrenatural.`, n3:`Pode invocar um espírito-animal por uma sessão inteira (Mestre e jogador definem estatísticas e efeitos do espírito).`},
-      {nome:"Batedor Animal", n1:`+2 em dados de Percepção quando acompanhado do animal.`, n2:`O animal pode agir 2x por turno (2x por sessão).`, n3:`Animal pode rastrear qualquer ser ou sentir entidades a 10m (mesmo sobrenatural).`},
-      {nome:"Caçador Instintivo", n1:`+1 ponto em Sobrevivência ou Armas de Fogo.`, n2:`Duas vezes por sessão, pode coordenar seu animal para atacar junto, causando +1d8 de dano extra.`, n3:`Quando o companheiro animal abate um inimigo, você ganha +1 no dado em seu próximo ataque na mesma cena.`},
-      {nome:"Alfa Instintivo", n1:`+1 ponto em Intimidação. Animais selvagens não o atacam.`, n2:`Pode comandar temporariamente animais próximos por 1d4 de turnos (exceto os totalmente sobrenaturais).`, n3:`Uma vez por missão, pode invocar uma matilha ou bando (narrativo: corvos, lobos, cães) para ajudar por 1d5 de turnos.`},
-    ]
-  },
-  filhosdoveu:{
-    nome:"Filhos do Véu", vidaBase:50,
-    descricao:`Seu corpo e mente são os receptáculos perfeitos do sobrenatural desde o seu nascimento. Desde o começo até o fim de sua vida, ele vai te perseguir.`,
-    bonus:`+1 ponto em Ocultismo ou Intimidação. +2 pontos de Resiliência inicial. Pode começar como Marcado, Amaldiçoado ou Fractus e segue o caminho correspondente (ao escolher Fractus, pode escolher entre Angústia, Sofrimento, Medo, Morte ou Caos como Primordial).`,
-    caminhos:[
-      {nome:"Marcado", n1:`Suporta +1 marca corporal antes de sofrer penalidades.`, n2:`1x por combate, intensifica uma marca corporal por 3 turnos, aumentando os bônus dela.`, n3:`Não recebe nenhuma penalidade de ter múltiplas marcas no corpo.`},
-      {nome:"Amaldiçoado", n1:`Não pode ter mais de uma Maldição no corpo.`, n2:`Os efeitos negativos de corpo/itens são diminuídos pela metade.`, n3:`Pode amaldiçoar um aliado com bônus temporários (2x por sessão, duram 2 turnos: +2 pontos em duas perícias e +3 pontos em um atributo do alvo).`},
-      {nome:"Fractus", descricao:`Escolha 1 dos 5 Primordiais (Morte, Medo, Angústia, Sofrimento ou Caos) como fonte do seu Fragmento — veja a referência "Pactos & Fragmentado" logo abaixo para os temas, custos e falhas de cada um.`, n1:`Ecos fracos evitam chegar perto de você.`, n2:`Pode pedir ajuda temporária ao Fragmento; essa ajuda dura até o final da sessão (o Mestre decide os efeitos e estatísticas).`, n3:`O fragmento escolhido se intensifica: recebe um aumento permanente de +1 ponto em uma perícia e +2 pontos em um atributo à sua escolha (ultrapassa o limite de 12 em perícias e atributos), porém perde -10 de SAN máxima permanente.`},
+      {nome:"Domador Espiritual", n1:`+5% em Rituais; companheiro animal ganha resistência sobrenatural.`, n2:`Pode invocar espíritos-animais por breves instantes (Mestre decide o efeito).`, n3:`Animal ganha habilidade Sobrenatural (ex: visão no Véu, ataque espiritual).`},
+      {nome:"Batedor Animal", n1:`+10% em Percepção quando acompanhado do animal.`, n2:`O animal pode agir 2x por turno (2x por missão).`, n3:`Animal pode rastrear qualquer ser ou sentir entidades a 10m (mesmo sobrenatural).`},
+      {nome:"Caçador Instintivo", n1:`+5% em Sobrevivência ou Armas de Fogo.`, n2:`Duas vezes por missão, pode coordenar seu animal para atacar junto, causando +1d6 de dano extra.`, n3:`Quando o companheiro animal abate um inimigo, ganha +10% em seu próximo ataque na mesma cena.`},
+      {nome:"Alfa Instintivo", n1:`+10% em Intimidação. Animais selvagens não o atacam sem motivo.`, n2:`Pode comandar temporariamente animais próximos por 1d4 turnos (exceto os totalmente sobrenaturais).`, n3:`Uma vez por missão, pode invocar uma matilha ou bando para ajudar por 1d5 turnos.`},
     ]
   },
 };
@@ -1171,78 +1094,69 @@ const ORIGENS = {
    ===================================================================== */
 const BUFF_RULES = {
   militar:{
-    origem:{ type:"skill", amount:1, options:["armasFogo","armasBrancas","briga"] },
+    origem:{ type:"skill", amount:5, options:["armasFogo","armasBrancas"] },
     caminhos:[
-      null,                                                              // Atirador — "+2 no dado" é situacional, não permanente
-      { type:"skill", amount:1, options:["furtividade","atletismo"] },   // Forças Especiais
-      { type:"skill", amount:1, options:["armasFogo","armasBrancas","briga"] }, // Guerrilha
-      { type:"skill", amount:1, options:["tecnologia","oficios"] },      // Demolidor
-      { type:"skill", amount:1, options:["armasBrancas"] },              // Samurai (extra desta mesa)
+      { type:"skill", amount:10, options:["percepcao"] },          // Atirador de Elite
+      { type:"skill", amount:5, options:["furtividade","atletismo"] }, // Forças Especiais
+      { type:"skill", amount:5, options:["sobrevivencia","briga"] },   // Veterano de Guerrilha
+      { type:"skill", amount:5, options:["tecnologia","ciencias"] },   // Demolidor
+      { type:"skill", amount:5, options:["armasBrancas"] },            // Samurai
     ]
   },
   ocultista:{
-    origem:{ type:"skill", amount:1, options:["ocultismo","rituais"] },
+    origem:{ type:"skill", amount:5, options:["ocultismo","rituais"] },
     caminhos:[
-      { type:"skill", amount:1, options:["rituais"] },     // Invocador
-      { type:"skill", amount:1, options:["ocultismo"] },   // Purificador
-      { type:"skill", amount:1, options:["intimidacao"] }, // Maledicente
-      null,                                                 // Conjurador Bélico — "+1 no dado" é situacional
+      { type:"skill", amount:5, options:["rituais"] },       // Invocador
+      { type:"skill", amount:5, options:["ocultismo"] },     // Selador
+      { type:"skill", amount:5, options:["intimidacao"] },   // Maledicente
+      { type:"skill", amount:5, options:["rituais"] },       // Conjurador Bélico
     ]
   },
   cetico:{
-    origem:{ type:"skill", amount:1, options:["tecnologia","percepcao"] },
+    origem:{ type:"skill", amount:5, options:["tecnologia","percepcao"] },
     caminhos:[
-      { type:"skill", amount:2, options:["investigacao"] },      // Investigador Forense
-      { type:"skill", amount:1, options:["tecnologia"] },        // Tecnólogo
-      { type:"attr", amount:2, options:["von"] },                // Racionalista
-      { type:"skill", amount:1, options:["armasFogo","briga"] }, // Executor Lógico
+      { type:"skill", amount:10, options:["investigacao"] }, // Investigador Forense
+      { type:"skill", amount:5, options:["tecnologia"] },    // Tecnólogo
+      { type:"attr", amount:5, options:["von"] },            // Racionalista
+      { type:"skill", amount:5, options:["armasFogo","briga"] }, // Executor Lógico
     ]
   },
   medium:{
-    origem:{ type:"skill", amount:1, options:["ocultismo","intuicao"] },
+    origem:{ type:"skill", amount:5, options:["rituais","intuicao"] },
     caminhos:[
-      { type:"skill", amount:1, options:["rituais"] },              // Canalizador
-      { type:"skill", amount:1, options:["intuicao"] },             // Oráculo
-      { type:"attr", amount:2, options:["von"] },                   // Necroempata
-      { type:"skill", amount:1, options:["armasBrancas","briga"] }, // Flagelo Espiritual
+      { type:"skill", amount:5, options:["rituais"] },   // Canalizador
+      { type:"skill", amount:5, options:["intuicao"] },  // Oráculo
+      { type:"attr", amount:5, options:["von"] },        // Necroempata
+      { type:"skill", amount:5, options:["intuicao","briga"] }, // Flagelo Espiritual
     ]
   },
   erudito:{
-    origem:{ type:"skill", amount:1, options:["erudicao","ocultismo"] },
-    origemAttr:{ type:"attr", amount:3, options:["int"] }, // "Começa com 4 pontos em INT" (base 1 + 3)
+    origem:{ type:"skill", amount:5, options:["erudicao","ciencias"] },
+    origemAttr:{ type:"attr", amount:5, options:["int"] }, // "Começa com 5 pontos em INT"
     caminhos:[
-      { type:"skill", amount:1, options:["erudicao"] },     // Linguista
-      { type:"skill", amount:1, options:["ocultismo"] },    // Historiador Arcano
-      { type:"skill", amount:1, options:["investigacao"] }, // Mestre dos Textos
-      null,                                                  // Caçador Arcanista — "+1 no dado" é situacional
+      { type:"skill", amount:5, options:["erudicao"] },     // Linguista
+      { type:"skill", amount:5, options:["ocultismo"] },    // Historiador Arcano
+      { type:"skill", amount:5, options:["investigacao"] }, // Mestre dos Textos
+      { type:"skill", amount:5, options:["ocultismo"] },    // Caçador Arcanista
     ]
   },
   medico:{
-    origem:{ type:"skill", amount:1, options:["medicina","sobrevivencia"] },
+    origem:{ type:"skill", amount:5, options:["medicina","sobrevivencia"] },
     caminhos:[
-      { type:"skill", amount:1, options:["medicina"] },     // Cirurgião de Campo
-      { type:"attr", amount:1, options:["int"] },           // Alquimista
-      { type:"skill", amount:1, options:["ocultismo"] },    // Exorcista Clínico (VIT extra abaixo)
-      { type:"skill", amount:1, options:["armasBrancas"] }, // Cirurgião Letal
-    ],
-    caminhosExtra:[
-      null, null,
-      { type:"attr", amount:2, options:["vit"] }, // Exorcista Clínico: +2 pontos em VIT
-      null,
+      { type:"skill", amount:5, options:["medicina"] },     // Cirurgião de Campo
+      { type:"skill", amount:5, options:["ciencias"] },     // Alquimista
+      { type:"attr", amount:5, options:["von"] },           // Exorcista Clínico
+      { type:"skill", amount:5, options:["armasBrancas"] }, // Cirurgião Letal
     ]
   },
   amigoanimais:{
-    origem:{ type:"skill", amount:1, options:["intuicao","sobrevivencia"] },
+    origem:{ type:"skill", amount:5, options:["intuicao","sobrevivencia"] },
     caminhos:[
-      { type:"skill", amount:1, options:["rituais"] },                     // Domador Espiritual
-      null,                                                                 // Batedor Animal — "+2 em dados" é situacional
-      { type:"skill", amount:1, options:["sobrevivencia","armasFogo"] },    // Caçador Instintivo
-      { type:"skill", amount:1, options:["intimidacao"] },                 // Alfa Instintivo
+      { type:"skill", amount:5, options:["rituais"] },            // Domador Espiritual
+      { type:"skill", amount:10, options:["percepcao"] },         // Batedor Animal
+      { type:"skill", amount:5, options:["sobrevivencia","armasFogo"] }, // Caçador Instintivo
+      { type:"skill", amount:10, options:["intimidacao"] },       // Alfa Instintivo
     ]
-  },
-  filhosdoveu:{
-    origem:{ type:"skill", amount:1, options:["ocultismo","intimidacao"] },
-    caminhos:[ null, null, null ], // Marcado / Amaldiçoado / Fractus — nível 1 concede só habilidades especiais
   },
 };
 
@@ -1251,14 +1165,14 @@ const CHAGAS = {
   protecao:[
     {nome:"Cicatrizes Compartilhadas", efeito:`Você pode absorver parte do dano que um aliado iria sofrer.`, custo:"1 de Resiliência", colateral:`Você sofre metade do dano, mesmo que a origem seja sobrenatural.`},
     {nome:"Sopro do Vazio", efeito:`Ao sussurrar em voz baixa, pode causar terror profundo em um alvo humanoide.`, custo:"1 de Resiliência", colateral:`O sussurrante ouve vozes por 1d4 horas.`},
-    {nome:"Olhos Reversos", efeito:`Pode ver entidades ocultas por 1d6 turnos.`, custo:"1 de Resiliência", colateral:`-2 em testes sociais até o fim da cena (pupilas inumanas).`},
+    {nome:"Olhos Reversos", efeito:`Pode ver entidades ocultas por 1d6 turnos.`, custo:"1 de Resiliência", colateral:`-10% em testes sociais até o fim da cena (pupilas inumanas).`},
     {nome:"Sangue que Queima", efeito:`Ao sofrer dano físico, pode causar 1d6 de dano espiritual no atacante.`, custo:"1 de Resiliência", colateral:`Perde 1d4 PV adicionais no turno seguinte.`},
-    {nome:"Voz da Ausência", efeito:`Pode emitir uma onda de silêncio absoluto em um raio de 10m (1 turno).`, custo:"1 de Resiliência", colateral:`Sofre -4 em testes de VON por 1 cena.`},
+    {nome:"Voz da Ausência", efeito:`Pode emitir uma onda de silêncio absoluto em um raio de 10m (1 turno).`, custo:"1 de Resiliência", colateral:`Sofre -20% em testes de VON por 1 cena.`},
     {nome:"Toque da Falha", efeito:`Pode desativar temporariamente um objeto tecnológico com o toque (drone, câmera, trava).`, custo:"1 de Resiliência", colateral:`Interferência magnética descontrolada afeta itens pessoais (perda temporária de 1 item eletrônico).`},
     {nome:"Grito Além do Véu", efeito:`Emite um grito que afasta entidades incorpóreas por 1d4 turnos.`, custo:"1 de Resiliência", colateral:`Fica mudo por 1d6 turnos.`},
     {nome:"Sombra Descolada", efeito:`Sua sombra pode agir independentemente por 1 turno, executando pequenas ações (abrir portas, distrair, pegar objetos).`, custo:"1 de Resiliência", colateral:`A sombra pode se mover sozinha por 1d4 turnos, causando paranoia.`},
-    {nome:"Maré do Abismo", efeito:`Encharca a área em um raio de 3m com escuridão viscosa. -4 para inimigos em testes de ataque ou movimento.`, custo:"1 de Resiliência", colateral:`Perde 1d10 de Sanidade ao fim do efeito.`},
-    {nome:"Manto do Vazio", efeito:`Ao entrar em área de penumbra ou escuridão total, seu corpo se mistura ao véu. Ganha +4 em Furtividade e Subterfúgio e pode ignorar 1 ataque direto por cena.`, custo:"1 de Resiliência por ativação (dura até sair da escuridão)", colateral:`Sua presença deixa rastros sombrios — criaturas sensíveis ao Véu te detectam com mais facilidade por 1 hora.`},
+    {nome:"Maré do Abismo", efeito:`Encharca a área em um raio de 3m com escuridão viscosa. -20% para inimigos atacarem ou se moverem.`, custo:"1 de Resiliência", colateral:`Perde 1d10 de Sanidade ao fim do efeito.`},
+    {nome:"Manto do Vazio", efeito:`Ao entrar em área de penumbra ou escuridão total, seu corpo se mistura ao véu. Ganha +20% em Furtividade e Subterfúgio e pode ignorar 1 ataque direto por cena.`, custo:"1 de Resiliência por ativação (dura até sair da escuridão)", colateral:`Sua presença deixa rastros sombrios — criaturas sensíveis ao Véu te detectam com mais facilidade por 1 hora.`},
   ],
   combate:[
     {nome:"Mente Paralela", efeito:`Ganha um turno adicional em combate (apenas para movimento ou percepção).`, custo:"1 de Resiliência", colateral:`Alucina durante o próximo turno.`},
@@ -1268,11 +1182,11 @@ const CHAGAS = {
     {nome:"Espasmo da Fera", efeito:`Seus tendões se contraem violentamente. Recebe +2 em FOR para testes e danos físicos até o final da cena.`, custo:"1 de Resiliência", colateral:`Ao final da cena, sofre 1 Strike automático pela tensão muscular extrema.`},
     {nome:"Sopro Carmesim", efeito:`Canalizando fúria sobrenatural, pode atacar duas vezes no mesmo turno com armas brancas.`, custo:"1 de Resiliência", colateral:`Seus olhos sangram e sua pressão interna se desregula — testes de VON sofrem -2 por 1 cena.`},
     {nome:"Espinha Fragmentada", efeito:`Pode realizar uma manobra impossível (torcer o corpo, atravessar um espaço minúsculo). Ganha +4 em um teste de AGI ou de esquiva física.`, custo:"1 de Resiliência", colateral:`A manobra desloca sua coluna de forma dolorosa — sofre -1 PV imediato e -1 em qualquer teste de movimentação por 1 cena.`},
-    {nome:"Fúria da Lâmina Viva", efeito:`Ao entrar em combate corpo a corpo, entra em fúria controlada. Ganha +2 em testes com armas brancas e ignora penalidades por ferimentos até o fim do combate.`, custo:"1 de Resiliência por combate ativado", colateral:`Após o combate, sente dores intensas e recebe -2 em qualquer teste físico até descansar.`},
+    {nome:"Fúria da Lâmina Viva", efeito:`Ao entrar em combate corpo a corpo, entra em fúria controlada. Ganha +10% em testes com armas brancas e ignora penalidades por ferimentos até o fim do combate.`, custo:"1 de Resiliência por combate ativado", colateral:`Após o combate, sente dores intensas e recebe -10% em qualquer teste físico até descansar.`},
     {nome:"Corte do Véu", efeito:`Seus ataques corpo a corpo podem atingir criaturas parcialmente fora da realidade. Armas brancas empunhadas por você causam dano mágico.`, custo:"1 de Resiliência por ataque que ignora intangibilidade", colateral:`Sua arma se torna instável — a cada 3 usos deve ser reforjada com um ritual simples, ou se quebra ao falhar.`},
     {nome:"Eco Sangrento", efeito:`Quando acerta um golpe crítico com arma branca, pode gastar 1 Resiliência para causar hemorragia (dano contínuo por 1d4 turnos).`, custo:"1 de Resiliência por ativação", colateral:`Role 1d6: com resultado 1-2, você sofre 1 PV de dano.`},
     {nome:"Sombra Enraizada", efeito:`Pode usar sua própria sombra como extensão do corpo. Uma vez por cena, pode atacar à distância com a sombra (alcance de até 5 metros).`, custo:"2 de Resiliência", colateral:`Enquanto a sombra estiver ativa, luz intensa causa dano extra em você (+1d6 por fontes de luz sagrada ou mágica).`},
-    {nome:"Comando das Sombras", efeito:`Comanda todas as sombras ao redor em um raio de 13m², que podem ser moldadas e usadas da forma que quiser.`, custo:"2 de Resiliência", colateral:`Logo após o uso, perde 15 pontos de Sanidade e -4 em testes de VON durante 2 cenas, ficando incapaz de agir durante 2 turnos.`},
+    {nome:"Comando das Sombras", efeito:`Comanda todas as sombras ao redor em um raio de 13m², que podem ser moldadas e usadas da forma que quiser.`, custo:"2 de Resiliência", colateral:`Logo após o uso, perde 15 pontos de Sanidade e -20% em testes de VON durante 2 cenas, ficando incapaz de agir durante 2 turnos.`},
   ],
   cura:[
     {nome:"Toque da Carne Costurada", efeito:`Ao tocar um aliado, cura instantaneamente 1d4 PV.`, custo:"1 de Resiliência", colateral:`A área tocada fica com cicatrizes grotescas e visíveis, mesmo após a cura.`},
@@ -1281,8 +1195,8 @@ const CHAGAS = {
     {nome:"Curandeiro do Véu", efeito:`Sempre que usar um ritual de cura, pode repetir a rolagem de cura uma vez.`, custo:"Passivo", colateral:`Vozes de pacientes falecidos sussurram durante os rituais — role 1d4 de perda de Sanidade.`},
   ],
   runico:[
-    {nome:"Marcar da Carne", efeito:`Cortes com lâminas insculpidas com símbolos rúnicos são mais precisos. Ganha +3 ao atacar criaturas que tenham corpo físico.`, custo:"2 de Resiliência", colateral:`Dura 2 horas; enquanto ativo, rolagens de Sanidade sofrem -2.`},
-    {nome:"Pele de Códice", efeito:`Projeta símbolos arcanos em sua pele, recebendo +2 em Ocultismo e Rituais por 1 cena.`, custo:"1 de Resiliência", colateral:`Sofre -1d6 de Sanidade ao término, devido à exposição às inscrições.`},
+    {nome:"Marcar da Carne", efeito:`Cortes com lâminas insculpidas com símbolos rúnicos são mais precisos. Ganha +15% ao atacar criaturas que tenham corpo físico.`, custo:"2 de Resiliência", colateral:`Dura 2 horas; enquanto ativo, rolagens de Sanidade sofrem -10%.`},
+    {nome:"Pele de Códice", efeito:`Projeta símbolos arcanos em sua pele, recebendo +10% em Ocultismo e Rituais por 1 cena.`, custo:"1 de Resiliência", colateral:`Sofre -1d6 de Sanidade ao término, devido à exposição às inscrições.`},
   ],
 };
 
@@ -1298,19 +1212,19 @@ const RITUAIS = {
     {nome:"Bênção dos Ligamentos Ocultos (Simples)", descricao:`O executor massageia rituais em espiral nos próprios braços ou pernas.`, componentes:"Nenhum", efeito:`Ignora penalidades por ferimentos em locomoção ou ataque por 1d4 turnos.`, tempo:"Ação rápida", falha:`Sofre -1 em testes de atributos físicos por entorpecimento.`},
     {nome:"Corrente Espectral (Médio)", descricao:`Recita palavras ritualísticas enquanto invoca um símbolo embaixo da entidade.`, componentes:"Estojo de Rituais (Crucifixo)", efeito:`Restringe o movimento de uma entidade por 1d4 turnos + 1d3 de dano.`, tempo:"1 turno / 5 minutos", falha:`A corrente se rompe e atinge o conjurador (1d6 dano espiritual).`},
     {nome:"Espiral de Sangue (Médio)", descricao:`Desenha um símbolo com o próprio sangue ao redor.`, componentes:"Sangue do próprio conjurador", efeito:`Marca o chão com um símbolo espiralado. Quem entra perde 1d4 de Sanidade.`, tempo:"1 turno / 5 minutos", falha:`O símbolo atrai uma presença por 1 cena.`},
-    {nome:"Vínculo Reverso (Médio)", descricao:`Recita palavras ritualísticas, criando uma corrente espiritual entre ele e o alvo.`, componentes:"Estojo de Rituais", efeito:`Desvia metade do dano sofrido para o alvo vinculado por 1d4 turnos.`, tempo:"1 turno / 5 minutos", falha:`Ambos compartilham o dano completo.`},
+    {nome:"Vínculo Reverso (Médio)", descricao:`Recita palavras ritualísticas, criando uma corrente espiritual entre ele e o alvo.`, componentes:"Estojo de Rituais", efeito:`Desvia 50% do dano sofrido para o alvo vinculado por 1d4 turnos.`, tempo:"1 turno / 5 minutos", falha:`Ambos compartilham o dano completo.`},
     {nome:"Muralha de Pele (Médio)", descricao:`O executor escreve um símbolo no próprio peito.`, componentes:"Estojo ritual", efeito:`Reduz em 1d6 o dano do próximo ataque recebido por 3 turnos.`, tempo:"1 turno / 5 minutos", falha:`Os músculos contraem de forma brusca; fica incapacitado de se mover por 2 turnos.`},
     {nome:"Véu da Escuridão (Avançado)", descricao:`Desenha um pentagrama com giz negro, recitando palavras de uma língua ritualística.`, componentes:"Estojo Avançado", efeito:`Cria uma área de escuridão sobrenatural por 1d5 turnos.`, tempo:"2 turnos / 10 minutos", falha:`O conjurador também fica cego por 1 turno.`},
     {nome:"Marca da Passagem (Avançado)", descricao:`Desenha uma marca em local escolhido como âncora, vinculando ponto de origem ao destino.`, componentes:"Estojo Avançado", efeito:`Marca um ponto usado como âncora para teleporte (1 uso por história; requer marca de destino previamente criada).`, tempo:"10 min para a marca + 2 turnos para teleporte", falha:`A marca invoca um Eco de nível aleatório.`},
     {nome:"Ritual da Quebra (Avançado)", descricao:`Desenha um símbolo no chão, alvo de joelhos no centro; desenha símbolo na testa do alvo recitando palavras antigas.`, componentes:"Estojo Avançado", efeito:`Rompe um pacto ou efeito espiritual que afeta o alvo ou aliado.`, tempo:"2 turnos / 10 minutos", falha:`A entidade possui o conjurador — deve resistir rolando 12 de VON durante 3 turnos.`},
   ],
   combate:[
-    {nome:"Predador Silencioso (Simples)", descricao:`Óleo ritualístico de sangue, carvão e ervas amargas aplicado na lâmina.`, componentes:"Estojo de Rituais", efeito:`A arma se torna silenciosa ao cortar e ignora armaduras leves por 1 cena.`, tempo:"1 turno / 5 minutos", falha:`A arma ganha -2 em testes por 1 hora devido à corrosão do unguento.`},
-    {nome:"Dança do Sangue Escorrido (Simples)", descricao:`Derrama uma gota do próprio sangue sobre a lâmina entoando um cântico rítmico.`, componentes:"Estojo de Rituais, 1 PV do executor", efeito:`Ganha +2 em Armas Brancas por 3 turnos.`, tempo:"Ação rápida", falha:`Perde mais 1 PV por exaustão mística.`},
+    {nome:"Predador Silencioso (Simples)", descricao:`Óleo ritualístico de sangue, carvão e ervas amargas aplicado na lâmina.`, componentes:"Estojo de Rituais", efeito:`A arma se torna silenciosa ao cortar e ignora armaduras leves por 1 cena.`, tempo:"1 turno / 5 minutos", falha:`A arma ganha -10% em testes por 1 hora devido à corrosão do unguento.`},
+    {nome:"Dança do Sangue Escorrido (Simples)", descricao:`Derrama uma gota do próprio sangue sobre a lâmina entoando um cântico rítmico.`, componentes:"Estojo de Rituais, 1 PV do executor", efeito:`Ganha +10% em Armas Brancas por 3 turnos.`, tempo:"Ação rápida", falha:`Perde mais 1 PV por exaustão mística.`},
     {nome:"Punho do Eco Fraturado (Simples)", descricao:`O executor estala os próprios dedos três vezes.`, componentes:"Nenhum", efeito:`O próximo ataque desarmado ignora armaduras leves.`, tempo:"Ação rápida", falha:`Sofre 1d4 de dano na mão usada.`},
     {nome:"Cicatriz na Mandíbula (Simples)", descricao:`O lutador corta levemente o próprio rosto.`, componentes:"Sangue do usuário", efeito:`Ganha +2 em ataques desarmados por 3 turnos.`, tempo:"1 turno / 5 minutos", falha:`Toma 2 de dano de sangramento por 2 turnos.`},
     {nome:"Corte do Além (Médio)", descricao:`Desenha um símbolo antigo sobre a lâmina com tinta de ossos moídos.`, componentes:"Estojo de Rituais", efeito:`O próximo ataque com a arma atinge criaturas mesmo em planos paralelos ou intangíveis.`, tempo:"1 turno / 5 minutos", falha:`O véu se enfraquece — invoca uma Complicação automática ao usar.`},
-    {nome:"Estouro dos Ossos (Médio)", descricao:`O executor quebra diversos ossos ritualísticos e usa o pó nos punhos.`, componentes:"Estojo de Rituais", efeito:`Recebe +1d3+2 de dano fixo no próximo ataque desarmado.`, tempo:"1 turno / 5 minutos", falha:`Sofre -2 em testes físicos por 1 cena (tensão muscular extrema).`},
+    {nome:"Estouro dos Ossos (Médio)", descricao:`O executor quebra diversos ossos ritualísticos e usa o pó nos punhos.`, componentes:"Estojo de Rituais", efeito:`Recebe +1d3+2 de dano fixo no próximo ataque desarmado.`, tempo:"1 turno / 5 minutos", falha:`Sofre -10% em testes físicos por 1 cena (tensão muscular extrema).`},
     {nome:"Espírito dos Punhos (Médio)", descricao:`O usuário prende um espírito em seu equipamento temporariamente.`, componentes:"Estojo de Rituais", efeito:`As armas de punho causam +2 de dano espiritual por 1d4 turnos.`, tempo:"2 turnos / 10 minutos", falha:`O espírito se revolta e se prende à arma, causando 1 de dano na durabilidade.`},
     {nome:"Armas do Juízo Final (Avançado)", descricao:`Uma inscrição complexa é feita ao redor do punho da arma com cinzas humanas.`, componentes:"Estojo de Rituais Avançado", efeito:`Durante 1 combate, seus golpes causam o dobro de dano.`, tempo:"2 turnos / 10 minutos", falha:`Se a arma for quebrada ou deixada para trás, torna-se ponto de ruptura do Véu e pode gerar um Eco de nível aleatório.`},
     {nome:"Chamar Sombras Antigas (Avançado)", descricao:`Desenha com giz negro um pentagrama; sombras surgem do chão e seguem o usuário.`, componentes:"Estojo de Rituais Avançado, ambiente escuro", efeito:`Pode manipular a sombra como uma arma viva (dano de arma leve, 1d6) por até 3 turnos.`, tempo:"2 turnos / 10 minutos", falha:`As sombras se revoltam e prendem o usuário no local, incapacitando-o por 3 turnos.`},
@@ -1346,8 +1260,8 @@ const WEAPON_TABLES = [
   { caption:"Itens de Arremesso", cols:["Item","Espaço","Dano","Efeito"], rows:[
     {nome:"Granada", espaco:1, dano:"3d20", extra:"Alcance 6m"},
     {nome:"Faca de Arremesso", espaco:1, dano:"1d6", extra:"—"},
-    {nome:"Granada de Fumaça", espaco:1, dano:"—", extra:"Cobre 10m; alvo direto -3 de Percepção por 3 turnos"},
-    {nome:"Granada de Luz", espaco:1, dano:"—", extra:"Área de 3m: -4 Percepção (2 turnos) e -2 em todas as perícias (4 turnos)"},
+    {nome:"Granada de Fumaça", espaco:1, dano:"—", extra:"Cobre 10m; alvo direto -20% Percepção por 3 turnos"},
+    {nome:"Granada de Luz", espaco:1, dano:"—", extra:"-30% Percepção (2 turnos) e -10% em todas as perícias (4 turnos) na área"},
     {nome:"Granada Incendiária / Molotov", espaco:1, dano:"1d5+3/turno", extra:"Área em chamas de 5m"},
   ]},
   { caption:"Armas de Fogo Simples", cols:["Arma","Dano","Alcance","Cap.","Esp."], rows:[
@@ -1372,10 +1286,10 @@ const WEAPON_TABLES = [
 
 const EQUIP_TABLES = [
   { caption:"Proteções", cols:["Item","Espaço","Efeito"], rows:[
-    {nome:"Colete Nível I", espacos:2, extra:"Reduz 2 de Dano Físico, -2 em testes de AGI, resiste 3 hits"},
-    {nome:"Colete Nível II", espacos:3, extra:"Reduz 3 de Dano Físico, -3 em testes de AGI, resiste 5 hits"},
-    {nome:"Colete Nível III", espacos:4, extra:"Reduz 4 de Dano Físico, -4 em testes de AGI, resiste 7 hits"},
-    {nome:"Símbolo Consagrado", espacos:1, extra:"+2 em testes contra possessão e medo sobrenatural (2 durabilidade)"},
+    {nome:"Colete Nível I", espacos:2, extra:"-2 Dano Físico, -3% AGI, resiste 3 hits"},
+    {nome:"Colete Nível II", espacos:3, extra:"-3 Dano Físico, -4% AGI, resiste 5 hits"},
+    {nome:"Colete Nível III", espacos:4, extra:"-4 Dano Físico, -5% AGI, resiste 7 hits"},
+    {nome:"Símbolo Consagrado", espacos:1, extra:"+10% contra possessão e medo sobrenatural (2 durabilidade)"},
     {nome:"Talismã", espacos:1, extra:"1 re-rolagem por sessão em testes de Sanidade (2 durabilidade)"},
   ]},
   { caption:"Equipamentos Gerais", cols:["Item","Espaço","Efeito"], rows:[
@@ -1384,7 +1298,7 @@ const EQUIP_TABLES = [
     {nome:"Estojo de Rituais Básico", espacos:2, extra:"Necessário para rituais simples e médios"},
     {nome:"Máscara de Gás", espacos:2, extra:"Evita gases venenosos"},
     {nome:"Lanterna UV", espacos:1, extra:"Revela símbolos ocultos, sangue, fluidos espectrais"},
-    {nome:"Gravador de Fenômenos", espacos:1, extra:"+2 em Investigação contra entidades"},
+    {nome:"Gravador de Fenômenos", espacos:1, extra:"+10% Investigação contra entidades"},
     {nome:"Correntes / Cordas", espacos:0, extra:"Amarração, fixação ou sustentação de cargas"},
     {nome:"Kit Médico P (1 uso)", espacos:1, extra:"Restaura 1d4 PV por uso"},
     {nome:"Kit Médico M (2 usos)", espacos:2, extra:"Restaura 1d7 PV por uso"},
@@ -1392,14 +1306,12 @@ const EQUIP_TABLES = [
     {nome:"Lente do Véu", espacos:1, extra:"Vê auras espirituais por 1 turno (1 uso/missão)"},
   ]},
   { caption:"Equipamentos Especiais (N.A. 4+)", cols:["Item","Espaço","Efeito"], rows:[
-    {nome:"Estojo de Rituais Avançados", espacos:3, extra:"Permite realizar rituais avançados sem penalidades; +3 em testes de Ocultismo ou Rituais (sem este item, rituais avançados sofrem -5 e maior risco de falha crítica)"},
-    {nome:"Coldre Tático do Véu", espacos:2, extra:"Sacar e trocar de armas como ação gratuita; 1x/missão concede +4 de Iniciativa (AGI) no início de um combate"},
-    {nome:"Grimório Vazio", espacos:2, extra:"Armazena até 3 rituais aprendidos, lidos sem rolagem em condições ideais; permite usar até 2 rituais simples no mesmo turno"},
-    {nome:"Scanner de Realidade", espacos:1, extra:"+3 em testes de Investigação ou Tecnologia em locais sobrenaturais; 1x/sessão revela pistas ocultas ignoradas por meios normais"},
-    {nome:"Medalhão de Cristal", espacos:1, extra:"+3 em Rituais e +2 em testes de VON; pode absorver 1 manifestação espiritual por sessão (impede um ataque ou efeito sobrenatural)"},
-    {nome:"Diário do Inominado", espacos:2, extra:"+4 em Percepção ou Investigação ao estudar pistas; pode identificar e nomear uma entidade desconhecida por missão (revela fraqueza ou efeito especial)"},
-    {nome:"Gargantilha Animal", espacos:1, extra:"Conecta o animal que a usa diretamente ao dono (e vice-versa), permitindo ações em conjunto sem testes separados; o dono pode sincronizar o animal com um aliado próximo para 1 ataque conjunto"},
-    {nome:"Mini Kit de Cirurgias", espacos:2, extra:"Funciona como um kit médico comum (2d6 de cura, 4 usos — pode ser reabastecido ao máximo após esgotar); permite tratamentos avançados e pequenas cirurgias para traumas e feridas mais severas"},
+    {nome:"Estojo de Rituais Avançados", espacos:3, extra:"Rituais avançados sem penalidade; +5% Ocultismo/Rituais"},
+    {nome:"Coldre Tático do Véu", espacos:2, extra:"Trocar de arma como ação gratuita; 1x/missão +10 Iniciativa"},
+    {nome:"Grimório Vazio", espacos:2, extra:"Armazena 3 rituais; permite ler sem rolagem; 2 rituais simples no mesmo turno"},
+    {nome:"Scanner de Realidade", espacos:1, extra:"+10% Investigação/Tecnologia em locais sobrenaturais; revela pista oculta 1x/missão"},
+    {nome:"Medalhão de Cristal", espacos:1, extra:"+5% Rituais, +5 VON; absorve 1 manifestação espiritual/sessão"},
+    {nome:"Diário do Inominado", espacos:2, extra:"+10% Percepção/Investigação ao estudar pistas; identifica entidade 1x/missão"},
   ]},
 ];
 
@@ -1416,12 +1328,12 @@ function blankState(){
     mesa: currentMesa,
     meta:{ nome:"", origem:"", idade:"", sexo:"", descFisica:"", na:1, pm:0, pe:0, historia:"", foto:"" },
     atributos:{ for:1, agi:1, int:1, car:1, von:1, vit:0 },
-    pericias: Object.fromEntries(SKILLS.map(s=>[s.key,4])),
+    pericias: Object.fromEntries(SKILLS.map(s=>[s.key,20])),
     caminho:{ pathIndex:null, n1:false, n2:false, n3:false, custom:{ nome:"", descricao:"", n1:"", n2:"", n3:"", buffs:[], debuffs:[] } },
     buffChoices:{ origem:"", caminho:"" },
     rollLog:[],
     trauma:{ tipo:"", desc:"", nomeCustom:"" },
-    sanidade:{ atual:50, max:50 },
+    sanidade:{ atual:100, max:100 },
     resiliencia:{ atual:1 },
     chagas:[],
     rituais:[],
@@ -1442,16 +1354,11 @@ function pvMax(){
   return base + state.atributos.vit*2;
 }
 function resilienciaMax(){
-  // V2: "Sua resiliência é igual a sua Vontade (VON)."
-  let m = Number(state.atributos.von) || 0;
-  if(state.meta.origem === "filhosdoveu") m += 2; // Filhos do Véu: +2 pontos de Resiliência inicial
+  let m = Math.ceil(state.atributos.von/2);
+  if(state.meta.origem === "militar") m += 1;
   return m;
 }
-function sanidadeSugestao(){
-  // V2: Sanidade inicia em 50; a cada 1 ponto de VON, +2 SAN (máx. +10 com VON 5); cada Chaga reduz -5 SAN máx.
-  const vonBonus = Math.min(Number(state.atributos.von)||0, 5) * 2;
-  return 50 + vonBonus - state.chagas.length*5;
-}
+function sanidadeSugestao(){ return 100 - state.chagas.length*10; }
 
 /* ---------- SINCRONIA: Sanidade (Trauma&Mente ⇄ Combate) e Resiliência (Chagas ⇄ Combate) ---------- */
 function setSanidadeAtual(v){
@@ -1471,8 +1378,7 @@ function setResilienciaAtual(v){
 }
 function strikesInfo(){
   const total = (Number(state.strikes.cabeca)||0) + (Number(state.strikes.tronco)||0) + (Number(state.strikes.membros)||0);
-  // V2: a cada 3 Strikes, -1 em todos os testes (e +2 de dano extra nos ataques); 5 Strikes = colapso/inconsciência.
-  return { total, penalty: Math.floor(total/3), unconscious: total >= 5 };
+  return { total, penalty: Math.floor(total/4), unconscious: total >= 9 };
 }
 function invMax(){ return 8 + Math.floor(state.atributos.agi/5); }
 function invUsed(){
@@ -1482,8 +1388,7 @@ function invUsed(){
 }
 function attrPointsSpent(){
   const a = state.atributos;
-  // V2: FOR/AGI/INT/CAR custam 1 ponto cada; VON e VIT custam 2 pontos cada (pool de 20).
-  return (a.for-1)+(a.agi-1)+(a.int-1)+(a.car-1) + (a.von-1)*2 + a.vit*2;
+  return (a.for-1)+(a.agi-1)+(a.int-1)+(a.car-1)+(a.von-1) + a.vit*2;
 }
 
 /* ---------- BUFFS (Origem/Caminho -> Perícias/Atributos) ---------- */
@@ -1509,11 +1414,6 @@ function activeBuffs(){
     if(state.caminho.n1 && state.caminho.pathIndex !== null && state.caminho.pathIndex !== "custom" && rules.caminhos && rules.caminhos[state.caminho.pathIndex]){
       const r = rules.caminhos[state.caminho.pathIndex];
       const key = r.options.length > 1 ? state.buffChoices.caminho : r.options[0];
-      if(key) out.push({ type:r.type, key, amount:r.amount, source:"Caminho" });
-    }
-    if(state.caminho.n1 && state.caminho.pathIndex !== null && state.caminho.pathIndex !== "custom" && rules.caminhosExtra && rules.caminhosExtra[state.caminho.pathIndex]){
-      const r = rules.caminhosExtra[state.caminho.pathIndex];
-      const key = r.options.length > 1 ? state.buffChoices.caminhoExtra : r.options[0];
       if(key) out.push({ type:r.type, key, amount:r.amount, source:"Caminho" });
     }
   }
@@ -1921,15 +1821,12 @@ function wirePassiveBuffControls(containerId, arrGetter, renderFn){
   el.addEventListener("input", e => handleFieldEvent(e, false));
   el.addEventListener("change", e => handleFieldEvent(e, true));
 }
-function skillCap(){ return (Number(state.meta.na)||0) >= 9 ? 14 : 12; }
+function skillCap(){ return (Number(state.meta.na)||0) >= 9 ? 85 : 80; }
 function skillBonus(key){ return activeBuffs().filter(b=>b.type==="skill" && (b.key===key || b.key==="todos")).reduce((s,b)=>s+b.amount,0); }
 function skillRawTotal(key){ return (Number(state.pericias[key])||0) + skillBonus(key); }
 function skillTotal(key){ return clampInt(skillRawTotal(key), 0, skillCap()); }
 function skillOverCap(key){ return skillRawTotal(key) > skillCap(); }
-function attrCap(key){
-  if(key === "vit" || key === "von") return 5;
-  return (Number(state.meta.na)||0) >= 9 ? 14 : 12;
-}
+function attrCap(key){ return key === "vit" ? 5 : 20; }
 function attrBonus(key){ return activeBuffs().filter(b=>b.type==="attr" && (b.key===key || b.key==="todos")).reduce((s,b)=>s+b.amount,0); }
 function attrRawTotal(key){ return (Number(state.atributos[key])||0) + attrBonus(key); }
 function attrTotal(key){ return Math.min(attrRawTotal(key), attrCap(key)); }
@@ -2007,7 +1904,7 @@ function spendResiliencia(cost, label){
    ===================================================================== */
 function renderAll(){
   $("#ptsUsed").textContent = attrPointsSpent();
-  const rem = 20 - attrPointsSpent();
+  const rem = 30 - attrPointsSpent();
   const remEl = $("#ptsRemaining");
   remEl.textContent = rem + " restantes";
   remEl.classList.toggle("over-budget", rem < 0);
@@ -2015,7 +1912,7 @@ function renderAll(){
   $("#f-pvMax").value = pvMax();
   $("#f-resMax").value = resilienciaMax();
   const resMax2 = $("#f-resMax2"); if(resMax2) resMax2.value = resilienciaMax();
-  $("#sanHint").textContent = "Sugestão (Base 50 + até +10 por VON, ajustável com o Mestre): " + sanidadeSugestao() + " — cada nova Chaga reduz a Sanidade máxima em 5.";
+  $("#sanHint").textContent = "Sugestão com base nas Chagas atuais: " + sanidadeSugestao() + " (cada nova Chaga reduz a Sanidade máxima em 10).";
   const sanHint2 = $("#sanHint2"); if(sanHint2) sanHint2.textContent = $("#sanHint").textContent;
 
   const si = strikesInfo();
@@ -2043,15 +1940,14 @@ function renderBuffBadges(){
     if(!el) return;
     const bonus = skillBonus(s.key);
     const overCap = skillOverCap(s.key);
-    const dado = "dado " + dieForPoints(skillTotal(s.key));
     if(overCap){
-      el.textContent = "⚠ " + skillRawTotal(s.key) + " ultrapassa o limite de " + skillCap() + " — capado em " + skillTotal(s.key) + " (base " + (Number(state.pericias[s.key])||0) + (bonus?" +"+bonus:"") + ") — " + dado;
+      el.textContent = "⚠ " + skillRawTotal(s.key) + "% ultrapassa o limite de " + skillCap() + "% — capado em " + skillTotal(s.key) + "% (base " + (Number(state.pericias[s.key])||0) + "%" + (bonus?" +"+bonus+"%":"") + ")";
       el.classList.add("over-cap"); el.classList.remove("has-bonus");
     } else if(bonus){
-      el.textContent = "Total: " + skillTotal(s.key) + " (base " + (Number(state.pericias[s.key])||0) + " +" + bonus + ") — " + dado;
+      el.textContent = "Total: " + skillTotal(s.key) + "% (base " + (Number(state.pericias[s.key])||0) + "% +" + bonus + "%)";
       el.classList.add("has-bonus"); el.classList.remove("over-cap");
     } else {
-      el.textContent = dado;
+      el.textContent = "";
       el.classList.remove("has-bonus"); el.classList.remove("over-cap");
     }
   });
@@ -2060,15 +1956,14 @@ function renderBuffBadges(){
     if(!el) return;
     const bonus = attrBonus(a.key);
     const overCap = attrOverCap(a.key);
-    const dado = a.rollable ? ("dado " + dieForPoints(attrTotal(a.key))) : "";
     if(overCap){
-      el.textContent = "⚠ " + attrRawTotal(a.key) + " ultrapassa o limite de " + attrCap(a.key) + " — capado em " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + (bonus?" +"+bonus:"") + ")" + (dado?" — "+dado:"");
+      el.textContent = "⚠ " + attrRawTotal(a.key) + " ultrapassa o limite de " + attrCap(a.key) + " — capado em " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + (bonus?" +"+bonus:"") + ")";
       el.classList.add("over-cap"); el.classList.remove("has-bonus");
     } else if(bonus){
-      el.textContent = "Total: " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + " +" + bonus + ")" + (dado?" — "+dado:"");
+      el.textContent = "Total: " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + " +" + bonus + ")";
       el.classList.add("has-bonus"); el.classList.remove("over-cap");
     } else {
-      el.textContent = dado;
+      el.textContent = "";
       el.classList.remove("has-bonus"); el.classList.remove("over-cap");
     }
   });
@@ -2079,10 +1974,9 @@ function renderMarcasStatus(){
   $("#marcasCount").textContent = count;
   const statusEl = $("#marcasStatus");
   let text, cls;
-  if(count <= 1){ text = "Sem efeitos negativos (0–1 marca)"; cls = "ok-text"; }
-  else if(count === 2){ text = "Debuff narrativo em testes e interações sociais (2 marcas)"; cls = "warn-text"; }
-  else if(count <= 4){ text = "Chama atenção de Ecos e sensíveis ao sobrenatural (3–4 marcas)"; cls = "warn-text"; }
-  else { text = "Ecos agem de forma mais agressiva contra você (5 marcas — limite do corpo)"; cls = "warn-text"; }
+  if(count <= 2){ text = "Sem efeitos negativos (1–2 marcas)"; cls = "ok-text"; }
+  else if(count <= 4){ text = "Debuff narrativo em testes e interações sociais (3–4 marcas)"; cls = "warn-text"; }
+  else { text = "Chama atenção de Ecos e sensíveis ao sobrenatural (5+ marcas)"; cls = "warn-text"; }
   statusEl.textContent = text;
   statusEl.className = cls;
 }
@@ -2106,7 +2000,7 @@ function renderOriginCard(){
   if(r.options.length > 1){
     box.innerHTML = `
       <div class="buff-choice">
-        <label for="f-buffOrigem">Aplicar bônus de Origem (+${r.amount} ${r.type==="skill"?"ponto(s)":"ponto(s) de atributo"}) em</label>
+        <label for="f-buffOrigem">Aplicar bônus de Origem (+${r.amount}${r.type==="skill"?"%":""}) em</label>
         <select id="f-buffOrigem">
           <option value="">— escolha —</option>
           ${r.options.map(k => {
@@ -2118,7 +2012,7 @@ function renderOriginCard(){
   } else {
     const k = r.options[0];
     const nome = r.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
-    box.innerHTML = `<p class="buff-fixed-note">Bônus automático aplicado: +${r.amount} em ${esc(nome||k)}.</p>`;
+    box.innerHTML = `<p class="buff-fixed-note">Bônus automático aplicado: +${r.amount}${r.type==="skill"?"%":""} em ${esc(nome||k)}.</p>`;
   }
   const sel = $("#f-buffOrigem");
   if(sel) sel.addEventListener("change", e=>{ state.buffChoices.origem = e.target.value; onChange(); });
@@ -2176,7 +2070,7 @@ function renderPathLevels(){
     if(cr.options.length > 1){
       n1BuffHtml = `
         <div class="buff-choice">
-          <label for="f-buffCaminho">Aplicar bônus (+${cr.amount} ${cr.type==="skill"?"ponto(s)":"ponto(s) de atributo"}) em</label>
+          <label for="f-buffCaminho">Aplicar bônus (+${cr.amount}${cr.type==="skill"?"%":""}) em</label>
           <select id="f-buffCaminho">
             <option value="">— escolha —</option>
             ${cr.options.map(k => {
@@ -2188,14 +2082,8 @@ function renderPathLevels(){
     } else {
       const k = cr.options[0];
       const nome = cr.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
-      n1BuffHtml = `<p class="buff-fixed-note">Bônus automático aplicado: +${cr.amount} em ${esc(nome||k)}.</p>`;
+      n1BuffHtml = `<p class="buff-fixed-note">Bônus automático aplicado: +${cr.amount}${cr.type==="skill"?"%":""} em ${esc(nome||k)}.</p>`;
     }
-  }
-  const crExtra = rules && rules.caminhosExtra ? rules.caminhosExtra[idx] : null;
-  if(crExtra && state.caminho.n1 && crExtra.options.length === 1){
-    const k = crExtra.options[0];
-    const nome = crExtra.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
-    n1BuffHtml += `<p class="buff-fixed-note">Bônus automático aplicado: +${crExtra.amount} em ${esc(nome||k)}.</p>`;
   }
 
   wrap.innerHTML = `
@@ -2407,10 +2295,10 @@ function renderMarcas(){
           <div class="field"><label>Nome da Marca</label><input type="text" data-field="nome" value="${esc(m.nome)}" placeholder="Ex: Runa de Ferro"></div>
           <div class="field"><label>${m.alvoTipo==="item" ? "Item/Arma Marcada" : "Local no Corpo"}</label><input type="text" data-field="alvoNome" value="${esc(m.alvoNome)}" placeholder="${m.alvoTipo==="item" ? "Ex: Espada Tática" : "Ex: Antebraço direito"}"></div>
         </div>
-        <div class="field"><label>Efeito Permanente</label><textarea data-field="efeito" rows="2" placeholder="Ex: +1 em Armas Brancas contra criaturas físicas">${esc(m.efeito)}</textarea></div>
+        <div class="field"><label>Efeito Permanente</label><textarea data-field="efeito" rows="2" placeholder="Ex: +5% em Armas Brancas contra criaturas físicas">${esc(m.efeito)}</textarea></div>
         <div class="field-grid-2">
           <div class="field"><label>Ritual Usado</label><input type="text" data-field="ritual" value="${esc(m.ritual)}" placeholder="Ex: Marca da Carne"></div>
-          <div class="field"><label>Teste (mín. 10+ pontos recomendado)</label><input type="text" data-field="teste" value="${esc(m.teste)}" placeholder="Ex: Ocultismo 10"></div>
+          <div class="field"><label>Teste (mín. 50% recomendado)</label><input type="text" data-field="teste" value="${esc(m.teste)}" placeholder="Ex: Ocultismo 55%"></div>
         </div>
         <div class="field"><label>Custo de Ativação (se houver)</label><input type="text" data-field="custo" value="${esc(m.custo||"")}" placeholder="Ex: 2 de Resiliência (deixe em branco se não houver custo)"></div>
         ${buffFieldsHTML(m)}
@@ -2443,8 +2331,8 @@ function renderMaldicoes(){
       </div>
       <div class="field"><label>Origem da Maldição</label><input type="text" data-field="origem" value="${esc(m.origem)}" placeholder="Ex: Falha crítica no ritual X / Pacto com NPC Y / Voluntária"></div>
       <div class="field-grid-2">
-        <div class="field"><label>Efeito Positivo (se houver)</label><textarea data-field="efeitoPositivo" rows="2" placeholder="Ex: +2 em Intimidação">${esc(m.efeitoPositivo)}</textarea></div>
-        <div class="field"><label>Efeito Negativo</label><textarea data-field="efeitoNegativo" rows="2" placeholder="Ex: -2 em testes sociais permanente">${esc(m.efeitoNegativo)}</textarea></div>
+        <div class="field"><label>Efeito Positivo (se houver)</label><textarea data-field="efeitoPositivo" rows="2" placeholder="Ex: +15% em Intimidação">${esc(m.efeitoPositivo)}</textarea></div>
+        <div class="field"><label>Efeito Negativo</label><textarea data-field="efeitoNegativo" rows="2" placeholder="Ex: -10% em testes sociais permanente">${esc(m.efeitoNegativo)}</textarea></div>
       </div>
       <div class="field"><label>Falha</label><textarea data-field="falhaNormal" rows="2" placeholder="O que acontece se o teste ligado a esta Maldição apenas falhar (sem ser crítico)">${esc(m.falhaNormal||"")}</textarea></div>
       <div class="field falha-critica-field"><label>Falha Crítica</label><textarea data-field="falhaCritica" rows="2" placeholder="O que acontece se o teste ligado a esta Maldição falhar criticamente">${esc(m.falhaCritica||"")}</textarea></div>
@@ -2878,7 +2766,7 @@ function buildStaticUI(){
     <div class="skill-box" data-skill="${s.key}">
       <div class="skill-main">
         <label for="f-per-${s.key}">${esc(s.nome)}</label>
-        <input type="number" min="0" max="14" id="f-per-${s.key}">
+        <input type="number" min="0" max="85" id="f-per-${s.key}">
       </div>
       <div class="skill-total" id="skillTotal-${s.key}"></div>
     </div>`).join("");
@@ -2889,14 +2777,14 @@ function buildStaticUI(){
       <tbody>
         <tr><td class="num">1</td><td class="num">—</td><td>Acesso básico a rituais simples e armas de Fogo Simples.</td></tr>
         <tr><td class="num">2</td><td class="num">10</td><td>Acesso a armas táticas e rituais médios.</td></tr>
-        <tr><td class="num">3</td><td class="num">20</td><td>Armas de fogo táticas e Pactos liberados.</td></tr>
+        <tr><td class="num">3</td><td class="num">20</td><td>Armas de fogo táticas liberadas.</td></tr>
         <tr><td class="num">4</td><td class="num">35</td><td>Equipamentos especiais liberados.</td></tr>
-        <tr><td class="num">5</td><td class="num">50</td><td>Rituais avançados liberados.</td></tr>
-        <tr><td class="num">6</td><td class="num">70</td><td>Pode criar/adquirir 1 arma especial personalizada.</td></tr>
-        <tr><td class="num">7</td><td class="num">95</td><td>Pode adquirir uma Chaga sem penalidade na Sanidade.</td></tr>
+        <tr><td class="num">5</td><td class="num">50</td><td>Rituais avançados (com estojo).</td></tr>
+        <tr><td class="num">6</td><td class="num">70</td><td>Pode criar 1 arma especial personalizada.</td></tr>
+        <tr><td class="num">7</td><td class="num">95</td><td>Pode adquirir uma Chaga sem penalidade.</td></tr>
         <tr><td class="num">8</td><td class="num">125</td><td>Acesso à tecnologia experimental.</td></tr>
-        <tr><td class="num">9</td><td class="num">160</td><td>+2 pontos em todas as Perícias, ultrapassando o limite máximo de 12 (máx. 14).</td></tr>
-        <tr><td class="num">10</td><td class="num">200</td><td>Conquista um título ("Agente Sênior"); recebe item exclusivo da V.E.U.; pode treinar/liderar recrutas; prioridade no uso de relíquias e rituais proibidos.</td></tr>
+        <tr><td class="num">9</td><td class="num">160</td><td>+5% em todas as Perícias, ultrapassando o limite máximo de 80% (máx. 85%).</td></tr>
+        <tr><td class="num">10</td><td class="num">200</td><td>Título de "Agente Sênior": item exclusivo, símbolo personalizado da V.E.U., pode treinar/liderar recrutas e tem prioridade no uso de relíquias e rituais proibidos.</td></tr>
       </tbody>
     </table>`;
 
@@ -2904,29 +2792,27 @@ function buildStaticUI(){
     <table class="ref-table">
       <thead><tr><th>Evolução</th><th class="num">Custo</th></tr></thead>
       <tbody>
-        <tr><td>Aumentar Atributo ou Perícia (+1)</td><td class="num">10 PE</td></tr>
+        <tr><td>Aumentar Perícia (+1%)</td><td class="num">2 PE</td></tr>
+        <tr><td>Aumentar Atributo (+1)</td><td class="num">10 PE</td></tr>
         <tr><td>Adquirir nova Chaga</td><td class="num">15 PE</td></tr>
         <tr><td>Aprender novo Ritual</td><td class="num">15 PE</td></tr>
-        <tr><td>Adquirir uma Marca</td><td class="num">10 PE</td></tr>
-        <tr><td>Adquirir uma Maldição</td><td class="num">20 PE</td></tr>
         <tr><td>Caminho da Origem (Nível 1)</td><td class="num">15 PE</td></tr>
         <tr><td>Proficiência da Origem (Nível 2)</td><td class="num">25 PE</td></tr>
         <tr><td>Mestre da Origem (Nível 3)</td><td class="num">35 PE</td></tr>
       </tbody>
     </table>
     <table class="ref-table">
-      <caption>Proficiência de Perícias &amp; Atributos</caption>
-      <thead><tr><th class="num">Pontos</th><th class="num">Dado</th><th>Nível</th></tr></thead>
+      <caption>Proficiência de Perícias</caption>
+      <thead><tr><th class="num">%</th><th>Nível</th></tr></thead>
       <tbody>
-        <tr><td class="num">4</td><td class="num">d4</td><td>Iniciante — compreende os conceitos básicos da perícia.</td></tr>
-        <tr><td class="num">6</td><td class="num">d6</td><td>Aprendiz — realiza tarefas simples.</td></tr>
-        <tr><td class="num">8</td><td class="num">d8</td><td>Competente — executa ações padrão de forma eficaz.</td></tr>
-        <tr><td class="num">10</td><td class="num">d10</td><td>Experiente — atua com consistência em situações difíceis.</td></tr>
-        <tr><td class="num">12</td><td class="num">d12</td><td>Mestre — sucesso quase certo, até em cenários extremos.</td></tr>
-        <tr><td class="num">14</td><td class="num">d14</td><td>Acima do limite — só com N.A. 9 ou habilidade/Origem específica do livro.</td></tr>
+        <tr><td class="num">20</td><td>Iniciante — sucesso apenas em condições ideais.</td></tr>
+        <tr><td class="num">40</td><td>Aprendiz — pode falhar sob estresse ou pressão.</td></tr>
+        <tr><td class="num">50</td><td>Competente — eficaz, pode improvisar com risco moderado.</td></tr>
+        <tr><td class="num">60</td><td>Experiente — consistente em situações difíceis.</td></tr>
+        <tr><td class="num">65</td><td>Especialista — ações complexas com confiança.</td></tr>
+        <tr><td class="num">70</td><td>Mestre — sucesso quase certo, até em cenários extremos.</td></tr>
       </tbody>
-    </table>
-    <p class="hint" style="margin-top:8px;">Teste = dado do Atributo + dado da Perícia, somados e comparados à Dificuldade do Teste (DT base 7). Dois ou mais dados iguais e ≥6 = sucesso crítico automático. Todos os dados em 1 = falha crítica.</p>`;
+    </table>`;
 
   $("#refArmas").innerHTML = `<p class="hint" style="margin-top:0;">Clique em "+ Adicionar" para lançar o item direto na lista de Armas e Proteções Equipadas, sem digitar nada.</p>` +
     WEAPON_TABLES.map(renderWeaponCatalogTable).join("");
@@ -2986,12 +2872,12 @@ function bindEvents(){
   $("#f-descfisica").addEventListener("input", e => { state.meta.descFisica = e.target.value; onChange(); });
   $("#f-historia").addEventListener("input", e => { state.meta.historia = e.target.value; onChange(); });
 
-  $("#a-for").addEventListener("input", e => { state.atributos.for = clampInt(e.target.value,1,attrCap("for")); onChange(); });
-  $("#a-agi").addEventListener("input", e => { state.atributos.agi = clampInt(e.target.value,1,attrCap("agi")); onChange(); });
-  $("#a-int").addEventListener("input", e => { state.atributos.int = clampInt(e.target.value,1,attrCap("int")); onChange(); });
-  $("#a-car").addEventListener("input", e => { state.atributos.car = clampInt(e.target.value,1,attrCap("car")); onChange(); });
-  $("#a-von").addEventListener("input", e => { state.atributos.von = clampInt(e.target.value,1,attrCap("von")); maybeTopUp(); onChange(); });
-  $("#a-vit").addEventListener("input", e => { state.atributos.vit = clampInt(e.target.value,0,attrCap("vit")); maybeTopUp(); onChange(); });
+  $("#a-for").addEventListener("input", e => { state.atributos.for = clampInt(e.target.value,1,20); onChange(); });
+  $("#a-agi").addEventListener("input", e => { state.atributos.agi = clampInt(e.target.value,1,20); onChange(); });
+  $("#a-int").addEventListener("input", e => { state.atributos.int = clampInt(e.target.value,1,20); onChange(); });
+  $("#a-car").addEventListener("input", e => { state.atributos.car = clampInt(e.target.value,1,20); onChange(); });
+  $("#a-von").addEventListener("input", e => { state.atributos.von = clampInt(e.target.value,1,20); maybeTopUp(); onChange(); });
+  $("#a-vit").addEventListener("input", e => { state.atributos.vit = clampInt(e.target.value,0,5); maybeTopUp(); onChange(); });
 
   SKILLS.forEach(s => {
     document.getElementById("f-per-" + s.key).addEventListener("input", e => {
