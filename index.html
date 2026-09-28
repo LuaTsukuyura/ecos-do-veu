@@ -902,7 +902,7 @@ footer.appfoot{ text-align:center; color:var(--text-faint); font-size:11px; marg
       <!-- II. ATRIBUTOS & PERÍCIAS -->
       <section class="tab-panel" data-panel="atributos">
         <h2 class="panel-title">Atributos</h2>
-        <p class="hint">Distribua 20 pontos. FOR / AGI / INT / CAR começam em 1 (máx. 12, custo 1 ponto cada). VON começa em 1 e VIT começa em 0 — ambos com máx. 5, custo 2 pontos cada (VON concede +2 SAN por ponto, até +10; VIT concede +2 PV por ponto, até +10).</p>
+        <p class="hint">Distribua 20 pontos. FOR / AGI / INT / CAR começam em 1 (máx. 12, custo 1 ponto cada). VON começa em 1 e VIT começa em 0 — ambos com máx. 5, custo 2 pontos cada (VON concede +2 SAN por ponto, até +10, e rola sempre d20; VIT concede +2 PV por ponto, até +10).</p>
         <div class="points-tracker">
           <span>Pontos usados: <strong id="ptsUsed">0</strong> / 30</span>
           <span id="ptsRemaining" class="pts-remaining">30 restantes</span>
@@ -1198,6 +1198,8 @@ const ATTRS = [
   {key:"vit", nome:"Vitalidade (VIT)", id:"a-vit", min:0, max:5, rollable:false},
 ];
 const ATTR_DICE = {4:"d4",6:"d6",8:"d8",10:"d10",12:"d12",14:"d14"};
+// VON sempre rola d20: seus pontos vão para a Sanidade (+2 cada), não para o tamanho do dado.
+function attrDie(key){ return key === "von" ? "d20" : dieForPoints(attrTotal(key)); }
 function dieForPoints(pts){
   const n = Number(pts)||0;
   if(n>=14) return "d14"; if(n>=12) return "d12"; if(n>=10) return "d10";
@@ -2226,7 +2228,7 @@ function renderRollLog(){
    dados em 1 = falha crítica." (ver referência em Perícias). */
 function rollAttrDie(key){
   const a = ATTRS.find(x => x.key === key); if(!a) return;
-  const sides = Number(dieForPoints(attrTotal(key)).slice(1));
+  const sides = Number(attrDie(key).slice(1));
   const r = d(sides);
   let suffix = "";
   if(r === sides) suffix = " (valor máximo do dado)";
@@ -2238,7 +2240,7 @@ function rollSkillTest(key){
   const attrKey = skillAttrPick[key] || "for";
   const a = ATTRS.find(x => x.key === attrKey) || ATTRS[0];
   const skillSides = Number(dieForPoints(skillTotal(key)).slice(1));
-  const attrSides = Number(dieForPoints(attrTotal(attrKey)).slice(1));
+  const attrSides = Number(attrDie(attrKey).slice(1));
   const rSkill = d(skillSides);
   const rAttr = d(attrSides);
   const sum = rSkill + rAttr;
@@ -2348,7 +2350,7 @@ function renderBuffBadges(){
     if(!el) return;
     const bonus = attrBonus(a.key);
     const overCap = attrOverCap(a.key);
-    const dado = a.rollable ? ("dado " + dieForPoints(attrTotal(a.key))) : "";
+    const dado = a.rollable ? ("dado " + attrDie(a.key)) : "";
     if(overCap){
       el.textContent = "⚠ " + attrRawTotal(a.key) + " ultrapassa o limite de " + attrCap(a.key) + " — capado em " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + (bonus?" +"+bonus:"") + ")" + (dado?" — "+dado:"");
       el.classList.add("over-cap"); el.classList.remove("has-bonus");
