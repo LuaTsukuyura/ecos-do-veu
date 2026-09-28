@@ -16,505 +16,641 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <style>
 :root{
-  --bg:#0e0c0b;
-  --bg-alt:#141110;
+  /* ---- surfaces ---- */
+  --bg:#0d0b0a;
+  --bg-raised:#161210;
   --bg-panel:#1a1613;
-  --bg-card:#201b17;
-  --bg-input:#161210;
-  --border:#3a3128;
-  --border-light:#54473572;
+  --bg-card:#211c17;
+  --bg-card-hover:#251f19;
+  --bg-input:#17130f;
+  --bg-input-focus:#1c160f;
+
+  /* ---- borders ---- */
+  --border:#372e25;
+  --border-soft:#282219;
   --border-bright:#6b5a41;
-  --text:#e7ded0;
-  --text-muted:#9c9182;
-  --text-dim:#6c6355;
-  --blood:#8c3a34;
-  --blood-bright:#c25850;
-  --arcane:#6b5590;
-  --arcane-bright:#9179ba;
+
+  /* ---- text ---- */
+  --text:#ece3d3;
+  --text-muted:#a89a86;
+  --text-faint:#6c6153;
+
+  /* ---- accents ---- */
   --brass:#b8935a;
-  --brass-bright:#dcb679;
+  --brass-bright:#e0b876;
+  --blood:#8c3a34;
+  --blood-bright:#d1685f;
+  --arcane:#6b5590;
+  --arcane-bright:#a68fc9;
+  --warn:#c9863f;
+  --warn-bright:#e2a866;
+
+  /* ---- state colors (vitals) ---- */
+  --state-ok:var(--brass-bright);
+  --state-warn:var(--warn-bright);
+  --state-crit:var(--blood-bright);
+
+  /* ---- type ---- */
   --font-display:'Cinzel',Georgia,serif;
   --font-body:'EB Garamond',Georgia,serif;
   --font-mono:'JetBrains Mono','Courier New',monospace;
-  --radius:3px;
+
+  /* ---- spacing scale ---- */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px; --sp-8:40px;
+
+  /* ---- misc ---- */
+  --radius-sm:4px;
+  --radius:6px;
+  --radius-lg:10px;
+  --shadow-pop:0 16px 40px rgba(0,0,0,.5);
+  --shadow-card:0 1px 0 rgba(0,0,0,.35);
+  --ease:cubic-bezier(.4,0,.2,1);
 }
-*{box-sizing:border-box;}
-html{scroll-behavior:smooth;}
+
+/* =====================================================================
+   RESET & BASE
+   ===================================================================== */
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
 body{
   margin:0;
   background-color:var(--bg);
   background-image:
-    radial-gradient(ellipse at 15% 0%, rgba(139,58,52,0.06), transparent 55%),
-    radial-gradient(ellipse at 85% 100%, rgba(107,85,144,0.07), transparent 55%),
-    repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+    radial-gradient(ellipse 900px 600px at 10% -5%, rgba(140,58,52,.09), transparent 60%),
+    radial-gradient(ellipse 900px 700px at 95% 105%, rgba(107,85,144,.10), transparent 60%);
+  background-attachment:fixed;
   color:var(--text);
   font-family:var(--font-body);
   font-size:16px;
-  line-height:1.5;
+  line-height:1.55;
   min-height:100vh;
+  -webkit-font-smoothing:antialiased;
 }
 ::selection{ background:var(--blood); color:#fff; }
 ::-webkit-scrollbar{ width:10px; height:10px; }
-::-webkit-scrollbar-track{ background:var(--bg-alt); }
+::-webkit-scrollbar-track{ background:transparent; }
 ::-webkit-scrollbar-thumb{ background:var(--border-bright); border-radius:6px; }
+::-webkit-scrollbar-thumb:hover{ background:var(--brass); }
 
 a{ color:var(--brass-bright); }
 h1,h2,h3{ font-family:var(--font-display); letter-spacing:.03em; margin:0; }
 button, input, select, textarea{ font-family:inherit; }
-:focus-visible{ outline:2px solid var(--brass-bright); outline-offset:2px; }
+:focus-visible{ outline:2px solid var(--brass-bright); outline-offset:2px; border-radius:2px; }
+p{ margin:0 0 .8em; }
+p:last-child{ margin-bottom:0; }
 
-.app{ max-width:1180px; margin:0 auto; padding:22px 20px 70px; }
+.app{ max-width:1180px; margin:0 auto; padding:var(--sp-5) var(--sp-4) 70px; }
+.is-hidden{ display:none !important; }
 
-/* ---------- MASTHEAD ---------- */
+/* =====================================================================
+   MASTHEAD
+   ===================================================================== */
 .masthead{
-  display:flex; align-items:center; gap:18px;
-  padding:18px 22px;
+  display:flex; align-items:center; gap:var(--sp-5);
+  padding:var(--sp-4) var(--sp-5);
   border:1px solid var(--border);
   border-radius:var(--radius);
-  background:linear-gradient(180deg, var(--bg-panel), var(--bg-alt));
+  background:linear-gradient(165deg, var(--bg-raised), var(--bg-panel) 70%);
   position:relative;
   overflow:hidden;
 }
 .masthead::before{
   content:""; position:absolute; inset:0;
-  background:linear-gradient(120deg, transparent 40%, rgba(184,147,90,0.05) 50%, transparent 60%);
+  background:linear-gradient(120deg, transparent 45%, rgba(184,147,90,.05) 52%, transparent 60%);
   pointer-events:none;
 }
-.emblem-svg{ width:56px; height:56px; flex:none; color:var(--brass); filter:drop-shadow(0 0 6px rgba(184,147,90,.25)); }
+.emblem-svg{ width:48px; height:48px; flex:none; color:var(--brass); filter:drop-shadow(0 0 6px rgba(184,147,90,.22)); }
 .masthead-title{ flex:1; min-width:0; }
-.masthead-title h1{ font-size:clamp(22px,4vw,32px); font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:.12em; }
-.masthead-title p{ margin:4px 0 0; color:var(--text-muted); font-style:italic; font-size:14px; }
+.masthead-title h1{ font-size:clamp(20px,3.6vw,28px); font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:.1em; }
+.masthead-title p{ margin:5px 0 0; color:var(--text-muted); font-style:italic; font-size:13.5px; }
 .masthead-stamp{
   flex:none;
   font-family:var(--font-mono);
-  font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  font-size:9.5px; letter-spacing:.12em; text-transform:uppercase;
   color:var(--blood-bright);
-  border:2px solid var(--blood-bright);
+  border:1.5px solid var(--blood-bright);
   border-radius:50%;
-  width:78px; height:78px;
+  width:66px; height:66px;
   display:flex; align-items:center; justify-content:center; text-align:center;
   transform:rotate(-9deg);
-  opacity:.72;
+  opacity:.55;
   padding:6px;
   mix-blend-mode:screen;
 }
-@media (max-width:640px){ .masthead-stamp{ display:none; } }
+@media (max-width:640px){ .masthead-stamp{ display:none; } .masthead{ gap:var(--sp-3); padding:var(--sp-4); } }
 
-/* ---------- CHAR BAR ---------- */
+/* =====================================================================
+   CHAR BAR (mesa / agente / ações de sessão)
+   ===================================================================== */
 .char-bar{
-  margin-top:14px;
-  display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
-  padding:12px 16px;
+  margin-top:var(--sp-3);
+  display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-2) var(--sp-4);
+  padding:var(--sp-3) var(--sp-4);
   border:1px solid var(--border);
   border-radius:var(--radius);
   background:var(--bg-panel);
 }
-.char-bar-select{ display:flex; align-items:center; gap:8px; }
-.char-bar-select label{ font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); }
-.char-bar select{ min-width:180px; }
-.char-bar-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-left:auto; }
-.char-bar-status{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-dim); flex-basis:100%; text-align:right; }
-@media (min-width:641px){ .char-bar-status{ flex-basis:auto; margin-left:10px; } }
-.char-bar-status.error{ color:var(--blood-bright); }
-.char-bar-mesa{ display:flex; align-items:baseline; gap:8px; font-size:12.5px; color:var(--text-muted); }
-.char-bar-mesa .mesa-eyebrow{ font-size:10.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--text-dim); }
+.char-bar-mesa{ display:flex; align-items:baseline; gap:var(--sp-2); font-size:12.5px; color:var(--text-muted); }
+.char-bar-mesa .mesa-eyebrow{ font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:var(--text-faint); }
 .char-bar-mesa strong{ font-family:var(--font-display); font-size:14px; letter-spacing:.03em; color:var(--brass-bright); font-weight:600; }
-.btn-link-mesa{ background:none; border:none; padding:0; margin:0; color:var(--brass); text-decoration:underline; text-underline-offset:2px; font-size:11.5px; letter-spacing:.03em; }
+.btn-link-mesa{ background:none; border:none; padding:0; margin:0; color:var(--brass); text-decoration:underline; text-underline-offset:3px; font-size:11.5px; letter-spacing:.02em; }
 .btn-link-mesa:hover{ color:var(--brass-bright); background:none; border-color:transparent; }
+.char-bar-select{ display:flex; align-items:center; gap:var(--sp-2); }
+.char-bar-select label{ font-size:10.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-faint); }
+.char-bar select{ min-width:170px; }
+.char-bar-actions{ display:flex; flex-wrap:wrap; gap:var(--sp-2); margin-left:auto; }
+.char-bar-status{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); flex-basis:100%; text-align:right; }
+@media (min-width:641px){ .char-bar-status{ flex-basis:auto; margin-left:var(--sp-2); } }
+.char-bar-status.error{ color:var(--blood-bright); }
 
-.is-hidden{ display:none !important; }
-
+/* =====================================================================
+   BUTTONS
+   ===================================================================== */
 button{
   cursor:pointer;
   background:var(--bg-card);
   color:var(--text);
   border:1px solid var(--border-bright);
-  border-radius:var(--radius);
+  border-radius:var(--radius-sm);
   padding:8px 14px;
   font-size:13px;
-  letter-spacing:.03em;
-  transition:border-color .15s, background .15s;
+  letter-spacing:.02em;
+  transition:border-color .15s var(--ease), background .15s var(--ease), color .15s var(--ease), transform .1s var(--ease);
 }
-button:hover{ border-color:var(--brass); background:#241f1a; }
+button:hover{ border-color:var(--brass); background:var(--bg-card-hover); }
 button:active{ transform:translateY(1px); }
-.btn-primary{ border-color:var(--brass); color:var(--brass-bright); }
-.btn-primary:hover{ background:rgba(184,147,90,.12); }
+button:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
+.btn-primary{ border-color:var(--brass); color:var(--brass-bright); background:rgba(184,147,90,.06); }
+.btn-primary:hover{ background:rgba(184,147,90,.14); }
 .btn-danger{ color:var(--blood-bright); border-color:#5c2b27; }
 .btn-danger:hover{ border-color:var(--blood-bright); background:rgba(140,58,52,.12); }
 .btn-secondary{ font-size:12.5px; padding:7px 12px; }
-.btn-add{ margin-top:10px; border-style:dashed; color:var(--brass-bright); }
+.btn-add{ margin-top:var(--sp-2); border-style:dashed; color:var(--brass-bright); width:100%; }
+.btn-add:hover{ background:rgba(184,147,90,.08); }
 .btn-remove{
   background:transparent; border:1px solid var(--border);
-  color:var(--text-dim); width:28px; height:28px; padding:0; border-radius:50%;
-  line-height:1; flex:none;
+  color:var(--text-faint); width:28px; height:28px; padding:0; border-radius:50%;
+  line-height:1; flex:none; font-size:13px;
 }
-.btn-remove:hover{ color:var(--blood-bright); border-color:var(--blood-bright); }
-
-/* ---------- VITALS BAR ---------- */
-.vitals-bar{
-  margin-top:14px;
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:1px;
-  background:var(--border);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  overflow:hidden;
-}
-.vital{
-  background:var(--bg-panel);
-  padding:10px 8px;
-  text-align:center;
-}
-.vital-label{ display:block; font-size:10px; text-transform:uppercase; letter-spacing:.14em; color:var(--text-dim); margin-bottom:4px; }
-.vital-value{ display:block; font-family:var(--font-mono); font-size:17px; font-weight:600; color:var(--text); }
-.vital.pv .vital-value{ color:var(--blood-bright); }
-.vital.san .vital-value{ color:var(--arcane-bright); }
-.vital.res .vital-value{ color:var(--brass-bright); }
-@media (max-width:700px){ .vitals-bar{ grid-template-columns:repeat(3,1fr); } .vital:nth-child(4),.vital:nth-child(5){ border-top:1px solid var(--border); } }
-
-/* ---------- ROLL LOG ---------- */
-.roll-bar{
-  margin-top:10px; display:flex; align-items:center; gap:10px;
-  padding:8px 14px; border:1px solid var(--border); border-radius:var(--radius);
-  background:var(--bg-card);
-}
-.roll-bar-label{ font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); flex:none; }
-.roll-bar-current{ font-family:var(--font-mono); font-size:13px; color:var(--text); flex:1; min-width:0; }
-.roll-bar-current .rc-crit{ color:var(--brass-bright); font-weight:700; }
-.roll-bar-current .rc-fail{ color:var(--blood-bright); font-weight:700; }
-.roll-bar-toggle{ flex:none; font-size:12px; padding:6px 10px; }
-.roll-history{ margin-top:8px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:8px 12px; max-height:170px; overflow-y:auto; display:none; }
-.roll-history.open{ display:block; }
-.roll-history-item{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); padding:3px 0; border-bottom:1px solid var(--border-light); }
-.roll-history-item:last-child{ border-bottom:none; }
-.roll-history-empty{ color:var(--text-dim); font-style:italic; font-size:12.5px; }
-
-/* ---------- DICE / ROLL BUTTONS ---------- */
-.skill-box{ flex-wrap:wrap; }
-.skill-box .skill-main{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
-.skill-box .skill-total{ font-family:var(--font-mono); font-size:11px; color:var(--text-dim); flex-basis:100%; padding-left:2px; }
-.skill-box .skill-total.has-bonus{ color:var(--brass-bright); }
-.skill-box .skill-total.over-cap{ color:var(--blood-bright); font-weight:700; }
-.attr-box .attr-total{ font-family:var(--font-mono); font-size:11px; color:var(--text-dim); margin-top:4px; }
-.attr-box .attr-total.has-bonus{ color:var(--brass-bright); }
-.attr-box .attr-total.over-cap{ color:var(--blood-bright); font-weight:700; }
-
-/* ---------- BUFF / DEBUFF CHOICE ---------- */
-.buff-choice{ margin-top:10px; display:flex; flex-direction:column; gap:6px; }
-.buff-choice > label{ font-size:11.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em; }
-.buff-choice select{ width:auto; min-width:150px; padding:5px 26px 5px 8px; font-size:13px; }
-.buff-row, .debuff-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.debuff-row select, .debuff-row input{ border-color:#5c2b27; }
-.debuff-choice > label{ color:var(--blood-bright); }
+.btn-remove:hover{ color:var(--blood-bright); border-color:var(--blood-bright); background:rgba(140,58,52,.08); }
 .btn-add-mini{
   align-self:flex-start; font-size:11.5px; padding:5px 10px; margin-top:2px;
   border-style:dashed; color:var(--brass-bright);
 }
 .btn-add-mini:hover{ background:rgba(184,147,90,.12); }
-.debuff-choice .btn-add-mini{ color:var(--blood-bright); }
-.debuff-choice .btn-add-mini:hover{ background:rgba(140,58,52,.12); }
-.passive-buff-choice{ margin-top:12px; padding-top:10px; border-top:1px dashed var(--border-light); }
-.passive-buff-choice > label{ color:var(--arcane-bright); }
-.passive-buff-choice.debuff-choice > label{ color:var(--blood-bright); }
-.passive-buff-choice .btn-add-mini{ color:var(--arcane-bright); border-color:var(--arcane); }
-.passive-buff-choice .btn-add-mini:hover{ background:rgba(107,85,144,.14); }
-.passive-buff-note{ font-size:11px; color:var(--text-dim); font-style:italic; margin:0 0 6px; }
-.falha-critica-field textarea{ border-color:#5c2b27; }
-.falha-critica-field label{ color:var(--blood-bright); }
-.buff-fixed-note{ margin-top:6px; font-size:12.5px; color:var(--brass-bright); font-style:italic; }
-
-/* ---------- USE / SPEND BUTTONS ---------- */
 .btn-use{
-  font-size:12px; padding:6px 11px; border-color:var(--brass); color:var(--brass-bright);
-  margin-top:8px;
+  font-size:12px; padding:7px 12px; border-color:var(--brass); color:var(--brass-bright);
+  margin-top:0;
 }
 .btn-use:hover{ background:rgba(184,147,90,.12); }
 .btn-use:disabled{ opacity:.4; cursor:not-allowed; }
-.entry-card-foot{ display:flex; align-items:center; gap:10px; margin-top:6px; flex-wrap:wrap; }
-.use-feedback{ font-size:12px; color:var(--text-dim); font-family:var(--font-mono); }
-.use-feedback.err{ color:var(--blood-bright); }
-
-/* ---------- DURATION / ACTIVE-TURNS CONTROL (Chagas/Rituais/Maldições) ---------- */
-.duration-box{
-  margin-top:10px; padding:10px 12px;
-  border:1px solid var(--border); border-radius:var(--radius);
-  background:var(--bg-input);
-  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-}
-.duration-box .field{ margin:0; flex:none; }
-.duration-box .field label{ white-space:nowrap; }
-.duration-box input[type=number]{ width:70px; text-align:center; }
-.duration-status{ font-family:var(--font-mono); font-size:12.5px; flex:1; min-width:140px; }
-.duration-status .st-on{ color:var(--brass-bright); font-weight:600; }
-.duration-status .st-off{ color:var(--text-dim); }
-.duration-actions{ display:flex; gap:8px; flex-wrap:wrap; }
 .btn-turn{ font-size:12px; padding:6px 10px; }
 .btn-turn-off{ color:var(--blood-bright); border-color:#5c2b27; }
 .btn-turn-off:hover{ border-color:var(--blood-bright); background:rgba(140,58,52,.12); }
-.entry-card.is-inactive-effect{ opacity:.82; }
-.entry-card.is-active-effect{ border-left:3px solid var(--brass); }
-.entry-card.is-postuse-active{ border-left:3px solid var(--blood-bright); }
-
-/* ---------- DEBUFF PÓS-USO (Chagas/Maldições) ---------- */
-.post-use-box{ border-color:#5c2b27; background:rgba(140,58,52,.06); }
-.post-use-box .post-use-title{ font-family:var(--font-display); font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--blood-bright); flex-basis:100%; }
-.post-use-hint{ flex-basis:100%; margin:0; font-size:11.5px; color:var(--text-dim); }
-
-/* ---------- CATALOG "ADD TO INVENTORY" BUTTONS ---------- */
-.ref-table td.add-col{ text-align:right; white-space:nowrap; }
-.btn-add-row{
-  font-size:11px; padding:4px 10px; border-color:var(--brass); color:var(--brass-bright);
-}
+.btn-add-row{ font-size:11px; padding:4px 10px; border-color:var(--brass); color:var(--brass-bright); }
 .btn-add-row:hover{ background:rgba(184,147,90,.12); }
-.btn-add-row.added{ color:var(--text-dim); border-color:var(--border); }
+.btn-add-row.added{ color:var(--text-faint); border-color:var(--border); }
 
-/* ---------- LAYOUT ---------- */
-.layout{ margin-top:16px; display:grid; grid-template-columns:210px 1fr; gap:16px; align-items:start; }
+/* small dice-roll buttons introduced for Atributos/Perícias/Combate */
+.btn-roll{
+  flex:none; display:inline-flex; align-items:center; justify-content:center; gap:5px;
+  font-size:12px; padding:6px 10px; border-color:var(--border-bright); color:var(--text-muted);
+  background:var(--bg-input);
+}
+.btn-roll:hover{ border-color:var(--brass); color:var(--brass-bright); background:rgba(184,147,90,.1); }
+
+/* =====================================================================
+   VITALS BAR — leitura rápida do estado do agente
+   ===================================================================== */
+.vitals-bar{
+  position:sticky; top:0; z-index:30;
+  margin-top:var(--sp-3);
+  padding:var(--sp-3) var(--sp-4) var(--sp-2);
+  display:grid;
+  grid-template-columns:repeat(3,1fr) auto auto;
+  gap:var(--sp-3);
+  align-items:stretch;
+  background:linear-gradient(180deg, rgba(13,11,10,.97) 78%, rgba(13,11,10,.92));
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+}
+.vital{
+  background:var(--bg-panel);
+  border:1px solid var(--border-soft);
+  border-radius:var(--radius-sm);
+  padding:8px 10px 9px;
+  min-width:0;
+}
+.vital-top{ display:flex; align-items:baseline; justify-content:space-between; gap:6px; margin-bottom:6px; }
+.vital-label{ font-size:9.5px; text-transform:uppercase; letter-spacing:.13em; color:var(--text-faint); white-space:nowrap; }
+.vital-value{ font-family:var(--font-mono); font-size:14.5px; font-weight:600; color:var(--text); white-space:nowrap; }
+.vital-track{ height:5px; border-radius:3px; background:var(--bg-input); overflow:hidden; }
+.vital-fill{ height:100%; border-radius:3px; width:0%; background:var(--state-ok); transition:width .3s var(--ease), background-color .3s var(--ease); }
+.vital-fill.is-warn{ background:var(--state-warn); }
+.vital-fill.is-crit{ background:var(--state-crit); }
+.vital.pv .vital-value{ color:var(--blood-bright); }
+.vital.san .vital-value{ color:var(--arcane-bright); }
+.vital.res .vital-value{ color:var(--brass-bright); }
+.vital.badge{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:8px 12px; }
+.vital.badge .vital-top{ margin:0; flex-direction:column; align-items:center; gap:2px; }
+@media (max-width:760px){
+  .vitals-bar{ grid-template-columns:repeat(3,1fr); }
+  .vital.badge{ grid-column:span 1; }
+}
+@media (max-width:480px){
+  .vitals-bar{ grid-template-columns:repeat(3,1fr); gap:6px; padding:var(--sp-2) var(--sp-3) 6px; }
+  .vital{ padding:6px 7px 7px; }
+  .vital-value{ font-size:13px; }
+}
+
+/* =====================================================================
+   ROLL BAR / HISTÓRICO
+   ===================================================================== */
+.roll-bar{
+  margin-top:var(--sp-3); display:flex; align-items:center; gap:var(--sp-3);
+  padding:9px 14px; border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--bg-card);
+}
+.roll-bar-label{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); flex:none; }
+.roll-bar-current{ font-family:var(--font-mono); font-size:12.5px; color:var(--text); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.roll-bar-current .rc-crit{ color:var(--brass-bright); font-weight:700; }
+.roll-bar-current .rc-fail{ color:var(--blood-bright); font-weight:700; }
+.roll-bar-toggle{ flex:none; font-size:12px; padding:6px 10px; }
+.roll-history{ margin-top:8px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:4px 12px; max-height:190px; overflow-y:auto; display:none; }
+.roll-history.open{ display:block; }
+.roll-history-item{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); padding:6px 0; border-bottom:1px solid var(--border-soft); }
+.roll-history-item:last-child{ border-bottom:none; }
+.roll-history-item .rc-crit{ color:var(--brass-bright); font-weight:700; }
+.roll-history-item .rc-fail{ color:var(--blood-bright); font-weight:700; }
+.roll-history-empty{ color:var(--text-faint); font-style:italic; font-size:12.5px; padding:6px 0; }
+
+/* =====================================================================
+   LAYOUT — abas + conteúdo
+   ===================================================================== */
+.layout{ margin-top:var(--sp-4); display:grid; grid-template-columns:198px 1fr; gap:var(--sp-4); align-items:start; }
 @media (max-width:860px){ .layout{ grid-template-columns:1fr; } }
 
 .tabs{
   display:flex; flex-direction:column; gap:2px;
-  position:sticky; top:16px;
+  position:sticky; top:calc(64px + var(--sp-3));
   border:1px solid var(--border); border-radius:var(--radius);
   background:var(--bg-panel); padding:6px;
 }
 @media (max-width:860px){
-  .tabs{ position:static; flex-direction:row; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .tabs{ position:static; flex-direction:row; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; }
   .tab-btn{ white-space:nowrap; }
 }
 .tab-btn{
-  background:transparent; border:1px solid transparent; text-align:left;
-  color:var(--text-muted); font-size:12.5px; letter-spacing:.03em;
-  padding:10px 12px; border-radius:2px;
+  background:transparent; border:1px solid transparent; border-left:2px solid transparent; text-align:left;
+  color:var(--text-muted); font-size:12.5px; letter-spacing:.02em;
+  padding:9px 11px; border-radius:3px;
 }
-.tab-btn:hover{ color:var(--text); background:rgba(255,255,255,.03); }
-.tab-btn.active{ color:var(--brass-bright); background:rgba(184,147,90,.08); border-left:2px solid var(--brass); font-weight:600;}
+.tab-btn:hover{ color:var(--text); background:rgba(255,255,255,.03); border-color:transparent; }
+.tab-btn.active{ color:var(--brass-bright); background:rgba(184,147,90,.09); border-left-color:var(--brass); font-weight:600; }
 
 .content{
   border:1px solid var(--border); border-radius:var(--radius);
   background:var(--bg-panel);
-  padding:22px 24px 26px;
+  padding:var(--sp-5) var(--sp-5) var(--sp-6);
   min-width:0;
 }
-.tab-panel{ display:none; animation:fadein .18s ease; }
+@media (max-width:600px){ .content{ padding:var(--sp-4); } }
+.tab-panel{ display:none; animation:fadein .16s var(--ease); }
 .tab-panel.active{ display:block; }
 @keyframes fadein{ from{opacity:0; transform:translateY(3px);} to{opacity:1; transform:none;} }
 
 .panel-title{
-  font-size:15px; text-transform:uppercase; letter-spacing:.1em; color:var(--brass-bright);
-  padding-bottom:8px; margin-bottom:16px; margin-top:28px;
+  font-size:15px; text-transform:uppercase; letter-spacing:.09em; color:var(--brass-bright);
+  padding-bottom:9px; margin-bottom:var(--sp-4); margin-top:30px;
   border-bottom:1px solid var(--border);
 }
 .panel-title:first-child{ margin-top:0; }
+.hint{ color:var(--text-muted); font-size:13px; margin:-6px 0 var(--sp-4); line-height:1.6; }
 
-.hint{ color:var(--text-muted); font-size:13px; margin:-8px 0 16px; line-height:1.55; }
-
-/* ---------- FIELDS ---------- */
-.field-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:14px; }
-.field-grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px; }
-.field-grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:10px; }
-.field-grid-4{ display:grid; grid-template-columns:2fr 1fr 1fr 1.4fr; gap:10px; margin-bottom:10px; flex:1; }
+/* =====================================================================
+   CAMPOS DE FORMULÁRIO
+   ===================================================================== */
+.field-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:var(--sp-3); margin-bottom:var(--sp-3); }
+.field-grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3); margin-bottom:var(--sp-2); }
+.field-grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--sp-3); margin-bottom:var(--sp-2); }
+.field-grid-4{ display:grid; grid-template-columns:2fr 1fr 1fr 1.4fr; gap:var(--sp-2); margin-bottom:var(--sp-2); flex:1; }
 @media (max-width:600px){ .field-grid-4{ grid-template-columns:1fr 1fr; } .field-grid-3{ grid-template-columns:1fr; } }
 .field{ display:flex; flex-direction:column; gap:5px; }
 .field-full{ grid-column:1/-1; }
-.field label{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); }
+.field label{ font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-faint); }
 
 input[type=text], input[type=number], select, textarea{
   background:var(--bg-input);
   border:1px solid var(--border);
-  border-radius:var(--radius);
+  border-radius:var(--radius-sm);
   color:var(--text);
   padding:8px 10px;
   font-size:14.5px;
   width:100%;
+  transition:border-color .15s var(--ease), background .15s var(--ease);
 }
 input[type=number]{ font-family:var(--font-mono); }
 textarea{ resize:vertical; font-family:var(--font-body); line-height:1.5; }
-input:focus, select:focus, textarea:focus{ border-color:var(--brass); background:#1c1712; }
+input:focus, select:focus, textarea:focus{ border-color:var(--brass); background:var(--bg-input-focus); }
 input[readonly]{ color:var(--brass-bright); background:#181410; }
-select{ appearance:none; background-image:linear-gradient(45deg,transparent 50%, var(--text-dim) 50%),linear-gradient(135deg,var(--text-dim) 50%,transparent 50%); background-position:calc(100% - 16px) center, calc(100% - 11px) center; background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:30px;}
+select{ appearance:none; background-image:linear-gradient(45deg,transparent 50%, var(--text-faint) 50%),linear-gradient(135deg,var(--text-faint) 50%,transparent 50%); background-position:calc(100% - 16px) center, calc(100% - 11px) center; background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:30px;}
 
-/* ---------- ORIGIN CARD ---------- */
+/* =====================================================================
+   IDENTIFICAÇÃO — foto / origin card
+   ===================================================================== */
+.photo-upload{ display:flex; align-items:center; gap:var(--sp-4); margin-bottom:var(--sp-4); flex-wrap:wrap; }
+.photo-preview{
+  width:92px; height:92px; border-radius:var(--radius-sm); overflow:hidden; flex-shrink:0;
+  background:var(--bg-input); border:1px solid var(--border-bright);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text-faint); font-size:10px; text-align:center; text-transform:uppercase; letter-spacing:.06em;
+}
+.photo-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
+.photo-preview.npc-photo-preview{ width:60px; height:60px; }
+.photo-upload-actions{ display:flex; flex-direction:column; gap:8px; }
+.photo-upload-actions .btn-row, .btn-row{ display:flex; gap:8px; flex-wrap:wrap; }
+
 .origin-card{
-  margin:4px 0 18px; padding:14px 16px;
+  margin:2px 0 var(--sp-4); padding:var(--sp-3) var(--sp-4);
   border-left:3px solid var(--brass);
-  background:var(--bg-card); border-radius:var(--radius);
+  background:var(--bg-card); border-radius:var(--radius-sm);
 }
 .origin-card-head{ display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
-.origin-name{ font-family:var(--font-display); color:var(--brass-bright); font-size:16px; letter-spacing:.04em; }
+.origin-name{ font-family:var(--font-display); color:var(--brass-bright); font-size:16px; letter-spacing:.03em; }
 .origin-vida{ font-size:12.5px; color:var(--text-muted); }
 .origin-vida strong{ color:var(--blood-bright); font-family:var(--font-mono); }
 .origin-flavor{ font-style:italic; color:var(--text-muted); font-size:13.5px; margin:4px 0 8px; }
-.caminho-flavor{ font-style:italic; color:var(--text-muted); font-size:13.5px; margin:0 0 10px; }
+.caminho-flavor{ font-style:italic; color:var(--text-muted); font-size:13.5px; margin:0 0 var(--sp-3); }
 .origin-bonus{ font-size:13.5px; color:var(--text); }
 
-/* ---------- REFERENCE / DETAILS ---------- */
+/* =====================================================================
+   REFERÊNCIAS (details/summary + tabelas)
+   ===================================================================== */
 details.reference{
-  margin:14px 0; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card);
+  margin:var(--sp-3) 0; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card);
 }
 details.reference summary{
-  cursor:pointer; padding:10px 14px; font-size:12.5px; text-transform:uppercase; letter-spacing:.06em;
+  cursor:pointer; padding:10px 14px; font-size:12.5px; text-transform:uppercase; letter-spacing:.05em;
   color:var(--brass-bright); list-style:none; display:flex; align-items:center; gap:8px;
 }
-details.reference summary::before{ content:"▸"; transition:transform .15s; }
+details.reference summary::before{ content:"▸"; transition:transform .15s var(--ease); display:inline-block; }
 details.reference[open] summary::before{ transform:rotate(90deg); }
 details.reference summary::-webkit-details-marker{ display:none; }
-.reference-inner{ padding:4px 16px 16px; }
-.ref-table{ width:100%; border-collapse:collapse; font-size:12.5px; margin:8px 0 14px; }
-.ref-table caption{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); margin-bottom:6px; }
-.ref-table th, .ref-table td{ text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
-.ref-table th{ color:var(--brass-bright); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
+.reference-inner{ padding:2px 16px 16px; }
+.ref-table{ width:100%; border-collapse:collapse; font-size:12.5px; margin:8px 0 var(--sp-4); }
+.ref-table caption{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-faint); margin-bottom:6px; }
+.ref-table th, .ref-table td{ text-align:left; padding:7px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+.ref-table th{ color:var(--brass-bright); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
 .ref-table td.num, .ref-table th.num{ font-family:var(--font-mono); white-space:nowrap; }
+.ref-table td.add-col{ text-align:right; white-space:nowrap; }
 
-/* ---------- ATTRIBUTES ---------- */
+/* =====================================================================
+   ATRIBUTOS & PERÍCIAS
+   ===================================================================== */
 .points-tracker{
   display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
-  font-family:var(--font-mono); font-size:13px; padding:9px 14px; margin-bottom:14px;
+  font-family:var(--font-mono); font-size:13px; padding:10px 14px; margin-bottom:var(--sp-4);
   background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
 }
 .pts-remaining{ color:var(--brass-bright); font-weight:600; }
 .pts-remaining.over-budget{ color:var(--blood-bright); }
-.attr-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:8px; }
+
+.attr-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:var(--sp-3); margin-bottom:var(--sp-2); }
 .attr-box{
   background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
-  padding:12px; text-align:center;
+  padding:var(--sp-3); text-align:center; display:flex; flex-direction:column; gap:6px;
 }
-.attr-box label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); margin-bottom:8px; }
+.attr-box label{ font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-faint); }
 .attr-box input{ text-align:center; font-size:20px; font-weight:600; }
+.attr-total{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); min-height:14px; }
+.attr-total.has-bonus{ color:var(--brass-bright); }
+.attr-total.over-cap{ color:var(--blood-bright); font-weight:700; }
+.attr-box .btn-roll{ width:100%; }
 
-.skills-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px 14px; }
-.skill-box{ display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid var(--border); padding:6px 0; }
+.skills-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:2px var(--sp-4); }
+.skill-box{ display:flex; align-items:center; flex-wrap:wrap; gap:8px 10px; border-bottom:1px solid var(--border-soft); padding:9px 0; }
+.skill-box .skill-main{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
 .skill-box label{ font-size:13.5px; color:var(--text); }
-.skill-box input{ width:64px; text-align:center; padding:5px 6px; }
+.skill-box input{ width:56px; text-align:center; padding:5px 6px; flex:none; }
+.skill-roll{ display:flex; align-items:center; gap:4px; flex:none; }
+.skill-roll select{ width:64px; padding:5px 20px 5px 6px; font-size:11.5px; background-position:calc(100% - 9px) center, calc(100% - 5px) center; }
+.skill-roll .btn-roll{ padding:5px 8px; }
+.skill-box .skill-total{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); flex-basis:100%; padding-left:2px; }
+.skill-box .skill-total.has-bonus{ color:var(--brass-bright); }
+.skill-box .skill-total.over-cap{ color:var(--blood-bright); font-weight:700; }
 
-/* ---------- ORIGEM / CAMINHO ---------- */
-.path-select{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:16px; }
+/* =====================================================================
+   ORIGEM / CAMINHO
+   ===================================================================== */
+.path-select{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:var(--sp-2); margin-bottom:var(--sp-4); }
 .path-radio{
   display:flex; align-items:center; gap:9px; padding:11px 13px;
   border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); cursor:pointer;
-  font-size:14px;
+  font-size:14px; transition:border-color .15s var(--ease), background .15s var(--ease);
 }
+.path-radio:hover{ border-color:var(--border-bright); }
 .path-radio:has(input:checked){ border-color:var(--brass); background:rgba(184,147,90,.08); color:var(--brass-bright); }
 .path-radio input{ accent-color:var(--brass); }
-.path-levels{ display:flex; flex-direction:column; gap:10px; }
-.level-card{ border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:12px 14px; }
+.path-levels{ display:flex; flex-direction:column; gap:var(--sp-3); }
+.level-card{ border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:var(--sp-3) var(--sp-4); }
 .level-check{ display:flex; align-items:center; gap:9px; font-size:13.5px; cursor:pointer; }
 .level-check input{ accent-color:var(--brass); width:16px; height:16px; }
 .level-card p{ margin:8px 0 0 25px; font-size:13.5px; color:var(--text-muted); line-height:1.55; }
-.pe-tracker{ font-family:var(--font-mono); font-size:13px; color:var(--brass-bright); margin-top:14px; }
+.pe-tracker{ font-family:var(--font-mono); font-size:13px; color:var(--brass-bright); margin-top:var(--sp-4); }
 .pe-tracker .hint{ font-family:var(--font-body); }
 
-/* ---------- ENTRY CARDS (chagas/rituais/armas/inventario/marcas) ---------- */
+/* =====================================================================
+   ENTRY CARDS (chagas / rituais / marcas / maldições / npcs / armas / itens)
+   ===================================================================== */
 .entry-card{
   border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card);
-  padding:14px 16px; margin-bottom:12px; position:relative;
+  padding:var(--sp-3) var(--sp-4); margin-bottom:var(--sp-3); position:relative;
 }
-.entry-card-head{ display:flex; gap:10px; align-items:center; margin-bottom:12px; }
-.entry-select{ flex:1; }
+.entry-card-head{ display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+.entry-select{ flex:1; min-width:0; }
 .entry-card-compact{ display:flex; align-items:flex-end; gap:10px; padding:12px 14px; }
-.entry-card .field{ margin-bottom:10px; }
+.entry-card .field{ margin-bottom:var(--sp-3); }
 .entry-card .field:last-child{ margin-bottom:0; }
-.empty-note{ color:var(--text-dim); font-style:italic; font-size:13.5px; padding:10px 2px; }
-.photo-upload{ display:flex; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap; }
-.photo-preview{
-  width:96px; height:96px; border-radius:4px; overflow:hidden; flex-shrink:0;
-  background:var(--bg-input); border:1px solid var(--border-light);
-  display:flex; align-items:center; justify-content:center;
-  color:var(--text-dim); font-size:10.5px; text-align:center; text-transform:uppercase; letter-spacing:.06em;
-}
-.photo-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
-.photo-preview.npc-photo-preview{ width:64px; height:64px; }
-.photo-upload-actions{ display:flex; flex-direction:column; gap:8px; }
-.photo-upload-actions .btn-row{ display:flex; gap:8px; }
-.npc-card-head-row{ display:flex; gap:14px; align-items:flex-start; }
-.npc-card-fields{ flex:1; display:flex; flex-direction:column; gap:10px; }
+.entry-card-body > .field:first-child, .entry-card-body > .field-grid-2:first-child{ margin-top:0; }
+.empty-note{ color:var(--text-faint); font-style:italic; font-size:13.5px; padding:var(--sp-3) 2px; }
 
-/* ---------- STRIKES / COMBAT ---------- */
-.strikes-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:10px; }
-.strike-box{ background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:12px; text-align:center; }
-.strike-box label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); margin-bottom:8px; }
+.entry-toggle{
+  flex:none; width:28px; height:28px; padding:0; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:transparent; border:1px solid var(--border); color:var(--text-muted); font-size:11px;
+  transition:transform .18s var(--ease), border-color .15s var(--ease), color .15s var(--ease);
+}
+.entry-toggle:hover{ border-color:var(--brass); color:var(--brass-bright); }
+.entry-card.is-collapsed .entry-toggle{ transform:rotate(-90deg); }
+
+.entry-kicker{ font-family:var(--font-display); letter-spacing:.04em; font-size:13px; color:var(--text-muted); white-space:nowrap; flex:none; }
+.entry-title{
+  margin:-3px 0 var(--sp-3); font-family:var(--font-display); font-size:15px; letter-spacing:.02em;
+  color:var(--text); font-weight:600;
+}
+.entry-card.is-collapsed .entry-title{ margin-bottom:0; color:var(--text-muted); font-weight:400; }
+.entry-card.is-collapsed .entry-card-body{ display:none; }
+.marca-card .entry-title{ color:var(--arcane-bright); }
+.maldicao-card .entry-title{ color:var(--blood-bright); }
+
+.entry-card.is-active-effect{ border-left:3px solid var(--brass); }
+.entry-card.is-postuse-active{ border-left:3px solid var(--blood-bright); }
+.entry-card.is-inactive-effect{ opacity:.86; }
+
+/* status dot usado em duration-box / post-use-box no lugar de emoji */
+.status-line{ display:flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:12.5px; }
+.status-dot{ width:8px; height:8px; border-radius:50%; flex:none; background:var(--text-faint); box-shadow:0 0 0 3px rgba(255,255,255,0.03); }
+.status-dot.is-on{ background:var(--brass-bright); box-shadow:0 0 8px 1px rgba(224,184,118,.55); }
+.status-dot.is-post{ background:var(--blood-bright); box-shadow:0 0 8px 1px rgba(209,104,95,.55); }
+.status-text.st-on{ color:var(--brass-bright); font-weight:600; }
+.status-text.st-off{ color:var(--text-faint); }
+.status-text.st-post{ color:var(--blood-bright); font-weight:600; }
+
+/* =====================================================================
+   PERSONAGEM / NPC / FOTOS
+   ===================================================================== */
+.npc-card-head-row{ display:flex; gap:var(--sp-4); align-items:flex-start; }
+.npc-card-fields{ flex:1; display:flex; flex-direction:column; gap:10px; min-width:0; }
+
+/* =====================================================================
+   COMBATE — strikes
+   ===================================================================== */
+.strikes-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--sp-3); margin-bottom:var(--sp-3); }
+.strike-box{ background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:var(--sp-3); text-align:center; }
+.strike-box label{ display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-faint); margin-bottom:8px; }
 .strike-box input{ text-align:center; font-size:18px; }
 #strikesSummary.warn{ color:var(--blood-bright); font-weight:600; }
 
-/* ---------- MARCAS & MALDIÇÕES ---------- */
+/* =====================================================================
+   MARCAS & MALDIÇÕES
+   ===================================================================== */
 .marca-count-bar{
   display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
-  font-family:var(--font-mono); font-size:13px; padding:9px 14px; margin-bottom:14px;
+  font-family:var(--font-mono); font-size:13px; padding:10px 14px; margin-bottom:var(--sp-4);
   background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
 }
 .marca-count-bar .warn-text{ color:var(--blood-bright); font-weight:600; }
 .marca-count-bar .ok-text{ color:var(--brass-bright); font-weight:600; }
-.slot-badge{
-  display:inline-block; font-family:var(--font-mono); font-size:11px;
-  padding:2px 8px; border-radius:10px; border:1px solid var(--border-bright);
-  color:var(--text-muted); margin-left:8px;
-}
-.slot-badge.over{ color:var(--blood-bright); border-color:var(--blood-bright); }
 .maldicao-card{ border-left:3px solid var(--blood); }
 .marca-card{ border-left:3px solid var(--arcane); }
-.target-toggle{ display:flex; gap:8px; margin-bottom:10px; }
+.target-toggle{ display:flex; gap:8px; margin-bottom:var(--sp-3); }
 .target-toggle label{
   flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
-  padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius);
+  padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm);
   background:var(--bg-input); font-size:13px; cursor:pointer; color:var(--text-muted);
+  transition:border-color .15s var(--ease), color .15s var(--ease), background .15s var(--ease);
 }
 .target-toggle label:has(input:checked){ border-color:var(--arcane); color:var(--arcane-bright); background:rgba(107,85,144,.1); }
 .maldicao-card .target-toggle label:has(input:checked){ border-color:var(--blood); color:var(--blood-bright); background:rgba(140,58,52,.1); }
 .target-toggle input{ accent-color:var(--brass); }
 
-footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; margin-top:22px; letter-spacing:.04em; }
+/* =====================================================================
+   BUFF / DEBUFF EDITORS
+   ===================================================================== */
+.buff-choice{ margin-top:var(--sp-3); padding-top:var(--sp-3); border-top:1px dashed var(--border-soft); display:flex; flex-direction:column; gap:7px; }
+.buff-choice > label{ font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; }
+.buff-choice select{ width:auto; min-width:150px; padding:5px 26px 5px 8px; font-size:13px; }
+.buff-row, .debuff-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.debuff-row select, .debuff-row input{ border-color:#5c2b27; }
+.debuff-choice > label{ color:var(--blood-bright); }
+.debuff-choice .btn-add-mini{ color:var(--blood-bright); }
+.debuff-choice .btn-add-mini:hover{ background:rgba(140,58,52,.12); }
+.passive-buff-choice{ border-top:1px dashed var(--border-soft); }
+.passive-buff-choice > label{ color:var(--arcane-bright); }
+.passive-buff-choice.debuff-choice > label{ color:var(--blood-bright); }
+.passive-buff-choice .btn-add-mini{ color:var(--arcane-bright); border-color:var(--arcane); }
+.passive-buff-choice .btn-add-mini:hover{ background:rgba(107,85,144,.14); }
+.passive-buff-note{ font-size:11px; color:var(--text-faint); font-style:italic; margin:0 0 6px; }
+.falha-critica-field textarea{ border-color:#5c2b27; }
+.falha-critica-field label{ color:var(--blood-bright); }
+.buff-fixed-note{ margin-top:6px; font-size:12.5px; color:var(--brass-bright); font-style:italic; }
 
-/* ---------- MESA SELECT OVERLAY ---------- */
+/* =====================================================================
+   DURAÇÃO / EFEITO ATIVO (Chagas · Rituais · Maldições)
+   ===================================================================== */
+.duration-box{
+  margin-top:var(--sp-3); padding:var(--sp-3);
+  border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--bg-input);
+  display:flex; align-items:center; gap:var(--sp-3); flex-wrap:wrap;
+}
+.duration-box .field{ margin:0 !important; flex:none; }
+.duration-box .field label{ white-space:nowrap; }
+.duration-box input[type=number]{ width:68px; text-align:center; }
+.duration-status{ flex:1; min-width:150px; }
+.duration-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+
+.post-use-box{ border-color:#5c2b27; background:rgba(140,58,52,.06); }
+.post-use-box .post-use-title{ font-family:var(--font-display); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--blood-bright); flex-basis:100%; }
+.post-use-hint{ flex-basis:100%; margin:0; font-size:11.5px; color:var(--text-faint); }
+
+.entry-card-foot{ display:flex; align-items:center; gap:10px; margin-top:var(--sp-3); flex-wrap:wrap; }
+.use-feedback{ font-size:12px; color:var(--text-faint); font-family:var(--font-mono); }
+.use-feedback.err{ color:var(--blood-bright); }
+
+/* =====================================================================
+   RODAPÉ
+   ===================================================================== */
+footer.appfoot{ text-align:center; color:var(--text-faint); font-size:11px; margin-top:var(--sp-6); letter-spacing:.03em; }
+
+/* =====================================================================
+   OVERLAY DE SELEÇÃO DE MESA
+   ===================================================================== */
 .mesa-overlay{
   position:fixed; inset:0; z-index:999;
   display:flex; align-items:center; justify-content:center;
-  padding:26px 20px;
+  padding:var(--sp-6) var(--sp-4);
   background:
-    radial-gradient(ellipse at 18% 12%, rgba(139,58,52,0.10), transparent 55%),
-    radial-gradient(ellipse at 82% 88%, rgba(107,85,144,0.13), transparent 55%),
+    radial-gradient(ellipse 800px 600px at 18% 10%, rgba(140,58,52,.11), transparent 55%),
+    radial-gradient(ellipse 800px 600px at 84% 90%, rgba(107,85,144,.14), transparent 55%),
     var(--bg);
   overflow-y:auto;
 }
 .mesa-overlay-inner{ max-width:660px; width:100%; text-align:center; }
-.mesa-emblem{ width:60px; height:60px; color:var(--brass); margin:0 auto 16px; filter:drop-shadow(0 0 8px rgba(184,147,90,.28)); }
-.mesa-overlay-title{ font-family:var(--font-display); text-transform:uppercase; letter-spacing:.14em; font-size:clamp(22px,5vw,32px); color:var(--text); font-weight:700; }
-.mesa-overlay-sub{ color:var(--text-muted); font-style:italic; margin:8px 0 32px; font-size:14.5px; }
-.mesa-cards{ display:grid; gap:14px; grid-template-columns:1fr; }
+.mesa-emblem{ width:54px; height:54px; color:var(--brass); margin:0 auto var(--sp-4); filter:drop-shadow(0 0 8px rgba(184,147,90,.26)); }
+.mesa-overlay-title{ font-family:var(--font-display); text-transform:uppercase; letter-spacing:.12em; font-size:clamp(21px,4.6vw,30px); color:var(--text); font-weight:700; }
+.mesa-overlay-sub{ color:var(--text-muted); font-style:italic; margin:8px 0 30px; font-size:14px; }
+.mesa-cards{ display:grid; gap:var(--sp-3); grid-template-columns:1fr; }
 @media (min-width:680px){ .mesa-cards{ grid-template-columns:repeat(3,1fr); } }
 .mesa-card{
   position:relative;
   display:flex; flex-direction:column; align-items:center; gap:4px;
-  padding:28px 16px 24px;
-  background:linear-gradient(180deg, var(--bg-panel), var(--bg-alt));
+  padding:26px 16px 22px;
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-raised));
   border:1px solid var(--border); border-radius:var(--radius);
   text-align:center; overflow:hidden;
-  transition:border-color .15s, transform .15s, box-shadow .15s;
+  transition:border-color .15s var(--ease), transform .15s var(--ease), box-shadow .15s var(--ease);
 }
 .mesa-card::before{
   content:""; position:absolute; top:0; left:0; right:0; height:2px;
-  background:var(--mesa-accent, var(--brass)); opacity:.8;
+  background:var(--mesa-accent, var(--brass)); opacity:.85;
 }
-.mesa-card:hover{ border-color:var(--mesa-accent, var(--brass)); transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.35); }
+.mesa-card:hover{ border-color:var(--mesa-accent, var(--brass)); background:linear-gradient(180deg, var(--bg-panel), var(--bg-raised)); transform:translateY(-2px); box-shadow:var(--shadow-pop); }
 .mesa-card:active{ transform:translateY(0); }
-.mesa-card-eyebrow{ font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--text-dim); }
-.mesa-card-title{ font-family:var(--font-display); font-size:16.5px; letter-spacing:.03em; color:var(--mesa-accent, var(--brass-bright)); margin-top:6px; line-height:1.3; }
-.mesa-card-tag{ margin-top:12px; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--brass-bright); border:1px solid var(--border-bright); border-radius:20px; padding:3px 10px; }
-.mesa-overlay-close{ margin-top:28px; background:none; border:1px solid var(--border-bright); color:var(--text-muted); }
+.mesa-card-eyebrow{ font-family:var(--font-mono); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--text-faint); }
+.mesa-card-title{ font-family:var(--font-display); font-size:16px; letter-spacing:.02em; color:var(--mesa-accent, var(--brass-bright)); margin-top:6px; line-height:1.3; }
+.mesa-card-tag{ margin-top:12px; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--brass-bright); border:1px solid var(--border-bright); border-radius:20px; padding:3px 10px; }
+.mesa-overlay-close{ margin-top:26px; background:none; border:1px solid var(--border-bright); color:var(--text-muted); }
 .mesa-overlay-close:hover{ color:var(--text); }
 
-/* ---------- PRINT ---------- */
+/* =====================================================================
+   IMPRESSÃO
+   ===================================================================== */
 @media print{
   body{ background:#fff !important; color:#111 !important; }
-  .char-bar, .tabs, .masthead-stamp, .btn-add, .btn-remove, details.reference, footer.appfoot, .mesa-overlay{ display:none !important; }
+  .char-bar, .tabs, .masthead-stamp, .btn-add, .btn-remove, .btn-roll, .skill-roll, .entry-toggle, details.reference, footer.appfoot, .mesa-overlay{ display:none !important; }
   .app{ max-width:100%; padding:0; }
   .masthead{ border:1px solid #999; background:#fff !important; }
   .masthead-title h1, .masthead-title p{ color:#111 !important; }
   .layout{ display:block !important; }
   .content, .vital, .vitals-bar, .masthead{ background:#fff !important; border-color:#999 !important; }
+  .vitals-bar{ position:static; }
   .tab-panel{ display:block !important; page-break-inside:avoid; margin-bottom:18px; }
+  .entry-card.is-collapsed .entry-card-body{ display:block !important; }
   input, textarea, select{ background:#fff !important; color:#111 !important; border:1px solid #999 !important; }
-  .vital-value, .vital-label, .panel-title, .origin-name, .pts-remaining{ color:#111 !important; }
+  .vital-value, .vital-label, .panel-title, .origin-name, .pts-remaining, .entry-title{ color:#111 !important; }
 }
 @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
 </style>
@@ -567,14 +703,14 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
     <h1 class="mesa-overlay-title">Ecos do Véu</h1>
     <p class="mesa-overlay-sub">Selecione a mesa em que você está jogando</p>
     <div class="mesa-cards">
-      <button type="button" class="mesa-card" data-mesa="inicio-do-caos" style="--mesa-accent:var(--arcane-bright)">
+      <button type="button" class="mesa-card" data-mesa="Mesa God" style="--mesa-accent:var(--arcane-bright)">
         <span class="mesa-card-eyebrow">Ecos do Véu</span>
-        <span class="mesa-card-title">Início do Caos</span>
+        <span class="mesa-card-title">Mesa God</span>
         <span class="mesa-card-tag" data-last-tag hidden>Última mesa</span>
       </button>
-      <button type="button" class="mesa-card" data-mesa="sob-o-banhar-do-luar" style="--mesa-accent:var(--brass-bright)">
+      <button type="button" class="mesa-card" data-mesa="Mesa Fox" style="--mesa-accent:var(--brass-bright)">
         <span class="mesa-card-eyebrow">Ecos do Véu</span>
-        <span class="mesa-card-title">Sob o Banhar do Luar</span>
+        <span class="mesa-card-title">Mesa Fox</span>
         <span class="mesa-card-tag" data-last-tag hidden>Última mesa</span>
       </button>
       <button type="button" class="mesa-card" data-mesa="Personagens" style="--mesa-accent:var(--blood-bright)">
@@ -663,11 +799,20 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
   </div>
 
   <div class="vitals-bar">
-    <div class="vital pv"><span class="vital-label">PV</span><span class="vital-value" id="vitalPV">0 / 0</span></div>
-    <div class="vital san"><span class="vital-label">Sanidade</span><span class="vital-value" id="vitalSAN">100 / 100</span></div>
-    <div class="vital res"><span class="vital-label">Resiliência</span><span class="vital-value" id="vitalRES">0 / 0</span></div>
-    <div class="vital"><span class="vital-label">N.A.</span><span class="vital-value" id="vitalNA">1</span></div>
-    <div class="vital"><span class="vital-label">Strikes</span><span class="vital-value" id="vitalStrikes">0</span></div>
+    <div class="vital pv">
+      <div class="vital-top"><span class="vital-label">PV</span><span class="vital-value" id="vitalPV">0 / 0</span></div>
+      <div class="vital-track"><div class="vital-fill" id="vitalPVFill"></div></div>
+    </div>
+    <div class="vital san">
+      <div class="vital-top"><span class="vital-label">Sanidade</span><span class="vital-value" id="vitalSAN">100 / 100</span></div>
+      <div class="vital-track"><div class="vital-fill" id="vitalSANFill"></div></div>
+    </div>
+    <div class="vital res">
+      <div class="vital-top"><span class="vital-label">Resiliência</span><span class="vital-value" id="vitalRES">0 / 0</span></div>
+      <div class="vital-track"><div class="vital-fill" id="vitalRESFill"></div></div>
+    </div>
+    <div class="vital badge"><div class="vital-top"><span class="vital-label">N.A.</span><span class="vital-value" id="vitalNA">1</span></div></div>
+    <div class="vital badge"><div class="vital-top"><span class="vital-label">Strikes</span><span class="vital-value" id="vitalStrikes">0</span></div></div>
   </div>
 
   <div class="roll-bar">
@@ -743,7 +888,7 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
       <!-- II. ATRIBUTOS & PERÍCIAS -->
       <section class="tab-panel" data-panel="atributos">
         <h2 class="panel-title">Atributos</h2>
-        <p class="hint">Distribua 30 pontos. FOR / AGI / INT / CAR / VON começam em 1 (máx. 20, custo 1 ponto cada). VIT começa em 0 (máx. 5, custo 2 pontos cada — concede +2 PV por ponto, até +10).</p>
+        <p class="hint">Distribua 20 pontos. FOR / AGI / INT / CAR começam em 1 (máx. 12, custo 1 ponto cada). VON começa em 1 e VIT começa em 0 — ambos com máx. 5, custo 2 pontos cada (VON concede +2 SAN por ponto, até +10; VIT concede +2 PV por ponto, até +10).</p>
         <div class="points-tracker">
           <span>Pontos usados: <strong id="ptsUsed">0</strong> / 30</span>
           <span id="ptsRemaining" class="pts-remaining">30 restantes</span>
@@ -752,7 +897,7 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
         <p class="hint">O campo "Total" abaixo de cada atributo mostra o valor base somado a bônus vindos de Origem, Caminho, Chagas, Marcas, Maldições e Rituais.</p>
 
         <h2 class="panel-title">Perícias</h2>
-        <p class="hint">Valores em %. Referência de proficiência: 20 Iniciante · 40 Aprendiz · 50 Competente · 60 Experiente · 65 Especialista · 70 Mestre.</p>
+        <p class="hint">Valores em pontos (4 a 12, até 14 com N.A. 9 ou habilidade/Origem específica). Cada nível usa um dado diferente no teste: 4 Iniciante (d4) · 6 Aprendiz (d6) · 8 Competente (d8) · 10 Experiente (d10) · 12 Mestre (d12) · 14 (d14).</p>
         <div class="skills-grid" id="skillsGrid"></div>
 
         <details class="reference">
@@ -771,6 +916,41 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
           <div class="path-levels" id="pathLevels"></div>
           <div class="pe-tracker">PE investidos nesta progressão: <span id="peOrigemSpent">0</span></div>
         </div>
+
+        <details class="reference">
+          <summary>Consultar Pactos &amp; Fragmentado (Primordiais)</summary>
+          <div class="reference-inner">
+            <p style="font-size:13.5px; color:var(--text-muted); line-height:1.6; margin:0 0 10px;">
+              <strong>Fragmentado</strong> é o personagem escolhido por um dos 5 Primordiais, carregando um fragmento dele para sempre (caminho Fractus da Origem Filhos do Véu). Junto com o Mestre, crie o Fragmento com nome, efeito, custo (de acordo com o Primordial) e falha.<br><br>
+              <strong>Pactos</strong> trocam humanidade por poder. Exigem N.A. 3+, um item marcado por um Primordial e um Ocultista de alto nível para firmar o Pacto. Cada item concede 2 Pactos possíveis (escolha 1 por item); um personagem pode ter no máximo <strong>2 Pactos</strong>, do mesmo Primordial ou de Primordiais diferentes — uma vez aprendidos, não podem ser trocados ou removidos.
+            </p>
+            <table class="ref-table">
+              <thead><tr><th>Primordial</th><th>Tema</th><th>Custo do Fragmento</th><th>Modificação Corporal (1 / 2 Pactos)</th></tr></thead>
+              <tbody>
+                <tr><td class="num">Morte</td><td>Habilidades que brincam com a vida humana ou não humana.</td><td>Usa primariamente o PV do personagem.</td><td>Pele perde a cor e fica fria / Olheiras profundas, respiração e batimentos quase imperceptíveis.</td></tr>
+                <tr><td class="num">Medo</td><td>Manipula o sobrenatural como se fosse parte de si mesmo.</td><td>Usa primariamente a SAN do personagem.</td><td>Cabelo perde pigmentação (mescla de branco) / Pele pálida, olhos acinzentados e sobrenaturais.</td></tr>
+                <tr><td class="num">Angústia</td><td>Manipula a percepção e a mente de outros como brinquedos.</td><td>Usa primariamente a RES do personagem.</td><td>Pequenas rachaduras pelo corpo (olhos e articulações) / Íris avermelhada, ouve vozes do além.</td></tr>
+                <tr><td class="num">Sofrimento</td><td>O próprio sofrimento e o alheio alimentam corpo e mente.</td><td>Autoinflige strikes ao custo de poder.</td><td>Olhos e cabelo vermelho-sangue / Pele avermelhada, veias dilatadas.</td></tr>
+                <tr><td class="num">Caos</td><td>A energia caótica intensifica o corpo como uma máquina.</td><td>Dissociação (vê a si e aos outros como objetos/máquinas).</td><td>Corpo cada vez menos carne, mente cada vez menos humana / Partes de metal substituem partes do corpo.</td></tr>
+              </tbody>
+            </table>
+            <table class="ref-table" style="margin-top:10px;">
+              <thead><tr><th>Primordial</th><th>Pacto</th><th>Efeito</th></tr></thead>
+              <tbody>
+                <tr><td class="num">Angústia</td><td>Olhos Carmesim</td><td>2x/sessão cria uma ilusão poderosa: 2d4 de dano de SAN (Espiritual em Ecos) e prende o alvo por 1d4 turnos com -4 em todos os Atributos e Perícias dentro da ilusão.</td></tr>
+                <tr><td class="num">Angústia</td><td>Rei dos Pesadelos</td><td>Ilusões causam +3 de dano de sanidade e duram 1 turno a mais; imune a ilusões.</td></tr>
+                <tr><td class="num">Sofrimento</td><td>Canhão de Vidro</td><td>Ataques causam +2d4 de dano extra, mas você recebe 1d4 de dano extra.</td></tr>
+                <tr><td class="num">Sofrimento</td><td>Berserk</td><td>A cada ataque recebido, -1 de dano recebido e +1 de dano causado (acumula na sessão, reinicia ao final dela).</td></tr>
+                <tr><td class="num">Morte</td><td>Decadência</td><td>Ganha o ritual exclusivo "Decadência" (material adicional de Chagas e Rituais).</td></tr>
+                <tr><td class="num">Morte</td><td>Último Suspiro</td><td>2x/sessão pode agarrar o oponente e drenar 2d4 de PV, curando o valor drenado.</td></tr>
+                <tr><td class="num">Medo</td><td>Mestre dos Rituais</td><td>Rituais simples sem dano dispensam teste; rituais médios/avançados têm DT reduzida; aprende rituais simples só de observá-los.</td></tr>
+                <tr><td class="num">Medo</td><td>Pavor Absoluto</td><td>Sua presença inflige Medo mesmo em criaturas sobrenaturais; 2x/sessão faz um alvo perder um turno, paralisado.</td></tr>
+                <tr><td class="num">Caos</td><td>Máquina de Combate</td><td>Ataques corpo a corpo contra você causam -4 de dano físico e -3 se forem de arma branca.</td></tr>
+                <tr><td class="num">Caos</td><td>Controle do Caos</td><td>1x/sessão desvia de qualquer ataque que não seja de arma de fogo e garante uma ação crítica em seguida.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
       </section>
 
       <!-- IV. TRAUMA & MENTE -->
@@ -794,14 +974,14 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
       <!-- V. CHAGAS -->
       <section class="tab-panel" data-panel="chagas">
         <h2 class="panel-title">Chagas — Fragmentos do Além</h2>
-        <p class="hint">Toda Chaga corrompe, desgasta ou atrai a atenção dos Ecos. Com 2+ Chagas: debuff narrativo em testes sociais. Com 3+: atrai atenção instintiva de Ecos. A cada nova Chaga, a Sanidade máxima reduz em 10. Se a Chaga conceder um bônus (ou penalidade) mecânico a um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
+        <p class="hint">Toda Chaga corrompe, desgasta ou atrai a atenção dos Ecos. Com 2+ Chagas: debuff narrativo em testes sociais. Com 3+: atrai atenção instintiva de Ecos. A cada nova Chaga, a Sanidade máxima reduz em 5. Chaga Passiva: buff e colateral ficam sempre ativos ao mesmo tempo (não é possível ter uma Chaga passiva e ativa na mesma Chaga — use duas Chagas separadas). Se a Chaga conceder um bônus (ou penalidade) mecânico a um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
         <div id="chagasList"></div>
         <button type="button" class="btn-add" id="btnAddChaga">+ Adicionar Chaga</button>
 
         <h2 class="panel-title">Resiliência</h2>
         <div class="field-grid">
           <div class="field"><label for="f-resAtual">Resiliência Atual</label><input type="number" id="f-resAtual"></div>
-          <div class="field"><label for="f-resMax">Resiliência Máxima (VON ÷ 2)</label><input type="number" id="f-resMax" readonly></div>
+          <div class="field"><label for="f-resMax">Resiliência Máxima (= VON)</label><input type="number" id="f-resMax" readonly></div>
         </div>
         <p class="hint">Restaurada ao máximo ao final de toda sessão. Gasta para resistir a Ecos ou ativar Chagas.</p>
       </section>
@@ -812,15 +992,30 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
         <p class="hint">Todo ritual exige teste de Rituais ou Ocultismo. Rituais Simples: até 1 turno em combate. Médios: 1+ turno, podem ser interrompidos. Avançados: até 2 turnos, alta exigência de concentração. Se o ritual conceder um bônus temporário a um Atributo ou Perícia enquanto ativo, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
         <div id="rituaisList"></div>
         <button type="button" class="btn-add" id="btnAddRitual">+ Adicionar Ritual</button>
+
+        <details class="reference">
+          <summary>Consultar Tempo de Execução, N.A. e Conjuração Forçada</summary>
+          <div class="reference-inner">
+            <p style="font-size:13.5px; color:var(--text-muted); line-height:1.6; margin:0 0 10px;">
+              Todo personagem começa com 1 ritual simples. Rituais médios exigem N.A. 2+; rituais avançados exigem N.A. 5+ (sem Estojo de Rituais Avançados, sofrem -5 no teste e maior risco de falha crítica). Fora de combate, o tempo de conjuração é narrativo; em combate, cada 5 minutos narrativos equivalem a 1 turno (10 minutos = 2 turnos). Ação rápida: o efeito é aplicado no mesmo turno em que foi usado. Sucesso Crítico intensifica o efeito; Falha aplica as consequências descritas no ritual; Falha Crítica pode voltar-se contra o conjurador ou atrair atenção paranormal.
+            </p>
+            <table class="ref-table">
+              <thead><tr><th class="num">Pré-requisito</th><th>Conjuração Forçada — "Rasgar o Véu"</th></tr></thead>
+              <tbody>
+                <tr><td class="num">12+ em Rituais e 8+ em INT</td><td>Rituais Simples/Médios são ativados instantaneamente (mesmo turno), ignorando o tempo padrão — mas o personagem fica debilitado nesse turno (só pode se mover ou fazer ações menores). Rituais Avançados passam a levar 1 turno inteiro. Todo teste é forçado a DT 12, e falhar é sempre falha crítica. Custo: perde 5 de Sanidade imediatamente e fica incapaz de usar qualquer ritual por 2 turnos.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
       </section>
 
       <!-- VII. MARCAS & MALDIÇÕES -->
       <section class="tab-panel" data-panel="marcas">
         <h2 class="panel-title">Marcas — Runas Permanentes</h2>
-        <p class="hint">Gravuras aplicadas a itens/armas/equipamentos ou ao próprio corpo, concedendo melhorias <strong>permanentes</strong>. Custo sugerido: 2 de Resiliência + Ritual específico (teste de Ocultismo ou Rituais, recomendado 50%+) — ajuste ou deixe em branco o campo de Custo caso a Marca não exija gastar Resiliência. Limite: Armas simples até 1 Marca · Armas táticas até 2 Marcas · Corpo sem limite fixo, mas com risco. Se a Marca conceder um bônus mecânico, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
+        <p class="hint">Gravuras aplicadas a itens/armas/equipamentos ou ao próprio corpo, concedendo melhorias <strong>permanentes</strong>. Custo: 2 de Resiliência + Ritual específico (teste de Ocultismo ou Rituais, recomendado 10+ pontos na perícia) — ajuste ou deixe em branco o campo de Custo caso a Marca não exija gastar Resiliência. Limite: Armas simples até 1 Marca · Armas táticas até 2 Marcas · Corpo até 5 Marcas (2 marcas: debuff narrativo em testes e interações sociais · 3-4 marcas: chama atenção de Ecos e sensíveis ao sobrenatural · 5 marcas: Ecos agem de forma mais agressiva contra você). Se a Marca conceder um bônus mecânico, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias.</p>
         <div class="marca-count-bar">
           <span>Total de Marcas: <strong id="marcasCount">0</strong></span>
-          <span id="marcasStatus" class="ok-text">Sem efeitos negativos (1–2 marcas)</span>
+          <span id="marcasStatus" class="ok-text">Sem efeitos negativos (0–1 marca)</span>
         </div>
         <div id="marcasList"></div>
         <button type="button" class="btn-add" id="btnAddMarca">+ Adicionar Marca</button>
@@ -831,16 +1026,17 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
             <table class="ref-table">
               <thead><tr><th class="num">Marcas</th><th>Efeito</th></tr></thead>
               <tbody>
-                <tr><td class="num">1–2</td><td>Nenhum efeito negativo.</td></tr>
-                <tr><td class="num">3–4</td><td>Debuff narrativo em testes e interações sociais.</td></tr>
-                <tr><td class="num">5+</td><td>Chama atenção de Ecos e pessoas sensíveis ao sobrenatural.</td></tr>
+                <tr><td class="num">0–1</td><td>Nenhum efeito negativo.</td></tr>
+                <tr><td class="num">2</td><td>Debuff narrativo em testes e interações sociais.</td></tr>
+                <tr><td class="num">3–4</td><td>Chama atenção de Ecos e pessoas sensíveis ao sobrenatural.</td></tr>
+                <tr><td class="num">5</td><td>Ecos focam em você e agem de forma mais agressiva que o normal (limite máximo no corpo).</td></tr>
               </tbody>
             </table>
           </div>
         </details>
 
         <h2 class="panel-title">Maldições — O Preço do Abismo</h2>
-        <p class="hint">Mais fortes que Marcas, sempre vêm com efeitos colaterais. Impostas por falha crítica em rituais, pactos ou por escolha própria (com preço). Carregam efeito permanente positivo <em>e</em> negativo — ou apenas negativo. Só podem ser removidas por rituais de purificação, o que também remove os buffs. Armas/itens/equipamentos: apenas 1 maldição por vez. O corpo pode ter mais de uma. Se a Maldição alterar um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias (use valores negativos para penalidades).</p>
+        <p class="hint">Mais fortes que Marcas, sempre vêm com efeitos colaterais. Impostas por falha crítica em rituais, pactos ou por escolha própria (com preço). Carregam efeito permanente positivo <em>e</em> negativo — ou apenas negativo. <strong>Só é possível começar com uma Maldição que dê bônus/habilidades tendo a Origem Filhos do Véu com o caminho Amaldiçoado; caso contrário, a Maldição só pode ter efeitos negativos.</strong> Só podem ser removidas por rituais de purificação, o que também remove os buffs. Armas/itens/equipamentos: apenas 1 maldição por vez. O corpo pode ter mais de uma. Se a Maldição alterar um Atributo ou Perícia, use o campo "Buff" para refletir automaticamente na aba de Atributos &amp; Perícias (use valores negativos para penalidades).</p>
         <div id="maldicoesList"></div>
         <button type="button" class="btn-add" id="btnAddMaldicao">+ Adicionar Maldição</button>
 
@@ -871,7 +1067,16 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
           <div class="field"><label for="f-pvAtual">PV Atual</label><input type="number" id="f-pvAtual"></div>
           <div class="field"><label for="f-pvMax">PV Máximo (calculado)</label><input type="number" id="f-pvMax" readonly></div>
           <div class="field"><button type="button" id="btnRestorePV" class="btn-secondary">Restaurar ao Máximo</button></div>
+          <div class="field"><button type="button" id="btnRollMorte" class="btn-secondary">🎲 Teste de Morte (1d20)</button></div>
         </div>
+        <details class="reference">
+          <summary>Consultar Regras de Morte</summary>
+          <div class="reference-inner">
+            <p style="font-size:13.5px; color:var(--text-muted); line-height:1.6; margin:0;">
+              Existem dois estágios: <strong>caído</strong> e <strong>morto</strong>. Quando o PV chega a 0, o personagem cai. A partir do turno seguinte, ele faz testes de 1d20 para se manter vivo (as falhas não são acumulativas de resultado — são contadas em número de tentativas): pode falhar até <strong>3 vezes</strong> antes de morrer. Tirando <strong>20</strong>, levanta-se com 1d4 de PV; tirando <strong>1</strong>, é morte instantânea. Outros jogadores podem ajudar a estabilizar o aliado usando um kit médico, ou improvisando sem kit com um teste de Medicina ou Sobrevivência.
+            </p>
+          </div>
+        </details>
 
         <h2 class="panel-title">Sanidade</h2>
         <div class="field-grid">
@@ -883,12 +1088,12 @@ footer.appfoot{ text-align:center; color:var(--text-dim); font-size:11.5px; marg
         <h2 class="panel-title">Resiliência</h2>
         <div class="field-grid">
           <div class="field"><label for="f-resAtual2">Resiliência Atual</label><input type="number" id="f-resAtual2"></div>
-          <div class="field"><label for="f-resMax2">Resiliência Máxima (VON ÷ 2)</label><input type="number" id="f-resMax2" readonly></div>
+          <div class="field"><label for="f-resMax2">Resiliência Máxima (= VON)</label><input type="number" id="f-resMax2" readonly></div>
         </div>
         <p class="hint">Restaurada ao máximo ao final de toda sessão. Gasta para resistir a Ecos ou ativar Chagas.</p>
 
         <h2 class="panel-title">Strikes (Sistema de Dano por Localização)</h2>
-        <p class="hint">A cada 4 strikes acumulados (qualquer região): −1 em todos os testes. Dano crítico: +2 strikes na mesma região. Mesma região 3x: efeito narrativo específico (ex: membro inutilizado). Total de 9 strikes: colapso físico / inconsciência.</p>
+        <p class="hint">A cada 3 strikes acumulados (qualquer região): −1 em todos os testes até receber tratamento adequado (ritual, descanso ou kit médico), e os ataques passam a causar +2 de dano extra. Dano crítico: +2 strikes de uma vez na mesma região. Mesma região 3x: efeito narrativo específico (ex: membro inutilizado, visão comprometida). Total de 5 strikes: colapso físico / inconsciência.</p>
         <div class="strikes-grid">
           <div class="strike-box"><label>Cabeça</label><input type="number" min="0" id="s-cabeca"></div>
           <div class="strike-box"><label>Tronco</label><input type="number" min="0" id="s-tronco"></div>
@@ -967,42 +1172,50 @@ function fileToResizedDataURL(file, maxSize){
    ===================================================================== */
 
 const ATTRS = [
-  {key:"for", nome:"Força (FOR)", id:"a-for", min:1, max:20, rollable:true},
-  {key:"agi", nome:"Agilidade (AGI)", id:"a-agi", min:1, max:20, rollable:true},
-  {key:"int", nome:"Intelecto (INT)", id:"a-int", min:1, max:20, rollable:true},
-  {key:"car", nome:"Carisma (CAR)", id:"a-car", min:1, max:20, rollable:true},
-  {key:"von", nome:"Vontade (VON)", id:"a-von", min:1, max:20, rollable:true},
+  {key:"for", nome:"Força (FOR)", id:"a-for", min:1, max:12, rollable:true},
+  {key:"agi", nome:"Agilidade (AGI)", id:"a-agi", min:1, max:12, rollable:true},
+  {key:"int", nome:"Intelecto (INT)", id:"a-int", min:1, max:12, rollable:true},
+  {key:"car", nome:"Carisma (CAR)", id:"a-car", min:1, max:12, rollable:true},
+  {key:"von", nome:"Vontade (VON)", id:"a-von", min:1, max:5, rollable:true},
   {key:"vit", nome:"Vitalidade (VIT)", id:"a-vit", min:0, max:5, rollable:false},
 ];
+const ATTR_DICE = {4:"d4",6:"d6",8:"d8",10:"d10",12:"d12",14:"d14"};
+function dieForPoints(pts){
+  const n = Number(pts)||0;
+  if(n>=14) return "d14"; if(n>=12) return "d12"; if(n>=10) return "d10";
+  if(n>=8) return "d8"; if(n>=6) return "d6"; return "d4";
+}
 
 const SKILLS = [
   {key:"armasFogo", nome:"Armas de Fogo"},
   {key:"armasBrancas", nome:"Armas Brancas"},
-  {key:"briga", nome:"Briga"},
   {key:"ocultismo", nome:"Ocultismo"},
   {key:"medicina", nome:"Medicina"},
   {key:"tecnologia", nome:"Tecnologia"},
   {key:"investigacao", nome:"Investigação"},
   {key:"intimidacao", nome:"Intimidação"},
-  {key:"intuicao", nome:"Intuição"},
-  {key:"sobrevivencia", nome:"Sobrevivência"},
   {key:"rituais", nome:"Rituais"},
   {key:"atletismo", nome:"Atletismo"},
   {key:"erudicao", nome:"Erudição"},
-  {key:"percepcao", nome:"Percepção"},
-  {key:"ciencias", nome:"Ciências"},
+  {key:"pontaria", nome:"Pontaria"},
   {key:"sagacidade", nome:"Sagacidade"},
   {key:"oficios", nome:"Ofícios"},
   {key:"ladroagem", nome:"Ladroagem"},
   {key:"furtividade", nome:"Furtividade"},
+  {key:"briga", nome:"Briga"},
+  {key:"intuicao", nome:"Intuição"},
+  {key:"sobrevivencia", nome:"Sobrevivência"},
+  {key:"percepcao", nome:"Percepção"},
+  {key:"persuasao", nome:"Persuasão"},
+  {key:"enganacao", nome:"Enganação"},
 ];
 
 const TRAUMAS = [
-  {key:"fobia", nome:"Fobia", desc:`Medo irracional e paralisante de algo específico. Ao confrontar o objeto da fobia, teste de VON ou entra em pânico por 1d4 turnos, sofrendo -20% em todas as ações durante esse tempo.`},
+  {key:"fobia", nome:"Fobia", desc:`Medo irracional e paralisante de algo específico. Ao confrontar o objeto da fobia, teste de VON ou entra em pânico por 1d4 turnos, sofrendo -2 em todas as ações durante esse tempo.`},
   {key:"alucinacoes", nome:"Alucinações Leves", desc:`Vê ou ouve coisas que não estão lá. A cada cena estressante, teste de VON; em falha, uma alucinação se manifesta e pode interferir em decisões, testes sociais ou de percepção.`},
   {key:"compulsao", nome:"Compulsão", desc:`Comportamento obsessivo que precisa repetir (contar objetos, limpar as mãos, checar trancas). Resistir exige teste de VON; em falha, é forçado a executar a ação, perdendo tempo e foco.`},
-  {key:"culpa", nome:"Culpa Obsessiva", desc:`Sente-se responsável por uma perda, falha ou morte do passado. Ao falhar em proteger aliados ou falhar criticamente, perde 1d4 de Sanidade e pode entrar em retraimento (-10% em ações sociais e mentais).`},
-  {key:"apatia", nome:"Apatia Emocional", desc:`Dificuldade em demonstrar ou sentir emoções fortes. Sofre -20% em testes sociais relacionados à empatia, mas recebe +10% para resistir a manipulações emocionais ou possessões.`},
+  {key:"culpa", nome:"Culpa Obsessiva", desc:`Sente-se responsável por uma perda, falha ou morte do passado. Ao falhar em proteger aliados ou falhar criticamente, perde 1d4 de Sanidade e pode entrar em retraimento (-1 em ações sociais e mentais até superar a situação).`},
+  {key:"apatia", nome:"Apatia Emocional", desc:`Dificuldade em demonstrar ou sentir emoções fortes. Sofre -2 em testes sociais relacionados à empatia, mas recebe +1 para resistir a manipulações emocionais ou possessões.`},
   {key:"memoria", nome:"Memória Reprimida", desc:`Há lacunas na memória de eventos importantes. Flashes podem surgir em sonhos ou sob estresse, trazendo confusão ou revelando pistas ocultas ao longo da campanha.`},
 ];
 
@@ -1010,79 +1223,89 @@ const ORIGENS = {
   militar:{
     nome:"Militar", vidaBase:60,
     descricao:`Você foi moldado pelo conflito. Seja como soldado, policial de elite, segurança privada ou membro de uma força especial, aprendeu a manter a calma sob fogo cruzado e a agir com precisão. Agora, a guerra é contra o invisível.`,
-    bonus:`+5% em Armas de Fogo ou Armas Brancas. +1 ponto de Resiliência inicial. Em combate, pode agir primeiro no turno independente do resultado do teste (1x por missão).`,
+    bonus:`+1 ponto em Armas de Fogo, Armas Brancas ou Briga. Pode realizar Contra-Ataques. Em combate, pode agir primeiro no turno independente do resultado do teste (1x por sessão).`,
     caminhos:[
-      {nome:"Atirador de Elite", n1:`+10% em Percepção para detectar inimigos à distância.`, n2:`2x por missão, pode transformar um ataque em crítico automático (gasta 1 de Resiliência).`, n3:`Ataques à distância ignoram cobertura leve e armaduras dos inimigos.`},
-      {nome:"Forças Especiais", n1:`+5% em Furtividade ou Atletismo.`, n2:`Pode realizar duas ações no mesmo turno (2x por missão).`, n3:`Sua primeira ação de Furtividade da missão é um sucesso automático.`},
-      {nome:"Veterano de Guerrilha", n1:`+5% em Sobrevivência ou Briga.`, n2:`Pode criar uma arma improvisada por missão (1d6 de dano).`, n3:`Ignora penalidades de ambiente hostil (fome, frio, escuridão).`},
-      {nome:"Demolidor", n1:`+5% em Tecnologia ou Ciências (armamentos).`, n2:`Pode montar 2 armadilhas improvisadas por missão.`, n3:`Pode criar uma carga explosiva devastadora (3d16 de dano em área de 5m, 1x por missão).`},
-      {nome:"Samurai", descricao:`Samurai é um caminho para quem quer seguir um código de honra e quer ser o melhor em armas brancas em geral, porém com foco na katana. O código de honra pode ser diverso, não necessariamente ser bom ou ruim. Samurai é um guerreiro que no campo de batalha sua calma acaba assustando, sempre tendo controle de suas ações e sendo o mais letal possível sem perder a precisão de seus ataques, além disso sua honra vale mais que tudo, então suas promessas equivalem a barras de ouro.`, n1:`Treinamento de Lâmina — +5% em Armas Brancas.`, n2:`Vontade Ardente — 2x por combate, pode ignorar o golpe do inimigo e contra-atacar causando 1d6.`, n3:`Golpe Inabalável — 1x por combate, pode imbuir sua arma com sua vontade e causar +5 de dano adicional. Se o alvo morrer, ficar imobilizado ou incapaz de lutar por causa desse ataque, pode recuperar 1 uso de Vontade Ardente ou usar o Golpe Inabalável novamente contra um alvo diferente (apenas uma vez extra).`},
+      {nome:"Atirador", n1:`+2 no dado de Percepção para detectar inimigos à distância.`, n2:`2x por sessão, pode transformar um dano em dano crítico (gasta 1 de Resiliência).`, n3:`Ataques à distância ignoram cobertura leve e armaduras dos inimigos.`},
+      {nome:"Forças Especiais", n1:`+1 ponto em Furtividade ou Atletismo.`, n2:`Pode realizar duas ações no mesmo turno (2x por sessão).`, n3:`Pode escolher entre Armas de Fogo/Branca, Furtividade ou Atletismo para receber +1 ponto extra (excedendo o limite de 12).`},
+      {nome:"Guerrilha", n1:`+1 ponto em Armas de Fogo, Armas Brancas ou Briga.`, n2:`Pode criar uma arma improvisada por sessão (essa arma fica com 1d6 de dano).`, n3:`Caso caia em combate ao chegar em 0 de PV, pode se levantar sem necessidade de teste com 5 de PV (1x por sessão).`},
+      {nome:"Demolidor", n1:`+1 ponto em Tecnologia ou Ofícios (armamentos).`, n2:`Pode montar 2 armadilhas improvisadas sem necessidade de teste (1x por sessão).`, n3:`Pode criar uma carga explosiva devastadora (3d16 de dano em área de 5m, 1x por sessão).`},
+      {nome:"Samurai", descricao:`(Caminho adicional desta mesa, fora do livro de regras.) Samurai é um caminho para quem quer seguir um código de honra e quer ser o melhor em armas brancas em geral, porém com foco na katana. O código de honra pode ser diverso, não necessariamente ser bom ou ruim. Samurai é um guerreiro que no campo de batalha sua calma acaba assustando, sempre tendo controle de suas ações e sendo o mais letal possível sem perder a precisão de seus ataques, além disso sua honra vale mais que tudo, então suas promessas equivalem a barras de ouro.`, n1:`Treinamento de Lâmina — +1 ponto em Armas Brancas.`, n2:`Vontade Ardente — 2x por combate, pode ignorar o golpe do inimigo e contra-atacar causando 1d6.`, n3:`Golpe Inabalável — 1x por combate, pode imbuir sua arma com sua vontade e causar +5 de dano adicional. Se o alvo morrer, ficar imobilizado ou incapaz de lutar por causa desse ataque, pode recuperar 1 uso de Vontade Ardente ou usar o Golpe Inabalável novamente contra um alvo diferente (apenas uma vez extra).`},
     ]
   },
   ocultista:{
     nome:"Ocultista", vidaBase:40,
     descricao:`Você foi iniciado — por uma ordem esquecida, uma linhagem ancestral ou escolha própria — mas o preço foi alto. Conhece os nomes que não se devem pronunciar e os selos que selam aquilo que nunca dorme.`,
-    bonus:`+5% em Ocultismo ou Rituais. Pode realizar um ritual simples e médio sem estojo. Consegue sentir distúrbios no Véu até 5 metros, mesmo sem testes.`,
+    bonus:`+1 ponto em Ocultismo ou Rituais. Pode realizar rituais simples sem estojo. Inicia com +10 de SAN extra. Consegue sentir o sobrenatural em até 5 metros, sem necessidade de testes.`,
     caminhos:[
-      {nome:"Invocador", n1:`+5% em Rituais, pode sentir presenças até 10m.`, n2:`Pode chamar entidades menores como distração ou para conseguir informação (teste de Ocultismo).`, n3:`Pode invocar de 1 a 2 aliados espirituais temporários por missão (teste de Ocultismo).`},
-      {nome:"Selador", n1:`+5% em Ocultismo, +5 em resistir a possessão (teste de VON).`, n2:`Pode reforçar selos ou círculos dos rituais de aprisionamento (+10% em conjuração de rituais similares).`, n3:`Pode fechar portais menores automaticamente (2x por missão).`},
-      {nome:"Maledicente", n1:`+5% em Intimidação. Consegue sussurrar maldições que afetam o psicológico de alvos humanos.`, n2:`Pode amaldiçoar um inimigo 2x por missão (-20% em uma perícia e -3 em um atributo do alvo + a maldição).`, n3:`Uma vez por missão, pode lançar uma maldição poderosa (-30% em duas perícias e -5 em um atributo do alvo + a maldição).`},
-      {nome:"Conjurador Bélico", n1:`+5% em teste de Rituais ofensivos (ataques, maldições).`, n2:`Pode gastar 1 Resiliência para aumentar o dano de um ritual em +1d6.`, n3:`Uma vez por missão, pode lançar um ritual avançado como ação rápida, sem tempo de preparação.`},
+      {nome:"Invocador", n1:`+1 ponto em Rituais, pode sentir presenças sobrenaturais em até +5m.`, n2:`Pode chamar entidades menores como distração ou para conseguir informação (é necessário um teste de Ocultismo).`, n3:`Pode invocar de 1 a 2 aliados espirituais temporários que duram até o final da sessão (teste de Ocultismo; Mestre e jogador definem as estatísticas dos aliados).`},
+      {nome:"Purificador", n1:`+1 ponto em Ocultismo, +2 em Testes de VON para resistir a possessão.`, n2:`Pode reforçar selos ou círculos dos rituais de aprisionamento (bônus de +2 no dado em conjuração de rituais similares).`, n3:`Pode selar um Eco por completo com um teste de Ocultismo — a dificuldade varia de acordo com o nível do Eco (1x por sessão).`},
+      {nome:"Maledicente", n1:`+1 ponto em Intimidação, pode realizar testes para resistir a uma maldição (VON).`, n2:`Pode amaldiçoar um inimigo 2x por sessão (–2 pontos em uma perícia e -3 pontos em um atributo do alvo).`, n3:`Uma vez por sessão, pode lançar uma maldição poderosa (–4 pontos em duas perícias e -5 pontos em um atributo do alvo).`},
+      {nome:"Conjurador Bélico", n1:`+1 no dado em teste de Rituais ofensivos (ataques e maldições).`, n2:`Pode gastar 1 de Resiliência para aumentar o dano de um ritual em +1d8.`, n3:`Uma vez por sessão, pode lançar um ritual avançado como ação rápida, sem tempo de preparação.`},
     ]
   },
   cetico:{
     nome:"Cético", vidaBase:45,
     descricao:`Você não acredita em demônios, fantasmas ou deuses — não porque não viu, mas porque se recusa. Sua mente racional é um escudo contra o absurdo, o que ironicamente o torna mais resistente ao sobrenatural.`,
-    bonus:`+5% em Tecnologia ou Percepção. +3 em testes de Sanidade. Uma vez por missão, pode anular um efeito de medo ou ilusão.`,
+    bonus:`+1 ponto em Tecnologia ou Percepção. +2 em testes de Sanidade. Inicia com +10 de SAN extra. Uma vez por sessão, pode anular um efeito de medo ou ilusão.`,
     caminhos:[
-      {nome:"Investigador Forense", n1:`+10% em Investigação.`, n2:`Sempre detecta mentiras simples sem testes.`, n3:`Ganha pistas a mais para enigmas complexos.`},
-      {nome:"Tecnólogo", n1:`+5% em Tecnologia, pode criar gambiarras.`, n2:`Pode reparar ou alterar equipamentos improvisadamente.`, n3:`+5% de Tecnologia; pode hackear qualquer sistema (mesmo protegido).`},
-      {nome:"Racionalista", n1:`+5 em VON, pode ignorar efeitos emocionais fracos.`, n2:`2x por missão, ignora um ataque mental/sobrenatural.`, n3:`Imune a possessões fracas e ilusões fortes.`},
-      {nome:"Executor Lógico", n1:`+5% em Armas de Fogo ou Briga.`, n2:`Pode gastar 1 Resiliência para rolar ataque duas vezes e ficar com o melhor.`, n3:`Duas vezes por missão, pode negar qualquer bônus defensivo de um inimigo (ignora cobertura, armadura leve ou resistência sobrenatural).`},
+      {nome:"Investigador Forense", n1:`+2 pontos em Investigação.`, n2:`Sempre detecta mentiras simples sem testes.`, n3:`Ganha pistas a mais para enigmas complexos.`},
+      {nome:"Tecnólogo", n1:`+1 ponto em Tecnologia, pode criar gambiarras.`, n2:`Pode reparar ou alterar equipamentos improvisadamente.`, n3:`+1 ponto de Tecnologia; pode hackear qualquer sistema (mesmo protegido).`},
+      {nome:"Racionalista", n1:`+2 pontos em VON, pode ignorar efeitos emocionais fracos.`, n2:`2x por sessão, pode ignorar um ataque mental/sobrenatural.`, n3:`Imune a possessões fracas e ilusões fortes.`},
+      {nome:"Executor Lógico", n1:`+1 ponto em Armas de Fogo ou Briga.`, n2:`Pode gastar 1 Resiliência para rolar ataque duas vezes e ficar com o melhor.`, n3:`Duas vezes por sessão, pode negar qualquer bônus defensivo de um inimigo (ignora armadura leve ou resistência sobrenatural).`},
     ]
   },
   medium:{
     nome:"Médium", vidaBase:40,
     descricao:`Desde criança, você vê o que não devia. Sente frio em lugares onde o calor deveria reinar. Sua mente é um canal, por vezes aberto demais, para o Outro Lado. Os mortos sabem seu nome, e os Ecos o reconhecem como um espelho.`,
-    bonus:`+5% em Rituais ou Intuição. Pode sentir presenças ocultas num raio de 10 metros. Uma vez por missão, pode canalizar uma visão ou mensagem espiritual involuntária.`,
+    bonus:`+1 ponto em Ocultismo ou Intuição. Pode sentir presenças ocultas num raio de 10 metros. Inicia com +10 de SAN extra. Uma vez por sessão, pode canalizar uma visão ou mensagem espiritual involuntária (Mestre decide o conteúdo baseado no resultado do teste de VON).`,
     caminhos:[
-      {nome:"Canalizador", n1:`+5% em Rituais, espíritos sussurram dicas.`, n2:`Pode pedir ajuda a 1 espírito aliado (Mestre define o efeito).`, n3:`Pode "fundir-se" com 1 espírito, ganhando +20% em 2 perícias por cena ou por 1d4 turnos.`},
-      {nome:"Oráculo", n1:`+5% em Intuição, sonhos premonitórios ocasionais.`, n2:`Pode gastar Resiliência para prever 1 perigo imediato.`, n3:`1x por missão, pode pedir uma revelação narrativa ao Mestre.`},
-      {nome:"Necroempata", n1:`+5% em VON, sente emoções dos mortos.`, n2:`Pode absorver a dor de um aliado (cura 1d6 PV, perde igual em Sanidade).`, n3:`Pode absorver ferimentos mortais (pode morrer no lugar de um aliado).`},
-      {nome:"Flagelo Espiritual", n1:`+5% em Intuição ou Briga.`, n2:`Duas vezes por missão, pode usar um ataque físico como ataque espiritual (ignora defesa física, atinge entidades incorpóreas).`, n3:`Ao gastar 2 Resiliência, pode atacar 2 vezes no mesmo turno com bônus de +10% no segundo ataque.`},
+      {nome:"Canalizador", n1:`+1 ponto em Rituais, espíritos sussurram dicas (mensagens do Mestre).`, n2:`Pode pedir ajuda a 1 espírito aliado (Mestre define o efeito baseado na ação do jogador).`, n3:`Pode "fundir-se" com 1 espírito, ganhando +2 no dado de duas perícias por 1d4 de turnos.`},
+      {nome:"Oráculo", n1:`+1 ponto em Intuição, 1x por sessão pode ter uma premonição (pequenas visões do futuro).`, n2:`Pode gastar 1 de Resiliência para prever 1 perigo imediato.`, n3:`1x por sessão, pode pedir uma revelação narrativa ao Mestre.`},
+      {nome:"Necroempata", n1:`+2 pontos em VON, pode sentir presenças ocultas num raio de +5 metros.`, n2:`Pode absorver a dor de um aliado (cura 1d8 PV, perde igual em Sanidade).`, n3:`Pode proteger um aliado de um ataque mortal em um raio de 10m (1x por sessão).`},
+      {nome:"Flagelo Espiritual", n1:`+1 ponto em Armas Brancas ou Briga.`, n2:`Duas vezes por sessão, pode usar um ataque físico como ataque espiritual (ignora defesa física, atinge entidades incorpóreas).`, n3:`Todo ataque inflige +3 de dano Espiritual extra.`},
     ]
   },
   erudito:{
     nome:"Erudito", vidaBase:50,
     descricao:`Você passou anos mergulhado em arquivos esquecidos, manuscritos empoeirados e símbolos que só aparecem à luz da vela. Você não é um ocultista: você é o que os ocultistas consultam quando têm medo.`,
-    bonus:`+5% em Erudição ou Ciências. Começa com 5 pontos em INT. Pode identificar a origem de textos, símbolos ou entidades com um único teste de Erudição.`,
+    bonus:`+1 ponto em Erudição ou Ocultismo. Começa com 4 pontos em INT em vez de 1. Pode identificar a origem de textos, símbolos ou entidades sem necessidade de testes.`,
     caminhos:[
-      {nome:"Linguista", n1:`+5% em Erudição.`, n2:`Pode traduzir línguas mortas ou códigos instantaneamente.`, n3:`Pode conversar com entidades através de linguagem esquecida.`},
-      {nome:"Historiador Arcano", n1:`+5% em Ocultismo.`, n2:`Reconhece rituais antigos com apenas uma olhada.`, n3:`Consegue prever efeitos de um ritual só de vê-lo.`},
-      {nome:"Mestre dos Textos", n1:`+5% em Investigação.`, n2:`Pode criar falsificações convincentes de escritos arcanos.`, n3:`Uma vez por missão, pode criar um ritual falso que engana até o sobrenatural.`},
-      {nome:"Caçador Arcanista", n1:`+5% em Ocultismo quando usado de forma ofensiva (ex: identificar fraquezas para atacar).`, n2:`Pode gastar 1 Resiliência para dar +1d6 de dano extra ao ataque de um aliado, apontando o ponto fraco da criatura.`, n3:`Uma vez por missão, pode "nomear" uma entidade em combate — todos os ataques contra ela recebem +1d4 de dano até o fim da cena.`},
+      {nome:"Linguista", n1:`+1 ponto em Erudição.`, n2:`Pode traduzir línguas mortas ou códigos instantaneamente.`, n3:`Pode conversar com entidades através de linguagem esquecida.`},
+      {nome:"Historiador Arcano", n1:`+1 ponto em Ocultismo.`, n2:`Reconhece rituais antigos com apenas uma olhada.`, n3:`Consegue prever efeitos de um ritual só de vê-lo.`},
+      {nome:"Mestre dos Textos", n1:`+1 ponto em Investigação.`, n2:`Pode se especializar em Ecos Físicos ou Espirituais para ter informações extras sobre suas formas de agir (Mestre disponibiliza informações úteis extras).`, n3:`Uma vez por sessão, pode criar um ritual de ilusão que engana até o sobrenatural.`},
+      {nome:"Caçador Arcanista", n1:`+1 no dado de Percepção quando usado de forma ofensiva (ex: identificar fraquezas para atacar).`, n2:`Pode gastar 1 Resiliência para dar +1d8 de dano extra ao ataque de um aliado, ao apontar o ponto fraco da criatura.`, n3:`Uma vez por sessão, pode "nomear" uma entidade em combate — todos os ataques contra ela recebem +1d6 de dano até o fim da cena.`},
     ]
   },
   medico:{
-    nome:"Médico", vidaBase:30,
-    descricao:`Você já esteve entre a vida e a morte — e nem sempre no papel que esperava. Aprendeu a lidar com corpos partidos e decisões tomadas em segundos. Mas os Ecos não sangram como os humanos.`,
-    bonus:`+5% em Medicina ou Sobrevivência. Pode estabilizar um aliado à beira da morte (0 PV) sem rolagem, uma vez por sessão. Pode identificar estruturas anatômicas humanas e anômalas com um teste de INT simples.`,
+    nome:"Médico", vidaBase:35,
+    descricao:`Como médico, cirurgião ou paramédico, você aprendeu a lidar com corpos partidos, gritos abafados e decisões que precisam ser tomadas em segundos — assim como a utilizar o sobrenatural em suas técnicas médicas.`,
+    bonus:`+1 ponto em Medicina ou Sobrevivência. Você pode estabilizar um aliado à beira da morte (0 PV) sem rolagem, uma vez por sessão. Itens de cura recebem +1 uso extra.`,
     caminhos:[
-      {nome:"Cirurgião de Campo", n1:`+5% em Medicina.`, n2:`Pode curar 1d6 PV extras ao usar kits.`, n3:`Pode salvar alguém morto há até 1 turno.`},
-      {nome:"Alquimista", n1:`+5% em Ciências (misturas/compostos).`, n2:`Pode preparar 1 tônico (1d4 de cura ou 2 de resistência, 2 usos por missão).`, n3:`Pode criar 1 frasco especial 1x por missão (cura total ou resistência total).`},
-      {nome:"Exorcista Clínico", n1:`+5% em VON.`, n2:`Pode "diagnosticar" possessões como doenças e purificá-las.`, n3:`Pode expulsar espíritos fracos apenas com contato físico.`},
-      {nome:"Cirurgião Letal", n1:`+5% em Armas Brancas (uso de bisturis, lâminas, serras improvisadas).`, n2:`Uma vez por missão, pode declarar um ataque como golpe preciso; se acertar, causa dano dobrado.`, n3:`Pode gastar 1 Resiliência para ignorar resistência física do alvo em um ataque corpo a corpo.`},
+      {nome:"Cirurgião de Campo", n1:`+1 ponto em Medicina.`, n2:`Pode curar 1d8 de PV extras ao usar kits.`, n3:`Pode salvar alguém morto há até 1 turno (1x por sessão).`},
+      {nome:"Alquimista", n1:`+1 ponto em INT (misturas/compostos).`, n2:`Pode preparar 1 tônico (1d6 de cura ou 2 de Resiliência, 2 usos por sessão).`, n3:`Pode criar 1 frasco especial 1x por sessão (cura total ou Resiliência total).`},
+      {nome:"Exorcista Clínico", n1:`+2 pontos em VIT e +1 ponto em Ocultismo.`, n2:`Pode infundir seus utensílios de medicina com o sobrenatural, curando +5 de SAN extra ao curar aliados diretamente.`, n3:`Pode utilizar o próprio sangue e esfregá-lo em um aliado — durante 1 cena inflige +5 de dano Espiritual extra (2x por sessão).`},
+      {nome:"Cirurgião Letal", n1:`+1 ponto em Armas Brancas.`, n2:`Uma vez por sessão, pode declarar um ataque como golpe preciso; se acertar, causa dano dobrado.`, n3:`Pode focar pontos vitais no corpo do inimigo — todo ataque seu inflige +1d4 de sangramento.`},
     ]
   },
   amigoanimais:{
     nome:"Amigo dos Animais", vidaBase:45,
     descricao:`Você sempre teve uma conexão instintiva com os animais — selvagens, domésticos ou até aqueles que os outros não conseguem ver de maneira comum. Talvez um trauma, ou um dom inexplicável, o aproximou das criaturas do mundo natural e sobrenatural.`,
-    bonus:`+5% em Intuição ou Sobrevivência. Pode se comunicar com animais. Inicia com um companheiro animal fiel (estatísticas definidas com o Mestre).`,
+    bonus:`+1 ponto em Intuição ou Sobrevivência. Pode se comunicar com animais. Inicia com um companheiro animal fiel (Mestre e jogador definem as estatísticas do animal).`,
     caminhos:[
-      {nome:"Domador Espiritual", n1:`+5% em Rituais; companheiro animal ganha resistência sobrenatural.`, n2:`Pode invocar espíritos-animais por breves instantes (Mestre decide o efeito).`, n3:`Animal ganha habilidade Sobrenatural (ex: visão no Véu, ataque espiritual).`},
-      {nome:"Batedor Animal", n1:`+10% em Percepção quando acompanhado do animal.`, n2:`O animal pode agir 2x por turno (2x por missão).`, n3:`Animal pode rastrear qualquer ser ou sentir entidades a 10m (mesmo sobrenatural).`},
-      {nome:"Caçador Instintivo", n1:`+5% em Sobrevivência ou Armas de Fogo.`, n2:`Duas vezes por missão, pode coordenar seu animal para atacar junto, causando +1d6 de dano extra.`, n3:`Quando o companheiro animal abate um inimigo, ganha +10% em seu próximo ataque na mesma cena.`},
-      {nome:"Alfa Instintivo", n1:`+10% em Intimidação. Animais selvagens não o atacam sem motivo.`, n2:`Pode comandar temporariamente animais próximos por 1d4 turnos (exceto os totalmente sobrenaturais).`, n3:`Uma vez por missão, pode invocar uma matilha ou bando para ajudar por 1d5 turnos.`},
+      {nome:"Domador Espiritual", n1:`+1 ponto em Rituais, companheiro animal ganha resistência sobrenatural.`, n2:`Animal ganha uma habilidade sobrenatural.`, n3:`Pode invocar um espírito-animal por uma sessão inteira (Mestre e jogador definem estatísticas e efeitos do espírito).`},
+      {nome:"Batedor Animal", n1:`+2 em dados de Percepção quando acompanhado do animal.`, n2:`O animal pode agir 2x por turno (2x por sessão).`, n3:`Animal pode rastrear qualquer ser ou sentir entidades a 10m (mesmo sobrenatural).`},
+      {nome:"Caçador Instintivo", n1:`+1 ponto em Sobrevivência ou Armas de Fogo.`, n2:`Duas vezes por sessão, pode coordenar seu animal para atacar junto, causando +1d8 de dano extra.`, n3:`Quando o companheiro animal abate um inimigo, você ganha +1 no dado em seu próximo ataque na mesma cena.`},
+      {nome:"Alfa Instintivo", n1:`+1 ponto em Intimidação. Animais selvagens não o atacam.`, n2:`Pode comandar temporariamente animais próximos por 1d4 de turnos (exceto os totalmente sobrenaturais).`, n3:`Uma vez por missão, pode invocar uma matilha ou bando (narrativo: corvos, lobos, cães) para ajudar por 1d5 de turnos.`},
+    ]
+  },
+  filhosdoveu:{
+    nome:"Filhos do Véu", vidaBase:50,
+    descricao:`Seu corpo e mente são os receptáculos perfeitos do sobrenatural desde o seu nascimento. Desde o começo até o fim de sua vida, ele vai te perseguir.`,
+    bonus:`+1 ponto em Ocultismo ou Intimidação. +2 pontos de Resiliência inicial. Pode começar como Marcado, Amaldiçoado ou Fractus e segue o caminho correspondente (ao escolher Fractus, pode escolher entre Angústia, Sofrimento, Medo, Morte ou Caos como Primordial).`,
+    caminhos:[
+      {nome:"Marcado", n1:`Suporta +1 marca corporal antes de sofrer penalidades.`, n2:`1x por combate, intensifica uma marca corporal por 3 turnos, aumentando os bônus dela.`, n3:`Não recebe nenhuma penalidade de ter múltiplas marcas no corpo.`},
+      {nome:"Amaldiçoado", n1:`Não pode ter mais de uma Maldição no corpo.`, n2:`Os efeitos negativos de corpo/itens são diminuídos pela metade.`, n3:`Pode amaldiçoar um aliado com bônus temporários (2x por sessão, duram 2 turnos: +2 pontos em duas perícias e +3 pontos em um atributo do alvo).`},
+      {nome:"Fractus", descricao:`Escolha 1 dos 5 Primordiais (Morte, Medo, Angústia, Sofrimento ou Caos) como fonte do seu Fragmento — veja a referência "Pactos & Fragmentado" logo abaixo para os temas, custos e falhas de cada um.`, n1:`Ecos fracos evitam chegar perto de você.`, n2:`Pode pedir ajuda temporária ao Fragmento; essa ajuda dura até o final da sessão (o Mestre decide os efeitos e estatísticas).`, n3:`O fragmento escolhido se intensifica: recebe um aumento permanente de +1 ponto em uma perícia e +2 pontos em um atributo à sua escolha (ultrapassa o limite de 12 em perícias e atributos), porém perde -10 de SAN máxima permanente.`},
     ]
   },
 };
@@ -1094,69 +1317,78 @@ const ORIGENS = {
    ===================================================================== */
 const BUFF_RULES = {
   militar:{
-    origem:{ type:"skill", amount:5, options:["armasFogo","armasBrancas"] },
+    origem:{ type:"skill", amount:1, options:["armasFogo","armasBrancas","briga"] },
     caminhos:[
-      { type:"skill", amount:10, options:["percepcao"] },          // Atirador de Elite
-      { type:"skill", amount:5, options:["furtividade","atletismo"] }, // Forças Especiais
-      { type:"skill", amount:5, options:["sobrevivencia","briga"] },   // Veterano de Guerrilha
-      { type:"skill", amount:5, options:["tecnologia","ciencias"] },   // Demolidor
-      { type:"skill", amount:5, options:["armasBrancas"] },            // Samurai
+      null,                                                              // Atirador — "+2 no dado" é situacional, não permanente
+      { type:"skill", amount:1, options:["furtividade","atletismo"] },   // Forças Especiais
+      { type:"skill", amount:1, options:["armasFogo","armasBrancas","briga"] }, // Guerrilha
+      { type:"skill", amount:1, options:["tecnologia","oficios"] },      // Demolidor
+      { type:"skill", amount:1, options:["armasBrancas"] },              // Samurai (extra desta mesa)
     ]
   },
   ocultista:{
-    origem:{ type:"skill", amount:5, options:["ocultismo","rituais"] },
+    origem:{ type:"skill", amount:1, options:["ocultismo","rituais"] },
     caminhos:[
-      { type:"skill", amount:5, options:["rituais"] },       // Invocador
-      { type:"skill", amount:5, options:["ocultismo"] },     // Selador
-      { type:"skill", amount:5, options:["intimidacao"] },   // Maledicente
-      { type:"skill", amount:5, options:["rituais"] },       // Conjurador Bélico
+      { type:"skill", amount:1, options:["rituais"] },     // Invocador
+      { type:"skill", amount:1, options:["ocultismo"] },   // Purificador
+      { type:"skill", amount:1, options:["intimidacao"] }, // Maledicente
+      null,                                                 // Conjurador Bélico — "+1 no dado" é situacional
     ]
   },
   cetico:{
-    origem:{ type:"skill", amount:5, options:["tecnologia","percepcao"] },
+    origem:{ type:"skill", amount:1, options:["tecnologia","percepcao"] },
     caminhos:[
-      { type:"skill", amount:10, options:["investigacao"] }, // Investigador Forense
-      { type:"skill", amount:5, options:["tecnologia"] },    // Tecnólogo
-      { type:"attr", amount:5, options:["von"] },            // Racionalista
-      { type:"skill", amount:5, options:["armasFogo","briga"] }, // Executor Lógico
+      { type:"skill", amount:2, options:["investigacao"] },      // Investigador Forense
+      { type:"skill", amount:1, options:["tecnologia"] },        // Tecnólogo
+      { type:"attr", amount:2, options:["von"] },                // Racionalista
+      { type:"skill", amount:1, options:["armasFogo","briga"] }, // Executor Lógico
     ]
   },
   medium:{
-    origem:{ type:"skill", amount:5, options:["rituais","intuicao"] },
+    origem:{ type:"skill", amount:1, options:["ocultismo","intuicao"] },
     caminhos:[
-      { type:"skill", amount:5, options:["rituais"] },   // Canalizador
-      { type:"skill", amount:5, options:["intuicao"] },  // Oráculo
-      { type:"attr", amount:5, options:["von"] },        // Necroempata
-      { type:"skill", amount:5, options:["intuicao","briga"] }, // Flagelo Espiritual
+      { type:"skill", amount:1, options:["rituais"] },              // Canalizador
+      { type:"skill", amount:1, options:["intuicao"] },             // Oráculo
+      { type:"attr", amount:2, options:["von"] },                   // Necroempata
+      { type:"skill", amount:1, options:["armasBrancas","briga"] }, // Flagelo Espiritual
     ]
   },
   erudito:{
-    origem:{ type:"skill", amount:5, options:["erudicao","ciencias"] },
-    origemAttr:{ type:"attr", amount:5, options:["int"] }, // "Começa com 5 pontos em INT"
+    origem:{ type:"skill", amount:1, options:["erudicao","ocultismo"] },
+    origemAttr:{ type:"attr", amount:3, options:["int"] }, // "Começa com 4 pontos em INT" (base 1 + 3)
     caminhos:[
-      { type:"skill", amount:5, options:["erudicao"] },     // Linguista
-      { type:"skill", amount:5, options:["ocultismo"] },    // Historiador Arcano
-      { type:"skill", amount:5, options:["investigacao"] }, // Mestre dos Textos
-      { type:"skill", amount:5, options:["ocultismo"] },    // Caçador Arcanista
+      { type:"skill", amount:1, options:["erudicao"] },     // Linguista
+      { type:"skill", amount:1, options:["ocultismo"] },    // Historiador Arcano
+      { type:"skill", amount:1, options:["investigacao"] }, // Mestre dos Textos
+      null,                                                  // Caçador Arcanista — "+1 no dado" é situacional
     ]
   },
   medico:{
-    origem:{ type:"skill", amount:5, options:["medicina","sobrevivencia"] },
+    origem:{ type:"skill", amount:1, options:["medicina","sobrevivencia"] },
     caminhos:[
-      { type:"skill", amount:5, options:["medicina"] },     // Cirurgião de Campo
-      { type:"skill", amount:5, options:["ciencias"] },     // Alquimista
-      { type:"attr", amount:5, options:["von"] },           // Exorcista Clínico
-      { type:"skill", amount:5, options:["armasBrancas"] }, // Cirurgião Letal
+      { type:"skill", amount:1, options:["medicina"] },     // Cirurgião de Campo
+      { type:"attr", amount:1, options:["int"] },           // Alquimista
+      { type:"skill", amount:1, options:["ocultismo"] },    // Exorcista Clínico (VIT extra abaixo)
+      { type:"skill", amount:1, options:["armasBrancas"] }, // Cirurgião Letal
+    ],
+    caminhosExtra:[
+      null, null,
+      { type:"attr", amount:2, options:["vit"] }, // Exorcista Clínico: +2 pontos em VIT
+      null,
     ]
   },
   amigoanimais:{
-    origem:{ type:"skill", amount:5, options:["intuicao","sobrevivencia"] },
+    origem:{ type:"skill", amount:1, options:["intuicao","sobrevivencia"] },
     caminhos:[
-      { type:"skill", amount:5, options:["rituais"] },            // Domador Espiritual
-      { type:"skill", amount:10, options:["percepcao"] },         // Batedor Animal
-      { type:"skill", amount:5, options:["sobrevivencia","armasFogo"] }, // Caçador Instintivo
-      { type:"skill", amount:10, options:["intimidacao"] },       // Alfa Instintivo
+      { type:"skill", amount:1, options:["rituais"] },                     // Domador Espiritual
+      null,                                                                 // Batedor Animal — "+2 em dados" é situacional
+      { type:"skill", amount:1, options:["sobrevivencia","armasFogo"] },    // Caçador Instintivo
+      { type:"skill", amount:1, options:["intimidacao"] },                 // Alfa Instintivo
     ]
+  },
+  filhosdoveu:{
+    origem:{ type:"skill", amount:1, options:["ocultismo","intimidacao"] },
+    caminhos:[ null, null, null ], // Marcado / Amaldiçoado / Fractus — nível 1 concede só habilidades especiais
   },
 };
 
@@ -1165,14 +1397,14 @@ const CHAGAS = {
   protecao:[
     {nome:"Cicatrizes Compartilhadas", efeito:`Você pode absorver parte do dano que um aliado iria sofrer.`, custo:"1 de Resiliência", colateral:`Você sofre metade do dano, mesmo que a origem seja sobrenatural.`},
     {nome:"Sopro do Vazio", efeito:`Ao sussurrar em voz baixa, pode causar terror profundo em um alvo humanoide.`, custo:"1 de Resiliência", colateral:`O sussurrante ouve vozes por 1d4 horas.`},
-    {nome:"Olhos Reversos", efeito:`Pode ver entidades ocultas por 1d6 turnos.`, custo:"1 de Resiliência", colateral:`-10% em testes sociais até o fim da cena (pupilas inumanas).`},
+    {nome:"Olhos Reversos", efeito:`Pode ver entidades ocultas por 1d6 turnos.`, custo:"1 de Resiliência", colateral:`-2 em testes sociais até o fim da cena (pupilas inumanas).`},
     {nome:"Sangue que Queima", efeito:`Ao sofrer dano físico, pode causar 1d6 de dano espiritual no atacante.`, custo:"1 de Resiliência", colateral:`Perde 1d4 PV adicionais no turno seguinte.`},
-    {nome:"Voz da Ausência", efeito:`Pode emitir uma onda de silêncio absoluto em um raio de 10m (1 turno).`, custo:"1 de Resiliência", colateral:`Sofre -20% em testes de VON por 1 cena.`},
+    {nome:"Voz da Ausência", efeito:`Pode emitir uma onda de silêncio absoluto em um raio de 10m (1 turno).`, custo:"1 de Resiliência", colateral:`Sofre -4 em testes de VON por 1 cena.`},
     {nome:"Toque da Falha", efeito:`Pode desativar temporariamente um objeto tecnológico com o toque (drone, câmera, trava).`, custo:"1 de Resiliência", colateral:`Interferência magnética descontrolada afeta itens pessoais (perda temporária de 1 item eletrônico).`},
     {nome:"Grito Além do Véu", efeito:`Emite um grito que afasta entidades incorpóreas por 1d4 turnos.`, custo:"1 de Resiliência", colateral:`Fica mudo por 1d6 turnos.`},
     {nome:"Sombra Descolada", efeito:`Sua sombra pode agir independentemente por 1 turno, executando pequenas ações (abrir portas, distrair, pegar objetos).`, custo:"1 de Resiliência", colateral:`A sombra pode se mover sozinha por 1d4 turnos, causando paranoia.`},
-    {nome:"Maré do Abismo", efeito:`Encharca a área em um raio de 3m com escuridão viscosa. -20% para inimigos atacarem ou se moverem.`, custo:"1 de Resiliência", colateral:`Perde 1d10 de Sanidade ao fim do efeito.`},
-    {nome:"Manto do Vazio", efeito:`Ao entrar em área de penumbra ou escuridão total, seu corpo se mistura ao véu. Ganha +20% em Furtividade e Subterfúgio e pode ignorar 1 ataque direto por cena.`, custo:"1 de Resiliência por ativação (dura até sair da escuridão)", colateral:`Sua presença deixa rastros sombrios — criaturas sensíveis ao Véu te detectam com mais facilidade por 1 hora.`},
+    {nome:"Maré do Abismo", efeito:`Encharca a área em um raio de 3m com escuridão viscosa. -4 para inimigos em testes de ataque ou movimento.`, custo:"1 de Resiliência", colateral:`Perde 1d10 de Sanidade ao fim do efeito.`},
+    {nome:"Manto do Vazio", efeito:`Ao entrar em área de penumbra ou escuridão total, seu corpo se mistura ao véu. Ganha +4 em Furtividade e Subterfúgio e pode ignorar 1 ataque direto por cena.`, custo:"1 de Resiliência por ativação (dura até sair da escuridão)", colateral:`Sua presença deixa rastros sombrios — criaturas sensíveis ao Véu te detectam com mais facilidade por 1 hora.`},
   ],
   combate:[
     {nome:"Mente Paralela", efeito:`Ganha um turno adicional em combate (apenas para movimento ou percepção).`, custo:"1 de Resiliência", colateral:`Alucina durante o próximo turno.`},
@@ -1182,11 +1414,11 @@ const CHAGAS = {
     {nome:"Espasmo da Fera", efeito:`Seus tendões se contraem violentamente. Recebe +2 em FOR para testes e danos físicos até o final da cena.`, custo:"1 de Resiliência", colateral:`Ao final da cena, sofre 1 Strike automático pela tensão muscular extrema.`},
     {nome:"Sopro Carmesim", efeito:`Canalizando fúria sobrenatural, pode atacar duas vezes no mesmo turno com armas brancas.`, custo:"1 de Resiliência", colateral:`Seus olhos sangram e sua pressão interna se desregula — testes de VON sofrem -2 por 1 cena.`},
     {nome:"Espinha Fragmentada", efeito:`Pode realizar uma manobra impossível (torcer o corpo, atravessar um espaço minúsculo). Ganha +4 em um teste de AGI ou de esquiva física.`, custo:"1 de Resiliência", colateral:`A manobra desloca sua coluna de forma dolorosa — sofre -1 PV imediato e -1 em qualquer teste de movimentação por 1 cena.`},
-    {nome:"Fúria da Lâmina Viva", efeito:`Ao entrar em combate corpo a corpo, entra em fúria controlada. Ganha +10% em testes com armas brancas e ignora penalidades por ferimentos até o fim do combate.`, custo:"1 de Resiliência por combate ativado", colateral:`Após o combate, sente dores intensas e recebe -10% em qualquer teste físico até descansar.`},
+    {nome:"Fúria da Lâmina Viva", efeito:`Ao entrar em combate corpo a corpo, entra em fúria controlada. Ganha +2 em testes com armas brancas e ignora penalidades por ferimentos até o fim do combate.`, custo:"1 de Resiliência por combate ativado", colateral:`Após o combate, sente dores intensas e recebe -2 em qualquer teste físico até descansar.`},
     {nome:"Corte do Véu", efeito:`Seus ataques corpo a corpo podem atingir criaturas parcialmente fora da realidade. Armas brancas empunhadas por você causam dano mágico.`, custo:"1 de Resiliência por ataque que ignora intangibilidade", colateral:`Sua arma se torna instável — a cada 3 usos deve ser reforjada com um ritual simples, ou se quebra ao falhar.`},
     {nome:"Eco Sangrento", efeito:`Quando acerta um golpe crítico com arma branca, pode gastar 1 Resiliência para causar hemorragia (dano contínuo por 1d4 turnos).`, custo:"1 de Resiliência por ativação", colateral:`Role 1d6: com resultado 1-2, você sofre 1 PV de dano.`},
     {nome:"Sombra Enraizada", efeito:`Pode usar sua própria sombra como extensão do corpo. Uma vez por cena, pode atacar à distância com a sombra (alcance de até 5 metros).`, custo:"2 de Resiliência", colateral:`Enquanto a sombra estiver ativa, luz intensa causa dano extra em você (+1d6 por fontes de luz sagrada ou mágica).`},
-    {nome:"Comando das Sombras", efeito:`Comanda todas as sombras ao redor em um raio de 13m², que podem ser moldadas e usadas da forma que quiser.`, custo:"2 de Resiliência", colateral:`Logo após o uso, perde 15 pontos de Sanidade e -20% em testes de VON durante 2 cenas, ficando incapaz de agir durante 2 turnos.`},
+    {nome:"Comando das Sombras", efeito:`Comanda todas as sombras ao redor em um raio de 13m², que podem ser moldadas e usadas da forma que quiser.`, custo:"2 de Resiliência", colateral:`Logo após o uso, perde 15 pontos de Sanidade e -4 em testes de VON durante 2 cenas, ficando incapaz de agir durante 2 turnos.`},
   ],
   cura:[
     {nome:"Toque da Carne Costurada", efeito:`Ao tocar um aliado, cura instantaneamente 1d4 PV.`, custo:"1 de Resiliência", colateral:`A área tocada fica com cicatrizes grotescas e visíveis, mesmo após a cura.`},
@@ -1195,8 +1427,8 @@ const CHAGAS = {
     {nome:"Curandeiro do Véu", efeito:`Sempre que usar um ritual de cura, pode repetir a rolagem de cura uma vez.`, custo:"Passivo", colateral:`Vozes de pacientes falecidos sussurram durante os rituais — role 1d4 de perda de Sanidade.`},
   ],
   runico:[
-    {nome:"Marcar da Carne", efeito:`Cortes com lâminas insculpidas com símbolos rúnicos são mais precisos. Ganha +15% ao atacar criaturas que tenham corpo físico.`, custo:"2 de Resiliência", colateral:`Dura 2 horas; enquanto ativo, rolagens de Sanidade sofrem -10%.`},
-    {nome:"Pele de Códice", efeito:`Projeta símbolos arcanos em sua pele, recebendo +10% em Ocultismo e Rituais por 1 cena.`, custo:"1 de Resiliência", colateral:`Sofre -1d6 de Sanidade ao término, devido à exposição às inscrições.`},
+    {nome:"Marcar da Carne", efeito:`Cortes com lâminas insculpidas com símbolos rúnicos são mais precisos. Ganha +3 ao atacar criaturas que tenham corpo físico.`, custo:"2 de Resiliência", colateral:`Dura 2 horas; enquanto ativo, rolagens de Sanidade sofrem -2.`},
+    {nome:"Pele de Códice", efeito:`Projeta símbolos arcanos em sua pele, recebendo +2 em Ocultismo e Rituais por 1 cena.`, custo:"1 de Resiliência", colateral:`Sofre -1d6 de Sanidade ao término, devido à exposição às inscrições.`},
   ],
 };
 
@@ -1212,19 +1444,19 @@ const RITUAIS = {
     {nome:"Bênção dos Ligamentos Ocultos (Simples)", descricao:`O executor massageia rituais em espiral nos próprios braços ou pernas.`, componentes:"Nenhum", efeito:`Ignora penalidades por ferimentos em locomoção ou ataque por 1d4 turnos.`, tempo:"Ação rápida", falha:`Sofre -1 em testes de atributos físicos por entorpecimento.`},
     {nome:"Corrente Espectral (Médio)", descricao:`Recita palavras ritualísticas enquanto invoca um símbolo embaixo da entidade.`, componentes:"Estojo de Rituais (Crucifixo)", efeito:`Restringe o movimento de uma entidade por 1d4 turnos + 1d3 de dano.`, tempo:"1 turno / 5 minutos", falha:`A corrente se rompe e atinge o conjurador (1d6 dano espiritual).`},
     {nome:"Espiral de Sangue (Médio)", descricao:`Desenha um símbolo com o próprio sangue ao redor.`, componentes:"Sangue do próprio conjurador", efeito:`Marca o chão com um símbolo espiralado. Quem entra perde 1d4 de Sanidade.`, tempo:"1 turno / 5 minutos", falha:`O símbolo atrai uma presença por 1 cena.`},
-    {nome:"Vínculo Reverso (Médio)", descricao:`Recita palavras ritualísticas, criando uma corrente espiritual entre ele e o alvo.`, componentes:"Estojo de Rituais", efeito:`Desvia 50% do dano sofrido para o alvo vinculado por 1d4 turnos.`, tempo:"1 turno / 5 minutos", falha:`Ambos compartilham o dano completo.`},
+    {nome:"Vínculo Reverso (Médio)", descricao:`Recita palavras ritualísticas, criando uma corrente espiritual entre ele e o alvo.`, componentes:"Estojo de Rituais", efeito:`Desvia metade do dano sofrido para o alvo vinculado por 1d4 turnos.`, tempo:"1 turno / 5 minutos", falha:`Ambos compartilham o dano completo.`},
     {nome:"Muralha de Pele (Médio)", descricao:`O executor escreve um símbolo no próprio peito.`, componentes:"Estojo ritual", efeito:`Reduz em 1d6 o dano do próximo ataque recebido por 3 turnos.`, tempo:"1 turno / 5 minutos", falha:`Os músculos contraem de forma brusca; fica incapacitado de se mover por 2 turnos.`},
     {nome:"Véu da Escuridão (Avançado)", descricao:`Desenha um pentagrama com giz negro, recitando palavras de uma língua ritualística.`, componentes:"Estojo Avançado", efeito:`Cria uma área de escuridão sobrenatural por 1d5 turnos.`, tempo:"2 turnos / 10 minutos", falha:`O conjurador também fica cego por 1 turno.`},
     {nome:"Marca da Passagem (Avançado)", descricao:`Desenha uma marca em local escolhido como âncora, vinculando ponto de origem ao destino.`, componentes:"Estojo Avançado", efeito:`Marca um ponto usado como âncora para teleporte (1 uso por história; requer marca de destino previamente criada).`, tempo:"10 min para a marca + 2 turnos para teleporte", falha:`A marca invoca um Eco de nível aleatório.`},
     {nome:"Ritual da Quebra (Avançado)", descricao:`Desenha um símbolo no chão, alvo de joelhos no centro; desenha símbolo na testa do alvo recitando palavras antigas.`, componentes:"Estojo Avançado", efeito:`Rompe um pacto ou efeito espiritual que afeta o alvo ou aliado.`, tempo:"2 turnos / 10 minutos", falha:`A entidade possui o conjurador — deve resistir rolando 12 de VON durante 3 turnos.`},
   ],
   combate:[
-    {nome:"Predador Silencioso (Simples)", descricao:`Óleo ritualístico de sangue, carvão e ervas amargas aplicado na lâmina.`, componentes:"Estojo de Rituais", efeito:`A arma se torna silenciosa ao cortar e ignora armaduras leves por 1 cena.`, tempo:"1 turno / 5 minutos", falha:`A arma ganha -10% em testes por 1 hora devido à corrosão do unguento.`},
-    {nome:"Dança do Sangue Escorrido (Simples)", descricao:`Derrama uma gota do próprio sangue sobre a lâmina entoando um cântico rítmico.`, componentes:"Estojo de Rituais, 1 PV do executor", efeito:`Ganha +10% em Armas Brancas por 3 turnos.`, tempo:"Ação rápida", falha:`Perde mais 1 PV por exaustão mística.`},
+    {nome:"Predador Silencioso (Simples)", descricao:`Óleo ritualístico de sangue, carvão e ervas amargas aplicado na lâmina.`, componentes:"Estojo de Rituais", efeito:`A arma se torna silenciosa ao cortar e ignora armaduras leves por 1 cena.`, tempo:"1 turno / 5 minutos", falha:`A arma ganha -2 em testes por 1 hora devido à corrosão do unguento.`},
+    {nome:"Dança do Sangue Escorrido (Simples)", descricao:`Derrama uma gota do próprio sangue sobre a lâmina entoando um cântico rítmico.`, componentes:"Estojo de Rituais, 1 PV do executor", efeito:`Ganha +2 em Armas Brancas por 3 turnos.`, tempo:"Ação rápida", falha:`Perde mais 1 PV por exaustão mística.`},
     {nome:"Punho do Eco Fraturado (Simples)", descricao:`O executor estala os próprios dedos três vezes.`, componentes:"Nenhum", efeito:`O próximo ataque desarmado ignora armaduras leves.`, tempo:"Ação rápida", falha:`Sofre 1d4 de dano na mão usada.`},
     {nome:"Cicatriz na Mandíbula (Simples)", descricao:`O lutador corta levemente o próprio rosto.`, componentes:"Sangue do usuário", efeito:`Ganha +2 em ataques desarmados por 3 turnos.`, tempo:"1 turno / 5 minutos", falha:`Toma 2 de dano de sangramento por 2 turnos.`},
     {nome:"Corte do Além (Médio)", descricao:`Desenha um símbolo antigo sobre a lâmina com tinta de ossos moídos.`, componentes:"Estojo de Rituais", efeito:`O próximo ataque com a arma atinge criaturas mesmo em planos paralelos ou intangíveis.`, tempo:"1 turno / 5 minutos", falha:`O véu se enfraquece — invoca uma Complicação automática ao usar.`},
-    {nome:"Estouro dos Ossos (Médio)", descricao:`O executor quebra diversos ossos ritualísticos e usa o pó nos punhos.`, componentes:"Estojo de Rituais", efeito:`Recebe +1d3+2 de dano fixo no próximo ataque desarmado.`, tempo:"1 turno / 5 minutos", falha:`Sofre -10% em testes físicos por 1 cena (tensão muscular extrema).`},
+    {nome:"Estouro dos Ossos (Médio)", descricao:`O executor quebra diversos ossos ritualísticos e usa o pó nos punhos.`, componentes:"Estojo de Rituais", efeito:`Recebe +1d3+2 de dano fixo no próximo ataque desarmado.`, tempo:"1 turno / 5 minutos", falha:`Sofre -2 em testes físicos por 1 cena (tensão muscular extrema).`},
     {nome:"Espírito dos Punhos (Médio)", descricao:`O usuário prende um espírito em seu equipamento temporariamente.`, componentes:"Estojo de Rituais", efeito:`As armas de punho causam +2 de dano espiritual por 1d4 turnos.`, tempo:"2 turnos / 10 minutos", falha:`O espírito se revolta e se prende à arma, causando 1 de dano na durabilidade.`},
     {nome:"Armas do Juízo Final (Avançado)", descricao:`Uma inscrição complexa é feita ao redor do punho da arma com cinzas humanas.`, componentes:"Estojo de Rituais Avançado", efeito:`Durante 1 combate, seus golpes causam o dobro de dano.`, tempo:"2 turnos / 10 minutos", falha:`Se a arma for quebrada ou deixada para trás, torna-se ponto de ruptura do Véu e pode gerar um Eco de nível aleatório.`},
     {nome:"Chamar Sombras Antigas (Avançado)", descricao:`Desenha com giz negro um pentagrama; sombras surgem do chão e seguem o usuário.`, componentes:"Estojo de Rituais Avançado, ambiente escuro", efeito:`Pode manipular a sombra como uma arma viva (dano de arma leve, 1d6) por até 3 turnos.`, tempo:"2 turnos / 10 minutos", falha:`As sombras se revoltam e prendem o usuário no local, incapacitando-o por 3 turnos.`},
@@ -1260,8 +1492,8 @@ const WEAPON_TABLES = [
   { caption:"Itens de Arremesso", cols:["Item","Espaço","Dano","Efeito"], rows:[
     {nome:"Granada", espaco:1, dano:"3d20", extra:"Alcance 6m"},
     {nome:"Faca de Arremesso", espaco:1, dano:"1d6", extra:"—"},
-    {nome:"Granada de Fumaça", espaco:1, dano:"—", extra:"Cobre 10m; alvo direto -20% Percepção por 3 turnos"},
-    {nome:"Granada de Luz", espaco:1, dano:"—", extra:"-30% Percepção (2 turnos) e -10% em todas as perícias (4 turnos) na área"},
+    {nome:"Granada de Fumaça", espaco:1, dano:"—", extra:"Cobre 10m; alvo direto -3 de Percepção por 3 turnos"},
+    {nome:"Granada de Luz", espaco:1, dano:"—", extra:"Área de 3m: -4 Percepção (2 turnos) e -2 em todas as perícias (4 turnos)"},
     {nome:"Granada Incendiária / Molotov", espaco:1, dano:"1d5+3/turno", extra:"Área em chamas de 5m"},
   ]},
   { caption:"Armas de Fogo Simples", cols:["Arma","Dano","Alcance","Cap.","Esp."], rows:[
@@ -1286,10 +1518,10 @@ const WEAPON_TABLES = [
 
 const EQUIP_TABLES = [
   { caption:"Proteções", cols:["Item","Espaço","Efeito"], rows:[
-    {nome:"Colete Nível I", espacos:2, extra:"-2 Dano Físico, -3% AGI, resiste 3 hits"},
-    {nome:"Colete Nível II", espacos:3, extra:"-3 Dano Físico, -4% AGI, resiste 5 hits"},
-    {nome:"Colete Nível III", espacos:4, extra:"-4 Dano Físico, -5% AGI, resiste 7 hits"},
-    {nome:"Símbolo Consagrado", espacos:1, extra:"+10% contra possessão e medo sobrenatural (2 durabilidade)"},
+    {nome:"Colete Nível I", espacos:2, extra:"Reduz 2 de Dano Físico, -2 em testes de AGI, resiste 3 hits"},
+    {nome:"Colete Nível II", espacos:3, extra:"Reduz 3 de Dano Físico, -3 em testes de AGI, resiste 5 hits"},
+    {nome:"Colete Nível III", espacos:4, extra:"Reduz 4 de Dano Físico, -4 em testes de AGI, resiste 7 hits"},
+    {nome:"Símbolo Consagrado", espacos:1, extra:"+2 em testes contra possessão e medo sobrenatural (2 durabilidade)"},
     {nome:"Talismã", espacos:1, extra:"1 re-rolagem por sessão em testes de Sanidade (2 durabilidade)"},
   ]},
   { caption:"Equipamentos Gerais", cols:["Item","Espaço","Efeito"], rows:[
@@ -1298,7 +1530,7 @@ const EQUIP_TABLES = [
     {nome:"Estojo de Rituais Básico", espacos:2, extra:"Necessário para rituais simples e médios"},
     {nome:"Máscara de Gás", espacos:2, extra:"Evita gases venenosos"},
     {nome:"Lanterna UV", espacos:1, extra:"Revela símbolos ocultos, sangue, fluidos espectrais"},
-    {nome:"Gravador de Fenômenos", espacos:1, extra:"+10% Investigação contra entidades"},
+    {nome:"Gravador de Fenômenos", espacos:1, extra:"+2 em Investigação contra entidades"},
     {nome:"Correntes / Cordas", espacos:0, extra:"Amarração, fixação ou sustentação de cargas"},
     {nome:"Kit Médico P (1 uso)", espacos:1, extra:"Restaura 1d4 PV por uso"},
     {nome:"Kit Médico M (2 usos)", espacos:2, extra:"Restaura 1d7 PV por uso"},
@@ -1306,12 +1538,14 @@ const EQUIP_TABLES = [
     {nome:"Lente do Véu", espacos:1, extra:"Vê auras espirituais por 1 turno (1 uso/missão)"},
   ]},
   { caption:"Equipamentos Especiais (N.A. 4+)", cols:["Item","Espaço","Efeito"], rows:[
-    {nome:"Estojo de Rituais Avançados", espacos:3, extra:"Rituais avançados sem penalidade; +5% Ocultismo/Rituais"},
-    {nome:"Coldre Tático do Véu", espacos:2, extra:"Trocar de arma como ação gratuita; 1x/missão +10 Iniciativa"},
-    {nome:"Grimório Vazio", espacos:2, extra:"Armazena 3 rituais; permite ler sem rolagem; 2 rituais simples no mesmo turno"},
-    {nome:"Scanner de Realidade", espacos:1, extra:"+10% Investigação/Tecnologia em locais sobrenaturais; revela pista oculta 1x/missão"},
-    {nome:"Medalhão de Cristal", espacos:1, extra:"+5% Rituais, +5 VON; absorve 1 manifestação espiritual/sessão"},
-    {nome:"Diário do Inominado", espacos:2, extra:"+10% Percepção/Investigação ao estudar pistas; identifica entidade 1x/missão"},
+    {nome:"Estojo de Rituais Avançados", espacos:3, extra:"Permite realizar rituais avançados sem penalidades; +3 em testes de Ocultismo ou Rituais (sem este item, rituais avançados sofrem -5 e maior risco de falha crítica)"},
+    {nome:"Coldre Tático do Véu", espacos:2, extra:"Sacar e trocar de armas como ação gratuita; 1x/missão concede +4 de Iniciativa (AGI) no início de um combate"},
+    {nome:"Grimório Vazio", espacos:2, extra:"Armazena até 3 rituais aprendidos, lidos sem rolagem em condições ideais; permite usar até 2 rituais simples no mesmo turno"},
+    {nome:"Scanner de Realidade", espacos:1, extra:"+3 em testes de Investigação ou Tecnologia em locais sobrenaturais; 1x/sessão revela pistas ocultas ignoradas por meios normais"},
+    {nome:"Medalhão de Cristal", espacos:1, extra:"+3 em Rituais e +2 em testes de VON; pode absorver 1 manifestação espiritual por sessão (impede um ataque ou efeito sobrenatural)"},
+    {nome:"Diário do Inominado", espacos:2, extra:"+4 em Percepção ou Investigação ao estudar pistas; pode identificar e nomear uma entidade desconhecida por missão (revela fraqueza ou efeito especial)"},
+    {nome:"Gargantilha Animal", espacos:1, extra:"Conecta o animal que a usa diretamente ao dono (e vice-versa), permitindo ações em conjunto sem testes separados; o dono pode sincronizar o animal com um aliado próximo para 1 ataque conjunto"},
+    {nome:"Mini Kit de Cirurgias", espacos:2, extra:"Funciona como um kit médico comum (2d6 de cura, 4 usos — pode ser reabastecido ao máximo após esgotar); permite tratamentos avançados e pequenas cirurgias para traumas e feridas mais severas"},
   ]},
 ];
 
@@ -1320,6 +1554,10 @@ const EQUIP_TABLES = [
    ===================================================================== */
 let state = null;
 let saveTimer = null;
+// Atributo escolhido para acompanhar cada perícia num Teste combinado (dado da
+// Perícia + dado do Atributo). É apenas uma preferência de rolagem, não faz
+// parte da ficha salva — por isso fica fora de `state` e não é persistida.
+let skillAttrPick = {};
 
 function blankState(){
   return {
@@ -1328,12 +1566,12 @@ function blankState(){
     mesa: currentMesa,
     meta:{ nome:"", origem:"", idade:"", sexo:"", descFisica:"", na:1, pm:0, pe:0, historia:"", foto:"" },
     atributos:{ for:1, agi:1, int:1, car:1, von:1, vit:0 },
-    pericias: Object.fromEntries(SKILLS.map(s=>[s.key,20])),
+    pericias: Object.fromEntries(SKILLS.map(s=>[s.key,4])),
     caminho:{ pathIndex:null, n1:false, n2:false, n3:false, custom:{ nome:"", descricao:"", n1:"", n2:"", n3:"", buffs:[], debuffs:[] } },
     buffChoices:{ origem:"", caminho:"" },
     rollLog:[],
     trauma:{ tipo:"", desc:"", nomeCustom:"" },
-    sanidade:{ atual:100, max:100 },
+    sanidade:{ atual:50, max:50 },
     resiliencia:{ atual:1 },
     chagas:[],
     rituais:[],
@@ -1354,11 +1592,16 @@ function pvMax(){
   return base + state.atributos.vit*2;
 }
 function resilienciaMax(){
-  let m = Math.ceil(state.atributos.von/2);
-  if(state.meta.origem === "militar") m += 1;
+  // V2: "Sua resiliência é igual a sua Vontade (VON)."
+  let m = Number(state.atributos.von) || 0;
+  if(state.meta.origem === "filhosdoveu") m += 2; // Filhos do Véu: +2 pontos de Resiliência inicial
   return m;
 }
-function sanidadeSugestao(){ return 100 - state.chagas.length*10; }
+function sanidadeSugestao(){
+  // V2: Sanidade inicia em 50; a cada 1 ponto de VON, +2 SAN (máx. +10 com VON 5); cada Chaga reduz -5 SAN máx.
+  const vonBonus = Math.min(Number(state.atributos.von)||0, 5) * 2;
+  return 50 + vonBonus - state.chagas.length*5;
+}
 
 /* ---------- SINCRONIA: Sanidade (Trauma&Mente ⇄ Combate) e Resiliência (Chagas ⇄ Combate) ---------- */
 function setSanidadeAtual(v){
@@ -1378,7 +1621,8 @@ function setResilienciaAtual(v){
 }
 function strikesInfo(){
   const total = (Number(state.strikes.cabeca)||0) + (Number(state.strikes.tronco)||0) + (Number(state.strikes.membros)||0);
-  return { total, penalty: Math.floor(total/4), unconscious: total >= 9 };
+  // V2: a cada 3 Strikes, -1 em todos os testes (e +2 de dano extra nos ataques); 5 Strikes = colapso/inconsciência.
+  return { total, penalty: Math.floor(total/3), unconscious: total >= 5 };
 }
 function invMax(){ return 8 + Math.floor(state.atributos.agi/5); }
 function invUsed(){
@@ -1388,7 +1632,8 @@ function invUsed(){
 }
 function attrPointsSpent(){
   const a = state.atributos;
-  return (a.for-1)+(a.agi-1)+(a.int-1)+(a.car-1)+(a.von-1) + a.vit*2;
+  // V2: FOR/AGI/INT/CAR custam 1 ponto cada; VON e VIT custam 2 pontos cada (pool de 20).
+  return (a.for-1)+(a.agi-1)+(a.int-1)+(a.car-1) + (a.von-1)*2 + a.vit*2;
 }
 
 /* ---------- BUFFS (Origem/Caminho -> Perícias/Atributos) ---------- */
@@ -1414,6 +1659,11 @@ function activeBuffs(){
     if(state.caminho.n1 && state.caminho.pathIndex !== null && state.caminho.pathIndex !== "custom" && rules.caminhos && rules.caminhos[state.caminho.pathIndex]){
       const r = rules.caminhos[state.caminho.pathIndex];
       const key = r.options.length > 1 ? state.buffChoices.caminho : r.options[0];
+      if(key) out.push({ type:r.type, key, amount:r.amount, source:"Caminho" });
+    }
+    if(state.caminho.n1 && state.caminho.pathIndex !== null && state.caminho.pathIndex !== "custom" && rules.caminhosExtra && rules.caminhosExtra[state.caminho.pathIndex]){
+      const r = rules.caminhosExtra[state.caminho.pathIndex];
+      const key = r.options.length > 1 ? state.buffChoices.caminhoExtra : r.options[0];
       if(key) out.push({ type:r.type, key, amount:r.amount, source:"Caminho" });
     }
   }
@@ -1527,8 +1777,8 @@ function turnControlHTML(entry, kind, idx){
       </div>
       <div class="duration-status">
         ${ativa
-          ? `<span class="st-on">🟢 Ativa — ${restantes} turno${restantes===1?"":"s"} restante${restantes===1?"":"s"}</span>`
-          : `<span class="st-off">⚪ Inativa — sem efeito no momento</span>`}
+          ? `<span class="status-line"><span class="status-dot is-on"></span><span class="status-text st-on">Ativa — ${restantes} turno${restantes===1?"":"s"} restante${restantes===1?"":"s"}</span></span>`
+          : `<span class="status-line"><span class="status-dot"></span><span class="status-text st-off">Inativa — sem efeito no momento</span></span>`}
       </div>
       <div class="duration-actions">
         ${ativa
@@ -1616,7 +1866,7 @@ function postUseControlHTML(entry, kind, idx){
       <span class="post-use-title">Debuff pós-uso</span>
       <p class="post-use-hint">Só passa a valer depois que o efeito ativo acima terminar (ou for desligado). Escolha por quantos turnos ele dura e aplique quando quiser.</p>
       ${ativo
-        ? `<div class="duration-status"><span class="st-on" style="color:var(--blood-bright);">🔴 Ativo — ${restantes} turno${restantes===1?"":"s"} restante${restantes===1?"":"s"}</span></div>
+        ? `<div class="duration-status"><span class="status-line"><span class="status-dot is-post"></span><span class="status-text st-post">Ativo — ${restantes} turno${restantes===1?"":"s"} restante${restantes===1?"":"s"}</span></span></div>
            <div class="duration-actions">
              <button type="button" class="btn-turn btn-secondary" data-post-turn-minus="${kind}:${idx}">-1 Turno</button>
              <button type="button" class="btn-turn btn-turn-off" data-post-turn-off="${kind}:${idx}">Encerrar agora</button>
@@ -1821,12 +2071,15 @@ function wirePassiveBuffControls(containerId, arrGetter, renderFn){
   el.addEventListener("input", e => handleFieldEvent(e, false));
   el.addEventListener("change", e => handleFieldEvent(e, true));
 }
-function skillCap(){ return (Number(state.meta.na)||0) >= 9 ? 85 : 80; }
+function skillCap(){ return (Number(state.meta.na)||0) >= 9 ? 14 : 12; }
 function skillBonus(key){ return activeBuffs().filter(b=>b.type==="skill" && (b.key===key || b.key==="todos")).reduce((s,b)=>s+b.amount,0); }
 function skillRawTotal(key){ return (Number(state.pericias[key])||0) + skillBonus(key); }
 function skillTotal(key){ return clampInt(skillRawTotal(key), 0, skillCap()); }
 function skillOverCap(key){ return skillRawTotal(key) > skillCap(); }
-function attrCap(key){ return key === "vit" ? 5 : 20; }
+function attrCap(key){
+  if(key === "vit" || key === "von") return 5;
+  return (Number(state.meta.na)||0) >= 9 ? 14 : 12;
+}
 function attrBonus(key){ return activeBuffs().filter(b=>b.type==="attr" && (b.key===key || b.key==="todos")).reduce((s,b)=>s+b.amount,0); }
 function attrRawTotal(key){ return (Number(state.atributos[key])||0) + attrBonus(key); }
 function attrTotal(key){ return Math.min(attrRawTotal(key), attrCap(key)); }
@@ -1880,6 +2133,40 @@ function renderRollLog(){
   }
 }
 
+/* ---------- ROLAGEM DE ATRIBUTOS E PERÍCIAS ----------
+   Usa a mesma infraestrutura de dados acima (d, pushRoll) para dar suporte
+   direto ao teste do sistema: "dado do Atributo + dado da Perícia, somados
+   e comparados à DT. Dois dados iguais e ≥6 = sucesso crítico. Todos os
+   dados em 1 = falha crítica." (ver referência em Perícias). */
+function rollAttrDie(key){
+  const a = ATTRS.find(x => x.key === key); if(!a) return;
+  const sides = Number(dieForPoints(attrTotal(key)).slice(1));
+  const r = d(sides);
+  let suffix = "";
+  if(r === sides) suffix = " (valor máximo do dado)";
+  else if(r === 1) suffix = " (valor mínimo do dado)";
+  pushRoll({ text: `${a.nome}: d${sides} → ${r}${suffix}`, crit: r===sides, fail: r===1 });
+}
+function rollSkillTest(key){
+  const s = SKILLS.find(x => x.key === key); if(!s) return;
+  const attrKey = skillAttrPick[key] || "for";
+  const a = ATTRS.find(x => x.key === attrKey) || ATTRS[0];
+  const skillSides = Number(dieForPoints(skillTotal(key)).slice(1));
+  const attrSides = Number(dieForPoints(attrTotal(attrKey)).slice(1));
+  const rSkill = d(skillSides);
+  const rAttr = d(attrSides);
+  const sum = rSkill + rAttr;
+  const critSuccess = rSkill === rAttr && rSkill >= 6;
+  const critFail = rSkill === 1 && rAttr === 1;
+  let suffix = "";
+  if(critSuccess) suffix = " — Sucesso Crítico!";
+  else if(critFail) suffix = " — Falha Crítica!";
+  pushRoll({
+    text: `Teste de ${s.nome} (d${skillSides}→${rSkill}) + ${a.nome} (d${attrSides}→${rAttr}) = ${sum}${suffix}`,
+    crit: critSuccess, fail: critFail
+  });
+}
+
 /* ---------- GASTO DE RESILIÊNCIA ---------- */
 function parseResilienciaCost(text){
   if(!text) return 0;
@@ -1902,9 +2189,23 @@ function spendResiliencia(cost, label){
 /* =====================================================================
    RENDER
    ===================================================================== */
+// Preenche a barrinha de progresso de um vital (PV/Sanidade/Resiliência) e
+// aplica uma cor de estado (normal / atenção / crítico) conforme o quanto
+// resta do total — leitura rápida durante a mesa, sem precisar fazer conta.
+function setVitalFill(fillId, atual, max){
+  const el = document.getElementById(fillId);
+  if(!el) return;
+  const a = Number(atual) || 0;
+  const m = Number(max) || 0;
+  const pct = m > 0 ? Math.max(0, Math.min(1, a / m)) : 0;
+  el.style.width = (pct * 100) + "%";
+  el.classList.remove("is-warn", "is-crit");
+  if(m > 0 && pct <= 0.25) el.classList.add("is-crit");
+  else if(m > 0 && pct <= 0.5) el.classList.add("is-warn");
+}
 function renderAll(){
   $("#ptsUsed").textContent = attrPointsSpent();
-  const rem = 30 - attrPointsSpent();
+  const rem = 20 - attrPointsSpent();
   const remEl = $("#ptsRemaining");
   remEl.textContent = rem + " restantes";
   remEl.classList.toggle("over-budget", rem < 0);
@@ -1912,7 +2213,7 @@ function renderAll(){
   $("#f-pvMax").value = pvMax();
   $("#f-resMax").value = resilienciaMax();
   const resMax2 = $("#f-resMax2"); if(resMax2) resMax2.value = resilienciaMax();
-  $("#sanHint").textContent = "Sugestão com base nas Chagas atuais: " + sanidadeSugestao() + " (cada nova Chaga reduz a Sanidade máxima em 10).";
+  $("#sanHint").textContent = "Sugestão (Base 50 + até +10 por VON, ajustável com o Mestre): " + sanidadeSugestao() + " — cada nova Chaga reduz a Sanidade máxima em 5.";
   const sanHint2 = $("#sanHint2"); if(sanHint2) sanHint2.textContent = $("#sanHint").textContent;
 
   const si = strikesInfo();
@@ -1928,6 +2229,9 @@ function renderAll(){
   $("#vitalRES").textContent = state.resiliencia.atual + " / " + resilienciaMax();
   $("#vitalNA").textContent = state.meta.na;
   $("#vitalStrikes").textContent = si.total + (si.penalty ? " (-" + si.penalty + ")" : "");
+  setVitalFill("vitalPVFill", state.pv.atual, pvMax());
+  setVitalFill("vitalSANFill", state.sanidade.atual, state.sanidade.max);
+  setVitalFill("vitalRESFill", state.resiliencia.atual, resilienciaMax());
 
   renderMarcasStatus();
   renderBuffBadges();
@@ -1940,14 +2244,15 @@ function renderBuffBadges(){
     if(!el) return;
     const bonus = skillBonus(s.key);
     const overCap = skillOverCap(s.key);
+    const dado = "dado " + dieForPoints(skillTotal(s.key));
     if(overCap){
-      el.textContent = "⚠ " + skillRawTotal(s.key) + "% ultrapassa o limite de " + skillCap() + "% — capado em " + skillTotal(s.key) + "% (base " + (Number(state.pericias[s.key])||0) + "%" + (bonus?" +"+bonus+"%":"") + ")";
+      el.textContent = "⚠ " + skillRawTotal(s.key) + " ultrapassa o limite de " + skillCap() + " — capado em " + skillTotal(s.key) + " (base " + (Number(state.pericias[s.key])||0) + (bonus?" +"+bonus:"") + ") — " + dado;
       el.classList.add("over-cap"); el.classList.remove("has-bonus");
     } else if(bonus){
-      el.textContent = "Total: " + skillTotal(s.key) + "% (base " + (Number(state.pericias[s.key])||0) + "% +" + bonus + "%)";
+      el.textContent = "Total: " + skillTotal(s.key) + " (base " + (Number(state.pericias[s.key])||0) + " +" + bonus + ") — " + dado;
       el.classList.add("has-bonus"); el.classList.remove("over-cap");
     } else {
-      el.textContent = "";
+      el.textContent = dado;
       el.classList.remove("has-bonus"); el.classList.remove("over-cap");
     }
   });
@@ -1956,14 +2261,15 @@ function renderBuffBadges(){
     if(!el) return;
     const bonus = attrBonus(a.key);
     const overCap = attrOverCap(a.key);
+    const dado = a.rollable ? ("dado " + dieForPoints(attrTotal(a.key))) : "";
     if(overCap){
-      el.textContent = "⚠ " + attrRawTotal(a.key) + " ultrapassa o limite de " + attrCap(a.key) + " — capado em " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + (bonus?" +"+bonus:"") + ")";
+      el.textContent = "⚠ " + attrRawTotal(a.key) + " ultrapassa o limite de " + attrCap(a.key) + " — capado em " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + (bonus?" +"+bonus:"") + ")" + (dado?" — "+dado:"");
       el.classList.add("over-cap"); el.classList.remove("has-bonus");
     } else if(bonus){
-      el.textContent = "Total: " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + " +" + bonus + ")";
+      el.textContent = "Total: " + attrTotal(a.key) + " (base " + (Number(state.atributos[a.key])||0) + " +" + bonus + ")" + (dado?" — "+dado:"");
       el.classList.add("has-bonus"); el.classList.remove("over-cap");
     } else {
-      el.textContent = "";
+      el.textContent = dado;
       el.classList.remove("has-bonus"); el.classList.remove("over-cap");
     }
   });
@@ -1974,9 +2280,10 @@ function renderMarcasStatus(){
   $("#marcasCount").textContent = count;
   const statusEl = $("#marcasStatus");
   let text, cls;
-  if(count <= 2){ text = "Sem efeitos negativos (1–2 marcas)"; cls = "ok-text"; }
-  else if(count <= 4){ text = "Debuff narrativo em testes e interações sociais (3–4 marcas)"; cls = "warn-text"; }
-  else { text = "Chama atenção de Ecos e sensíveis ao sobrenatural (5+ marcas)"; cls = "warn-text"; }
+  if(count <= 1){ text = "Sem efeitos negativos (0–1 marca)"; cls = "ok-text"; }
+  else if(count === 2){ text = "Debuff narrativo em testes e interações sociais (2 marcas)"; cls = "warn-text"; }
+  else if(count <= 4){ text = "Chama atenção de Ecos e sensíveis ao sobrenatural (3–4 marcas)"; cls = "warn-text"; }
+  else { text = "Ecos agem de forma mais agressiva contra você (5 marcas — limite do corpo)"; cls = "warn-text"; }
   statusEl.textContent = text;
   statusEl.className = cls;
 }
@@ -2000,7 +2307,7 @@ function renderOriginCard(){
   if(r.options.length > 1){
     box.innerHTML = `
       <div class="buff-choice">
-        <label for="f-buffOrigem">Aplicar bônus de Origem (+${r.amount}${r.type==="skill"?"%":""}) em</label>
+        <label for="f-buffOrigem">Aplicar bônus de Origem (+${r.amount} ${r.type==="skill"?"ponto(s)":"ponto(s) de atributo"}) em</label>
         <select id="f-buffOrigem">
           <option value="">— escolha —</option>
           ${r.options.map(k => {
@@ -2012,7 +2319,7 @@ function renderOriginCard(){
   } else {
     const k = r.options[0];
     const nome = r.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
-    box.innerHTML = `<p class="buff-fixed-note">Bônus automático aplicado: +${r.amount}${r.type==="skill"?"%":""} em ${esc(nome||k)}.</p>`;
+    box.innerHTML = `<p class="buff-fixed-note">Bônus automático aplicado: +${r.amount} em ${esc(nome||k)}.</p>`;
   }
   const sel = $("#f-buffOrigem");
   if(sel) sel.addEventListener("change", e=>{ state.buffChoices.origem = e.target.value; onChange(); });
@@ -2070,7 +2377,7 @@ function renderPathLevels(){
     if(cr.options.length > 1){
       n1BuffHtml = `
         <div class="buff-choice">
-          <label for="f-buffCaminho">Aplicar bônus (+${cr.amount}${cr.type==="skill"?"%":""}) em</label>
+          <label for="f-buffCaminho">Aplicar bônus (+${cr.amount} ${cr.type==="skill"?"ponto(s)":"ponto(s) de atributo"}) em</label>
           <select id="f-buffCaminho">
             <option value="">— escolha —</option>
             ${cr.options.map(k => {
@@ -2082,8 +2389,14 @@ function renderPathLevels(){
     } else {
       const k = cr.options[0];
       const nome = cr.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
-      n1BuffHtml = `<p class="buff-fixed-note">Bônus automático aplicado: +${cr.amount}${cr.type==="skill"?"%":""} em ${esc(nome||k)}.</p>`;
+      n1BuffHtml = `<p class="buff-fixed-note">Bônus automático aplicado: +${cr.amount} em ${esc(nome||k)}.</p>`;
     }
+  }
+  const crExtra = rules && rules.caminhosExtra ? rules.caminhosExtra[idx] : null;
+  if(crExtra && state.caminho.n1 && crExtra.options.length === 1){
+    const k = crExtra.options[0];
+    const nome = crExtra.type==="skill" ? (SKILLS.find(s=>s.key===k)||{}).nome : (ATTRS.find(a=>a.key===k)||{}).nome;
+    n1BuffHtml += `<p class="buff-fixed-note">Bônus automático aplicado: +${crExtra.amount} em ${esc(nome||k)}.</p>`;
   }
 
   wrap.innerHTML = `
@@ -2199,12 +2512,15 @@ function renderChagas(){
   el.innerHTML = list.map((c,i) => `
     <div class="entry-card ${isEntryEffectActive(c)?"is-active-effect":(isPostUseActive(c)?"is-postuse-active":"is-inactive-effect")}" data-idx="${i}">
       <div class="entry-card-head">
+        <button type="button" class="entry-toggle" data-toggle-collapse aria-label="Recolher ou expandir esta Chaga">⌄</button>
         <select class="entry-select" data-field="preset">
           <option value="">— Personalizada —</option>
           ${chagaOptionsHTML(c.presetKey)}
         </select>
         <button type="button" class="btn-remove" title="Remover">✕</button>
       </div>
+      <p class="entry-title" data-fallback="Sem nome">${esc(c.nome) || "Sem nome"}</p>
+      <div class="entry-card-body">
       <div class="field"><label>Nome</label><input type="text" data-field="nome" value="${esc(c.nome)}"></div>
       <div class="field"><label>Efeito</label><textarea data-field="efeito" rows="2">${esc(c.efeito)}</textarea></div>
       <div class="field"><label>Custo</label><input type="text" data-field="custo" value="${esc(c.custo)}"></div>
@@ -2215,6 +2531,7 @@ function renderChagas(){
       ${turnControlHTML(c, "chaga", i)}
       ${posDebuffFieldsHTML(c)}
       ${postUseControlHTML(c, "chaga", i)}
+      </div>
     </div>`).join("");
 }
 
@@ -2225,12 +2542,15 @@ function renderRituais(){
   el.innerHTML = list.map((r,i) => `
     <div class="entry-card ${isEntryEffectActive(r)?"is-active-effect":"is-inactive-effect"}" data-idx="${i}">
       <div class="entry-card-head">
+        <button type="button" class="entry-toggle" data-toggle-collapse aria-label="Recolher ou expandir este Ritual">⌄</button>
         <select class="entry-select" data-field="preset">
           <option value="">— Personalizado —</option>
           ${ritualOptionsHTML(r.presetKey)}
         </select>
         <button type="button" class="btn-remove" title="Remover">✕</button>
       </div>
+      <p class="entry-title" data-fallback="Sem nome">${esc(r.nome) || "Sem nome"}</p>
+      <div class="entry-card-body">
       <div class="field"><label>Nome</label><input type="text" data-field="nome" value="${esc(r.nome)}"></div>
       <div class="field"><label>Descrição</label><textarea data-field="descricao" rows="2">${esc(r.descricao)}</textarea></div>
       <div class="field-grid-2">
@@ -2242,6 +2562,7 @@ function renderRituais(){
       <div class="field falha-critica-field"><label>Falha Crítica</label><textarea data-field="falha" rows="2" placeholder="O que acontece se o ritual falhar criticamente">${esc(r.falha)}</textarea></div>
       ${buffFieldsHTML(r)}
       ${turnControlHTML(r, "ritual", i)}
+      </div>
     </div>`).join("");
 }
 
@@ -2284,9 +2605,12 @@ function renderMarcas(){
     el.innerHTML = list.map((m,i) => `
       <div class="entry-card marca-card" data-idx="${i}">
         <div class="entry-card-head">
-          <div class="entry-select" style="font-family:var(--font-display); color:var(--arcane-bright); letter-spacing:.04em; font-size:14px;">Marca #${i+1}</div>
+          <button type="button" class="entry-toggle" data-toggle-collapse aria-label="Recolher ou expandir esta Marca">⌄</button>
+          <span class="entry-kicker">Marca #${i+1}</span>
           <button type="button" class="btn-remove" title="Remover">✕</button>
         </div>
+        <p class="entry-title" data-fallback="Sem nome">${esc(m.nome) || "Sem nome"}</p>
+        <div class="entry-card-body">
         <div class="target-toggle">
           <label><input type="radio" name="marcaTarget${i}" value="corpo" data-field="alvoTipo" ${m.alvoTipo!=="item"?"checked":""}> No Corpo</label>
           <label><input type="radio" name="marcaTarget${i}" value="item" data-field="alvoTipo" ${m.alvoTipo==="item"?"checked":""}> Em Item/Arma</label>
@@ -2295,15 +2619,16 @@ function renderMarcas(){
           <div class="field"><label>Nome da Marca</label><input type="text" data-field="nome" value="${esc(m.nome)}" placeholder="Ex: Runa de Ferro"></div>
           <div class="field"><label>${m.alvoTipo==="item" ? "Item/Arma Marcada" : "Local no Corpo"}</label><input type="text" data-field="alvoNome" value="${esc(m.alvoNome)}" placeholder="${m.alvoTipo==="item" ? "Ex: Espada Tática" : "Ex: Antebraço direito"}"></div>
         </div>
-        <div class="field"><label>Efeito Permanente</label><textarea data-field="efeito" rows="2" placeholder="Ex: +5% em Armas Brancas contra criaturas físicas">${esc(m.efeito)}</textarea></div>
+        <div class="field"><label>Efeito Permanente</label><textarea data-field="efeito" rows="2" placeholder="Ex: +1 em Armas Brancas contra criaturas físicas">${esc(m.efeito)}</textarea></div>
         <div class="field-grid-2">
           <div class="field"><label>Ritual Usado</label><input type="text" data-field="ritual" value="${esc(m.ritual)}" placeholder="Ex: Marca da Carne"></div>
-          <div class="field"><label>Teste (mín. 50% recomendado)</label><input type="text" data-field="teste" value="${esc(m.teste)}" placeholder="Ex: Ocultismo 55%"></div>
+          <div class="field"><label>Teste (mín. 10+ pontos recomendado)</label><input type="text" data-field="teste" value="${esc(m.teste)}" placeholder="Ex: Ocultismo 10"></div>
         </div>
         <div class="field"><label>Custo de Ativação (se houver)</label><input type="text" data-field="custo" value="${esc(m.custo||"")}" placeholder="Ex: 2 de Resiliência (deixe em branco se não houver custo)"></div>
         ${buffFieldsHTML(m)}
         <div class="entry-card-foot">
           <button type="button" class="btn-use" data-use-marca="${i}">🔥 Gravar/Ativar Marca${parseResilienciaCost(m.custo) ? " (-"+parseResilienciaCost(m.custo)+" Resiliência)" : ""}</button>
+        </div>
         </div>
       </div>`).join("");
   }
@@ -2318,9 +2643,12 @@ function renderMaldicoes(){
   el.innerHTML = list.map((m,i) => `
     <div class="entry-card maldicao-card ${isEntryEffectActive(m)?"is-active-effect":(isPostUseActive(m)?"is-postuse-active":"is-inactive-effect")}" data-idx="${i}">
       <div class="entry-card-head">
-        <div class="entry-select" style="font-family:var(--font-display); color:var(--blood-bright); letter-spacing:.04em; font-size:14px;">Maldição #${i+1}</div>
+        <button type="button" class="entry-toggle" data-toggle-collapse aria-label="Recolher ou expandir esta Maldição">⌄</button>
+        <span class="entry-kicker">Maldição #${i+1}</span>
         <button type="button" class="btn-remove" title="Remover">✕</button>
       </div>
+      <p class="entry-title" data-fallback="Sem nome">${esc(m.nome) || "Sem nome"}</p>
+      <div class="entry-card-body">
       <div class="target-toggle">
         <label><input type="radio" name="maldicaoTarget${i}" value="corpo" data-field="alvoTipo" ${m.alvoTipo!=="item"?"checked":""}> No Corpo</label>
         <label><input type="radio" name="maldicaoTarget${i}" value="item" data-field="alvoTipo" ${m.alvoTipo==="item"?"checked":""}> Em Item/Arma</label>
@@ -2331,8 +2659,8 @@ function renderMaldicoes(){
       </div>
       <div class="field"><label>Origem da Maldição</label><input type="text" data-field="origem" value="${esc(m.origem)}" placeholder="Ex: Falha crítica no ritual X / Pacto com NPC Y / Voluntária"></div>
       <div class="field-grid-2">
-        <div class="field"><label>Efeito Positivo (se houver)</label><textarea data-field="efeitoPositivo" rows="2" placeholder="Ex: +15% em Intimidação">${esc(m.efeitoPositivo)}</textarea></div>
-        <div class="field"><label>Efeito Negativo</label><textarea data-field="efeitoNegativo" rows="2" placeholder="Ex: -10% em testes sociais permanente">${esc(m.efeitoNegativo)}</textarea></div>
+        <div class="field"><label>Efeito Positivo (se houver)</label><textarea data-field="efeitoPositivo" rows="2" placeholder="Ex: +2 em Intimidação">${esc(m.efeitoPositivo)}</textarea></div>
+        <div class="field"><label>Efeito Negativo</label><textarea data-field="efeitoNegativo" rows="2" placeholder="Ex: -2 em testes sociais permanente">${esc(m.efeitoNegativo)}</textarea></div>
       </div>
       <div class="field"><label>Falha</label><textarea data-field="falhaNormal" rows="2" placeholder="O que acontece se o teste ligado a esta Maldição apenas falhar (sem ser crítico)">${esc(m.falhaNormal||"")}</textarea></div>
       <div class="field falha-critica-field"><label>Falha Crítica</label><textarea data-field="falhaCritica" rows="2" placeholder="O que acontece se o teste ligado a esta Maldição falhar criticamente">${esc(m.falhaCritica||"")}</textarea></div>
@@ -2343,6 +2671,7 @@ function renderMaldicoes(){
       ${posDebuffFieldsHTML(m)}
       ${postUseControlHTML(m, "maldicao", i)}
       ${passiveBuffFieldsHTML(m)}
+      </div>
     </div>`).join("");
 }
 
@@ -2360,9 +2689,12 @@ function renderNpcs(){
   el.innerHTML = list.map((n,i) => `
     <div class="entry-card npc-card" data-idx="${i}">
       <div class="entry-card-head">
-        <div class="entry-select" style="font-family:var(--font-display); color:var(--arcane-bright); letter-spacing:.04em; font-size:14px;">${esc(n.nome) || ("NPC #" + (i+1))}</div>
+        <button type="button" class="entry-toggle" data-toggle-collapse aria-label="Recolher ou expandir este NPC">⌄</button>
+        <span class="entry-kicker">NPC #${i+1}</span>
         <button type="button" class="btn-remove" title="Remover">✕</button>
       </div>
+      <p class="entry-title" data-fallback="Sem nome">${esc(n.nome) || "Sem nome"}</p>
+      <div class="entry-card-body">
       <div class="npc-card-head-row">
         <div class="photo-preview npc-photo-preview" data-npc-photo="${i}">${n.foto ? `<img src="${n.foto}" alt="Foto de ${esc(n.nome)}">` : "Sem foto"}</div>
         <div class="npc-card-fields">
@@ -2376,6 +2708,7 @@ function renderNpcs(){
       </div>
       <div class="field"><label>Lore</label><textarea data-field="lore" rows="3" placeholder="Quem é, de onde veio, o que sabe...">${esc(n.lore)}</textarea></div>
       <div class="field"><label>Personalidade</label><textarea data-field="personalidade" rows="2" placeholder="Traços marcantes, jeito de agir e falar...">${esc(n.personalidade)}</textarea></div>
+      </div>
     </div>`).join("");
 }
 
@@ -2403,6 +2736,13 @@ function wireEntryList(containerId, arrGetter, renderFn, onPreset){
     const field = e.target.dataset.field; if(!field || field==="preset") return;
     const idx = +card.dataset.idx;
     arrGetter()[idx][field] = e.target.value;
+    if(field === "nome"){
+      // Mantém o título recolhível do cartão sincronizado com o campo Nome
+      // sem precisar re-renderizar a lista inteira (o que tiraria o foco
+      // do campo a cada letra digitada).
+      const titleEl = card.querySelector(".entry-title");
+      if(titleEl) titleEl.textContent = e.target.value || titleEl.dataset.fallback || "Sem nome";
+    }
     onChange();
   });
   el.addEventListener("change", e=>{
@@ -2420,6 +2760,22 @@ function wireEntryList(containerId, arrGetter, renderFn, onPreset){
       arrGetter()[idx][field] = e.target.value;
       renderFn(); onChange();
     }
+  });
+}
+
+// Liga o botão de recolher/expandir de cada cartão de entrada (Chagas,
+// Rituais, Marcas, Maldições, NPCs). É puramente visual — não mexe no
+// estado salvo — por isso um único listener delegado serve pra lista
+// inteira, mesmo quando ela é reconstruída (presets, adicionar/remover).
+function wireCollapseToggle(containerId){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.addEventListener("click", e => {
+    const btn = e.target.closest("[data-toggle-collapse]");
+    if(!btn) return;
+    const card = btn.closest(".entry-card");
+    if(!card) return;
+    card.classList.toggle("is-collapsed");
   });
 }
 
@@ -2602,8 +2958,8 @@ function ensureAuth(){
    em cada ficha e todas as consultas ao Firestore são filtradas por ele.
    ===================================================================== */
 const MESAS = [
-  { id:"inicio-do-caos",        titulo:"Ecos do Véu", subtitulo:"Início do Caos" },
-  { id:"sob-o-banhar-do-luar",  titulo:"Ecos do Véu", subtitulo:"Sob o Banhar do Luar" },
+  { id:"Mesa God",        titulo:"Ecos do Véu", subtitulo:"Mesa God" },
+  { id:"Mesa Fox",  titulo:"Ecos do Véu", subtitulo:"Mesa Fox" },
   { id:"Personagens",       titulo:"Ecos do Véu", subtitulo:"Personagens" },
 ];
 const MESA_STORAGE_KEY = "veu_mesa_atual";
@@ -2760,13 +3116,20 @@ function buildStaticUI(){
       <label for="${a.id}">${esc(a.nome)}</label>
       <input type="number" id="${a.id}" min="${a.min}" max="${a.max}">
       <div class="attr-total" id="attrTotal-${a.key}"></div>
+      ${a.rollable ? `<button type="button" class="btn-roll" data-roll-attr="${a.key}" title="Rolar o dado de ${esc(a.nome)}">🎲 Rolar</button>` : ``}
     </div>`).join("");
 
   $("#skillsGrid").innerHTML = SKILLS.map(s => `
     <div class="skill-box" data-skill="${s.key}">
       <div class="skill-main">
         <label for="f-per-${s.key}">${esc(s.nome)}</label>
-        <input type="number" min="0" max="85" id="f-per-${s.key}">
+        <input type="number" min="0" max="14" id="f-per-${s.key}">
+      </div>
+      <div class="skill-roll">
+        <select data-skill-attr-pick="${s.key}" title="Atributo combinado neste teste" aria-label="Atributo combinado com ${esc(s.nome)}">
+          ${ATTRS.filter(a=>a.rollable).map(a => `<option value="${a.key}" ${(skillAttrPick[s.key]||"for")===a.key?"selected":""}>${a.key.toUpperCase()}</option>`).join("")}
+        </select>
+        <button type="button" class="btn-roll" data-roll-skill="${s.key}" title="Rolar teste de ${esc(s.nome)} (dado da Perícia + dado do Atributo escolhido)">🎲</button>
       </div>
       <div class="skill-total" id="skillTotal-${s.key}"></div>
     </div>`).join("");
@@ -2777,14 +3140,14 @@ function buildStaticUI(){
       <tbody>
         <tr><td class="num">1</td><td class="num">—</td><td>Acesso básico a rituais simples e armas de Fogo Simples.</td></tr>
         <tr><td class="num">2</td><td class="num">10</td><td>Acesso a armas táticas e rituais médios.</td></tr>
-        <tr><td class="num">3</td><td class="num">20</td><td>Armas de fogo táticas liberadas.</td></tr>
+        <tr><td class="num">3</td><td class="num">20</td><td>Armas de fogo táticas e Pactos liberados.</td></tr>
         <tr><td class="num">4</td><td class="num">35</td><td>Equipamentos especiais liberados.</td></tr>
-        <tr><td class="num">5</td><td class="num">50</td><td>Rituais avançados (com estojo).</td></tr>
-        <tr><td class="num">6</td><td class="num">70</td><td>Pode criar 1 arma especial personalizada.</td></tr>
-        <tr><td class="num">7</td><td class="num">95</td><td>Pode adquirir uma Chaga sem penalidade.</td></tr>
+        <tr><td class="num">5</td><td class="num">50</td><td>Rituais avançados liberados.</td></tr>
+        <tr><td class="num">6</td><td class="num">70</td><td>Pode criar/adquirir 1 arma especial personalizada.</td></tr>
+        <tr><td class="num">7</td><td class="num">95</td><td>Pode adquirir uma Chaga sem penalidade na Sanidade.</td></tr>
         <tr><td class="num">8</td><td class="num">125</td><td>Acesso à tecnologia experimental.</td></tr>
-        <tr><td class="num">9</td><td class="num">160</td><td>+5% em todas as Perícias, ultrapassando o limite máximo de 80% (máx. 85%).</td></tr>
-        <tr><td class="num">10</td><td class="num">200</td><td>Título de "Agente Sênior": item exclusivo, símbolo personalizado da V.E.U., pode treinar/liderar recrutas e tem prioridade no uso de relíquias e rituais proibidos.</td></tr>
+        <tr><td class="num">9</td><td class="num">160</td><td>+2 pontos em todas as Perícias, ultrapassando o limite máximo de 12 (máx. 14).</td></tr>
+        <tr><td class="num">10</td><td class="num">200</td><td>Conquista um título ("Agente Sênior"); recebe item exclusivo da V.E.U.; pode treinar/liderar recrutas; prioridade no uso de relíquias e rituais proibidos.</td></tr>
       </tbody>
     </table>`;
 
@@ -2792,27 +3155,29 @@ function buildStaticUI(){
     <table class="ref-table">
       <thead><tr><th>Evolução</th><th class="num">Custo</th></tr></thead>
       <tbody>
-        <tr><td>Aumentar Perícia (+1%)</td><td class="num">2 PE</td></tr>
-        <tr><td>Aumentar Atributo (+1)</td><td class="num">10 PE</td></tr>
+        <tr><td>Aumentar Atributo ou Perícia (+1)</td><td class="num">10 PE</td></tr>
         <tr><td>Adquirir nova Chaga</td><td class="num">15 PE</td></tr>
         <tr><td>Aprender novo Ritual</td><td class="num">15 PE</td></tr>
+        <tr><td>Adquirir uma Marca</td><td class="num">10 PE</td></tr>
+        <tr><td>Adquirir uma Maldição</td><td class="num">20 PE</td></tr>
         <tr><td>Caminho da Origem (Nível 1)</td><td class="num">15 PE</td></tr>
         <tr><td>Proficiência da Origem (Nível 2)</td><td class="num">25 PE</td></tr>
         <tr><td>Mestre da Origem (Nível 3)</td><td class="num">35 PE</td></tr>
       </tbody>
     </table>
     <table class="ref-table">
-      <caption>Proficiência de Perícias</caption>
-      <thead><tr><th class="num">%</th><th>Nível</th></tr></thead>
+      <caption>Proficiência de Perícias &amp; Atributos</caption>
+      <thead><tr><th class="num">Pontos</th><th class="num">Dado</th><th>Nível</th></tr></thead>
       <tbody>
-        <tr><td class="num">20</td><td>Iniciante — sucesso apenas em condições ideais.</td></tr>
-        <tr><td class="num">40</td><td>Aprendiz — pode falhar sob estresse ou pressão.</td></tr>
-        <tr><td class="num">50</td><td>Competente — eficaz, pode improvisar com risco moderado.</td></tr>
-        <tr><td class="num">60</td><td>Experiente — consistente em situações difíceis.</td></tr>
-        <tr><td class="num">65</td><td>Especialista — ações complexas com confiança.</td></tr>
-        <tr><td class="num">70</td><td>Mestre — sucesso quase certo, até em cenários extremos.</td></tr>
+        <tr><td class="num">4</td><td class="num">d4</td><td>Iniciante — compreende os conceitos básicos da perícia.</td></tr>
+        <tr><td class="num">6</td><td class="num">d6</td><td>Aprendiz — realiza tarefas simples.</td></tr>
+        <tr><td class="num">8</td><td class="num">d8</td><td>Competente — executa ações padrão de forma eficaz.</td></tr>
+        <tr><td class="num">10</td><td class="num">d10</td><td>Experiente — atua com consistência em situações difíceis.</td></tr>
+        <tr><td class="num">12</td><td class="num">d12</td><td>Mestre — sucesso quase certo, até em cenários extremos.</td></tr>
+        <tr><td class="num">14</td><td class="num">d14</td><td>Acima do limite — só com N.A. 9 ou habilidade/Origem específica do livro.</td></tr>
       </tbody>
-    </table>`;
+    </table>
+    <p class="hint" style="margin-top:8px;">Teste = dado do Atributo + dado da Perícia, somados e comparados à Dificuldade do Teste (DT base 7). Dois ou mais dados iguais e ≥6 = sucesso crítico automático. Todos os dados em 1 = falha crítica.</p>`;
 
   $("#refArmas").innerHTML = `<p class="hint" style="margin-top:0;">Clique em "+ Adicionar" para lançar o item direto na lista de Armas e Proteções Equipadas, sem digitar nada.</p>` +
     WEAPON_TABLES.map(renderWeaponCatalogTable).join("");
@@ -2872,17 +3237,31 @@ function bindEvents(){
   $("#f-descfisica").addEventListener("input", e => { state.meta.descFisica = e.target.value; onChange(); });
   $("#f-historia").addEventListener("input", e => { state.meta.historia = e.target.value; onChange(); });
 
-  $("#a-for").addEventListener("input", e => { state.atributos.for = clampInt(e.target.value,1,20); onChange(); });
-  $("#a-agi").addEventListener("input", e => { state.atributos.agi = clampInt(e.target.value,1,20); onChange(); });
-  $("#a-int").addEventListener("input", e => { state.atributos.int = clampInt(e.target.value,1,20); onChange(); });
-  $("#a-car").addEventListener("input", e => { state.atributos.car = clampInt(e.target.value,1,20); onChange(); });
-  $("#a-von").addEventListener("input", e => { state.atributos.von = clampInt(e.target.value,1,20); maybeTopUp(); onChange(); });
-  $("#a-vit").addEventListener("input", e => { state.atributos.vit = clampInt(e.target.value,0,5); maybeTopUp(); onChange(); });
+  $("#a-for").addEventListener("input", e => { state.atributos.for = clampInt(e.target.value,1,attrCap("for")); onChange(); });
+  $("#a-agi").addEventListener("input", e => { state.atributos.agi = clampInt(e.target.value,1,attrCap("agi")); onChange(); });
+  $("#a-int").addEventListener("input", e => { state.atributos.int = clampInt(e.target.value,1,attrCap("int")); onChange(); });
+  $("#a-car").addEventListener("input", e => { state.atributos.car = clampInt(e.target.value,1,attrCap("car")); onChange(); });
+  $("#a-von").addEventListener("input", e => { state.atributos.von = clampInt(e.target.value,1,attrCap("von")); maybeTopUp(); onChange(); });
+  $("#a-vit").addEventListener("input", e => { state.atributos.vit = clampInt(e.target.value,0,attrCap("vit")); maybeTopUp(); onChange(); });
 
   SKILLS.forEach(s => {
     document.getElementById("f-per-" + s.key).addEventListener("input", e => {
       state.pericias[s.key] = clampInt(e.target.value,0,skillCap()); onChange();
     });
+  });
+
+  /* --- Rolagem de dados (Atributos e Perícias) --- */
+  $("#attrGrid").addEventListener("click", e => {
+    const btn = e.target.closest("[data-roll-attr]");
+    if(btn) rollAttrDie(btn.dataset.rollAttr);
+  });
+  $("#skillsGrid").addEventListener("click", e => {
+    const btn = e.target.closest("[data-roll-skill]");
+    if(btn) rollSkillTest(btn.dataset.rollSkill);
+  });
+  $("#skillsGrid").addEventListener("change", e => {
+    const sel = e.target.closest("[data-skill-attr-pick]");
+    if(sel) skillAttrPick[sel.dataset.skillAttrPick] = sel.value;
   });
 
   $("#f-traumaTipo").addEventListener("change", e => {
@@ -2918,6 +3297,14 @@ function bindEvents(){
 
   $("#f-pvAtual").addEventListener("input", e => { state.pv.atual = Number(e.target.value)||0; onChange(); });
   $("#btnRestorePV").addEventListener("click", () => { state.pv.atual = pvMax(); $("#f-pvAtual").value = state.pv.atual; onChange(); });
+  $("#btnRollMorte").addEventListener("click", () => {
+    const r = d(20);
+    let text = "Teste de Morte: 1d20 → " + r, crit=false, fail=false;
+    if(r === 20){ text += " — Estabiliza e levanta-se com 1d4 PV!"; crit = true; }
+    else if(r === 1){ text += " — Morte instantânea."; fail = true; }
+    else { text += " — Conte como uma tentativa (o personagem morre na 3ª falha)."; }
+    pushRoll({ text, crit, fail });
+  });
 
   $("#s-cabeca").addEventListener("input", e => { state.strikes.cabeca = Math.max(0, Number(e.target.value)||0); onChange(); });
   $("#s-tronco").addEventListener("input", e => { state.strikes.tronco = Math.max(0, Number(e.target.value)||0); onChange(); });
@@ -2948,6 +3335,7 @@ function bindEvents(){
     state.chagas[idx] = { nome:item.nome, efeito:item.efeito, custo:item.custo, colateral:item.colateral, falhaNormal:item.falhaNormal||"", falhaCritica:item.falhaCritica||"", presetKey:val, buffs:[], debuffs:[], ativa:false, turnos:0, turnosRestantes:0, posDebuffs:[], posAtiva:false, posTurnos:1, posTurnosRestantes:0 };
   });
   wireBuffDebuffControls("chagasList", () => state.chagas, renderChagas);
+  wireCollapseToggle("chagasList");
 
   $("#btnAddRitual").addEventListener("click", () => { state.rituais.push({nome:"",descricao:"",componentes:"",efeito:"",tempo:"",falhaNormal:"",falha:"",presetKey:"",buffs:[],debuffs:[],ativa:false,turnos:0,turnosRestantes:0}); renderRituais(); onChange(); });
   wireEntryList("rituaisList", () => state.rituais, renderRituais, (idx,val) => {
@@ -2958,6 +3346,7 @@ function bindEvents(){
     autoAddComponentsToInventory(item.componentes);
   });
   wireBuffDebuffControls("rituaisList", () => state.rituais, renderRituais);
+  wireCollapseToggle("rituaisList");
 
   $("#btnAddArma").addEventListener("click", () => { state.armas.push({nome:"",dano:"",espaco:"",notas:""}); renderArmas(); onChange(); });
   wireEntryList("armasList", () => state.armas, renderArmas, null);
@@ -2971,6 +3360,7 @@ function bindEvents(){
   });
   wireEntryList("marcasList", () => state.marcas, renderMarcas, null);
   wireBuffDebuffControls("marcasList", () => state.marcas, renderMarcas);
+  wireCollapseToggle("marcasList");
 
   $("#btnAddMaldicao").addEventListener("click", () => {
     state.maldicoes.push({nome:"", alvoTipo:"corpo", alvoNome:"", origem:"", efeitoPositivo:"", efeitoNegativo:"", falhaNormal:"", falhaCritica:"", remocao:"", custo:"", buffs:[], debuffs:[], buffsPassivos:[], ativa:false, turnos:0, turnosRestantes:0, posDebuffs:[], posAtiva:false, posTurnos:1, posTurnosRestantes:0});
@@ -2979,6 +3369,7 @@ function bindEvents(){
   wireEntryList("maldicoesList", () => state.maldicoes, renderMaldicoes, null);
   wireBuffDebuffControls("maldicoesList", () => state.maldicoes, renderMaldicoes);
   wirePassiveBuffControls("maldicoesList", () => state.maldicoes, renderMaldicoes);
+  wireCollapseToggle("maldicoesList");
 
   /* --- NPCs Relacionados --- */
   $("#btnAddNpc").addEventListener("click", () => {
@@ -2987,6 +3378,7 @@ function bindEvents(){
     renderNpcs(); onChange();
   });
   wireEntryList("npcsList", () => state.npcs, renderNpcs, null);
+  wireCollapseToggle("npcsList");
   $("#npcsList").addEventListener("click", e => {
     const photoBtn = e.target.closest("[data-npc-photo-btn]");
     if(photoBtn){
