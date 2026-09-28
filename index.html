@@ -1682,7 +1682,11 @@ function sanidadeSugestao(){
 function syncSanidadeComVON(){
   const s = state.sanidade;
   const novo = vonSanBonus();
-  if(typeof s.vonBonus !== "number"){ s.vonBonus = novo; return; } // ficha antiga: mantém o valor já salvo
+  if(typeof s.vonBonus !== "number"){
+    // Ficha antiga (sem marcador): se o máximo já bate com a sugestão (50 + VON − Chagas), o bônus
+    // já estava incluído; senão, soma o bônus de VON uma vez (ex.: VON 1 → 50 vira 52).
+    s.vonBonus = ((Number(s.max)||0) === sanidadeSugestao()) ? novo : 0;
+  }
   const delta = novo - s.vonBonus;
   if(!delta) return;
   const estavaCheia = (Number(s.atual)||0) >= (Number(s.max)||0);
