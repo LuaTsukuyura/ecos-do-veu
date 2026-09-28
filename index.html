@@ -453,6 +453,20 @@ details.reference summary::-webkit-details-marker{ display:none; }
 .path-radio:hover{ border-color:var(--border-bright); }
 .path-radio:has(input:checked){ border-color:var(--brass); background:rgba(184,147,90,.08); color:var(--brass-bright); }
 .path-radio input{ accent-color:var(--brass); }
+/* ---- Pactos ---- */
+.pactos-status{ font-family:var(--font-mono); font-size:13px; color:var(--brass-bright); margin:0 0 var(--sp-3); }
+.pactos-lock{ border:1px solid var(--warn); border-left-width:3px; border-radius:var(--radius); background:rgba(201,134,63,.08); color:var(--warn-bright); font-size:13.5px; line-height:1.6; padding:10px 14px; margin-bottom:var(--sp-4); }
+.pacto-group{ margin-bottom:var(--sp-4); }
+.pacto-group h3{ font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--brass-bright); margin:0 0 2px; }
+.pacto-group > p{ margin:0 0 var(--sp-2); font-size:13px; color:var(--text-muted); }
+.pacto-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:var(--sp-2); }
+.pacto-card{ display:flex; flex-direction:column; gap:8px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:var(--sp-3) var(--sp-4); }
+.pacto-card h4{ margin:0; font-size:15px; color:var(--text); }
+.pacto-card p{ margin:0; flex:1; font-size:13.5px; line-height:1.55; color:var(--text-muted); }
+.pacto-card p.pacto-corpo{ flex:none; font-size:12.5px; color:var(--arcane-bright); }
+.pacto-card.is-firmado{ border-color:var(--brass); border-left-width:3px; background:rgba(184,147,90,.06); }
+.pacto-tag{ margin-left:6px; font-size:11.5px; font-weight:400; color:var(--brass-bright); }
+.pacto-card button:disabled{ opacity:.45; cursor:not-allowed; }
 .path-levels{ display:flex; flex-direction:column; gap:var(--sp-3); }
 .level-card{ border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:var(--sp-3) var(--sp-4); }
 .level-check{ display:flex; align-items:center; gap:9px; font-size:13.5px; cursor:pointer; }
@@ -916,6 +930,10 @@ footer.appfoot{ text-align:center; color:var(--text-faint); font-size:11px; marg
           <div class="path-levels" id="pathLevels"></div>
           <div class="pe-tracker">PE investidos nesta progressão: <span id="peOrigemSpent">0</span></div>
         </div>
+
+        <h2 class="panel-title">Pactos</h2>
+        <p class="hint">Pactos trocam humanidade por poder. Escolha até 2, do mesmo Primordial ou de Primordiais diferentes. Depois de firmado, o Pacto não pode ser trocado nem removido.</p>
+        <div id="pactosArea"></div>
 
         <details class="reference">
           <summary>Consultar Pactos &amp; Fragmentado (Primordiais)</summary>
@@ -1552,6 +1570,56 @@ const EQUIP_TABLES = [
 /* =====================================================================
    ESTADO
    ===================================================================== */
+/* =====================================================================
+   PACTOS (aba III) — no máximo 2, irreversíveis, exigem N.A. 3+
+   ===================================================================== */
+const PACTOS_MAX = 2, PACTOS_NA_MIN = 3;
+const PRIMORDIAIS = {
+  morte:{ nome:"Morte", tema:"Habilidades que brincam com a vida humana ou não humana.", corpo:["Pele perde a cor e fica fria.","Olheiras profundas, respiração e batimentos quase imperceptíveis."] },
+  medo:{ nome:"Medo", tema:"Manipula o sobrenatural como se fosse parte de si mesmo.", corpo:["Cabelo perde pigmentação (mescla de branco).","Pele pálida, olhos acinzentados e sobrenaturais."] },
+  angustia:{ nome:"Angústia", tema:"Manipula a percepção e a mente de outros como brinquedos.", corpo:["Pequenas rachaduras pelo corpo (olhos e articulações).","Íris avermelhada, ouve vozes do além."] },
+  sofrimento:{ nome:"Sofrimento", tema:"O próprio sofrimento e o alheio alimentam corpo e mente.", corpo:["Olhos e cabelo vermelho-sangue.","Pele avermelhada, veias dilatadas."] },
+  caos:{ nome:"Caos", tema:"A energia caótica intensifica o corpo como uma máquina.", corpo:["Corpo cada vez menos carne, mente cada vez menos humana.","Partes de metal substituem partes do corpo."] }
+};
+const PACTOS = [
+  { key:"olhos-carmesim", prim:"angustia", nome:"Olhos Carmesim", efeito:`2x/sessão cria uma ilusão poderosa: 2d4 de dano de SAN (Espiritual em Ecos) e prende o alvo por 1d4 turnos com -4 em todos os Atributos e Perícias dentro da ilusão.` },
+  { key:"rei-dos-pesadelos", prim:"angustia", nome:"Rei dos Pesadelos", efeito:`Ilusões causam +3 de dano de sanidade e duram 1 turno a mais; imune a ilusões.` },
+  { key:"canhao-de-vidro", prim:"sofrimento", nome:"Canhão de Vidro", efeito:`Ataques causam +2d4 de dano extra, mas você recebe 1d4 de dano extra.` },
+  { key:"berserk", prim:"sofrimento", nome:"Berserk", efeito:`A cada ataque recebido, -1 de dano recebido e +1 de dano causado (acumula na sessão, reinicia ao final dela).` },
+  { key:"decadencia", prim:"morte", nome:"Decadência", efeito:`Ganha o ritual exclusivo "Decadência" (material adicional de Chagas e Rituais).` },
+  { key:"ultimo-suspiro", prim:"morte", nome:"Último Suspiro", efeito:`2x/sessão pode agarrar o oponente e drenar 2d4 de PV, curando o valor drenado.` },
+  { key:"mestre-dos-rituais", prim:"medo", nome:"Mestre dos Rituais", efeito:`Rituais simples sem dano dispensam teste; rituais médios/avançados têm DT reduzida; aprende rituais simples só de observá-los.` },
+  { key:"pavor-absoluto", prim:"medo", nome:"Pavor Absoluto", efeito:`Sua presença inflige Medo mesmo em criaturas sobrenaturais; 2x/sessão faz um alvo perder um turno, paralisado.` },
+  { key:"maquina-de-combate", prim:"caos", nome:"Máquina de Combate", efeito:`Ataques corpo a corpo contra você causam -4 de dano físico e -3 se forem de arma branca.` },
+  { key:"controle-do-caos", prim:"caos", nome:"Controle do Caos", efeito:`1x/sessão desvia de qualquer ataque que não seja de arma de fogo e garante uma ação crítica em seguida.` }
+];
+function pactoDef(key){ return PACTOS.find(p => p.key === key); }
+function renderPactos(){
+  const box = $("#pactosArea"); if(!box) return;
+  const isOwner = !state.ownerId || state.ownerId === currentUid;
+  const na = Number(state.meta.na) || 0;
+  const feitos = state.pactos;
+  const travado = na < PACTOS_NA_MIN, cheio = feitos.length >= PACTOS_MAX;
+  const nomes = feitos.map(f => (pactoDef(f.key) || {}).nome).filter(Boolean);
+  const motivo = travado ? `Exige N.A. ${PACTOS_NA_MIN}+` : `Limite de ${PACTOS_MAX} Pactos atingido`;
+  const cards = pk => PACTOS.filter(p => p.prim === pk).map(p => {
+    const i = feitos.findIndex(f => f.key === p.key);
+    if(i < 0){
+      const bloqueado = !isOwner || travado || cheio;
+      return `<div class="pacto-card"><h4>${esc(p.nome)}</h4><p>${esc(p.efeito)}</p>
+        <button type="button" class="btn-primary btn-secondary" data-pacto-firmar="${p.key}" ${bloqueado ? `disabled title="${esc(motivo)}"` : ""}>Firmar Pacto</button></div>`;
+    }
+    const n = feitos.filter(f => (pactoDef(f.key) || {}).prim === pk).length;
+    return `<div class="pacto-card is-firmado"><h4>${esc(p.nome)}<span class="pacto-tag">Pacto firmado</span></h4><p>${esc(p.efeito)}</p>
+      <p class="pacto-corpo">Corpo (${n} ${n > 1 ? "Pactos" : "Pacto"} de ${esc(PRIMORDIAIS[pk].nome)}): ${esc(PRIMORDIAIS[pk].corpo[Math.min(n,2) - 1])}</p>
+      <div class="field"><label for="pactoItem${i}">Item marcado</label><input type="text" id="pactoItem${i}" data-pacto-item="${i}" value="${esc(feitos[i].item || "")}" placeholder="Item que concedeu este Pacto"></div></div>`;
+  }).join("");
+  box.innerHTML = `
+    ${travado ? `<div class="pactos-lock">Pactos exigem N.A. ${PACTOS_NA_MIN} ou mais. Seu N.A. atual é ${na}.</div>` : ``}
+    <div class="pactos-status">Pactos firmados: ${feitos.length} / ${PACTOS_MAX}${nomes.length ? " — " + esc(nomes.join(", ")) : ""}</div>
+    ${Object.entries(PRIMORDIAIS).map(([pk, pr]) => `<div class="pacto-group"><h3>${esc(pr.nome)}</h3><p>${esc(pr.tema)}</p><div class="pacto-grid">${cards(pk)}</div></div>`).join("")}`;
+}
+
 let state = null;
 let saveTimer = null;
 // Atributo escolhido para acompanhar cada perícia num Teste combinado (dado da
@@ -1571,12 +1639,13 @@ function blankState(){
     buffChoices:{ origem:"", caminho:"" },
     rollLog:[],
     trauma:{ tipo:"", desc:"", nomeCustom:"" },
-    sanidade:{ atual:50, max:50 },
+    sanidade:{ atual:52, max:52, vonBonus:2 }, // 50 base + 2 (VON 1)
     resiliencia:{ atual:1 },
     chagas:[],
     rituais:[],
     marcas:[],
     maldicoes:[],
+    pactos:[],
     npcs:[],
     pv:{ atual:0 },
     strikes:{ cabeca:0, tronco:0, membros:0 },
@@ -1589,7 +1658,8 @@ function blankState(){
 function pvMax(){
   const o = ORIGENS[state.meta.origem];
   const base = o ? o.vidaBase : 0;
-  return base + state.atributos.vit*2;
+  // VIT: +2 PV por ponto, máx. 5 pontos (+10 PV). attrTotal soma buffs e já trava em 5.
+  return base + Math.min(attrTotal("vit"), 5) * 2;
 }
 function resilienciaMax(){
   // V2: "Sua resiliência é igual a sua Vontade (VON)."
@@ -1597,10 +1667,26 @@ function resilienciaMax(){
   if(state.meta.origem === "filhosdoveu") m += 2; // Filhos do Véu: +2 pontos de Resiliência inicial
   return m;
 }
+function vonSanBonus(){
+  // VON: +2 SAN máx. por ponto, máx. 5 pontos (+10 SAN). attrTotal soma buffs e já trava em 5.
+  return Math.min(attrTotal("von"), 5) * 2;
+}
 function sanidadeSugestao(){
   // V2: Sanidade inicia em 50; a cada 1 ponto de VON, +2 SAN (máx. +10 com VON 5); cada Chaga reduz -5 SAN máx.
-  const vonBonus = Math.min(Number(state.atributos.von)||0, 5) * 2;
-  return 50 + vonBonus - state.chagas.length*5;
+  return 50 + vonSanBonus() - state.chagas.length*5;
+}
+// Aplica só a diferença do bônus de VON no máximo salvo, preservando ajustes manuais
+// (Mestre, Origem, Chagas). Se a Sanidade estava cheia, a atual acompanha o novo máximo.
+function syncSanidadeComVON(){
+  const s = state.sanidade;
+  const novo = vonSanBonus();
+  if(typeof s.vonBonus !== "number"){ s.vonBonus = novo; return; } // ficha antiga: mantém o valor já salvo
+  const delta = novo - s.vonBonus;
+  if(!delta) return;
+  const estavaCheia = (Number(s.atual)||0) >= (Number(s.max)||0);
+  s.vonBonus = novo;
+  setSanidadeMax((Number(s.max)||0) + delta);
+  if(estavaCheia || (Number(s.atual)||0) > s.max) setSanidadeAtual(s.max);
 }
 
 /* ---------- SINCRONIA: Sanidade (Trauma&Mente ⇄ Combate) e Resiliência (Chagas ⇄ Combate) ---------- */
@@ -2204,6 +2290,7 @@ function setVitalFill(fillId, atual, max){
   else if(m > 0 && pct <= 0.5) el.classList.add("is-warn");
 }
 function renderAll(){
+  syncSanidadeComVON();
   $("#ptsUsed").textContent = attrPointsSpent();
   const rem = 20 - attrPointsSpent();
   const remEl = $("#ptsRemaining");
@@ -2213,7 +2300,7 @@ function renderAll(){
   $("#f-pvMax").value = pvMax();
   $("#f-resMax").value = resilienciaMax();
   const resMax2 = $("#f-resMax2"); if(resMax2) resMax2.value = resilienciaMax();
-  $("#sanHint").textContent = "Sugestão (Base 50 + até +10 por VON, ajustável com o Mestre): " + sanidadeSugestao() + " — cada nova Chaga reduz a Sanidade máxima em 5.";
+  $("#sanHint").textContent = "Base 50 + 2 por ponto de VON (até +10): o máximo acompanha a VON automaticamente e seus ajustes manuais são mantidos. Sugestão: " + sanidadeSugestao() + " — cada nova Chaga reduz a Sanidade máxima em 5.";
   const sanHint2 = $("#sanHint2"); if(sanHint2) sanHint2.textContent = $("#sanHint").textContent;
 
   const si = strikesInfo();
@@ -2893,6 +2980,7 @@ function hydrateFormFromState(){
 
   if(!state.marcas) state.marcas = [];
   if(!state.maldicoes) state.maldicoes = [];
+  if(!Array.isArray(state.pactos)) state.pactos = [];
   if(!state.npcs) state.npcs = [];
   if(!state.chagas) state.chagas = [];
   if(!state.rituais) state.rituais = [];
@@ -2906,6 +2994,7 @@ function hydrateFormFromState(){
 
   renderOriginCard();
   renderCaminhoArea();
+  renderPactos();
   renderChagas();
   renderRituais();
   renderMarcas();
@@ -3231,7 +3320,7 @@ function bindEvents(){
   });
   $("#f-idade").addEventListener("input", e => { state.meta.idade = e.target.value; onChange(); });
   $("#f-sexo").addEventListener("input", e => { state.meta.sexo = e.target.value; onChange(); });
-  $("#f-na").addEventListener("input", e => { state.meta.na = clampInt(e.target.value,0,10); onChange(); });
+  $("#f-na").addEventListener("input", e => { state.meta.na = clampInt(e.target.value,0,10); renderPactos(); onChange(); });
   $("#f-pm").addEventListener("input", e => { state.meta.pm = Math.max(0, Number(e.target.value)||0); onChange(); });
   $("#f-pe").addEventListener("input", e => { state.meta.pe = Math.max(0, Number(e.target.value)||0); onChange(); });
   $("#f-descfisica").addEventListener("input", e => { state.meta.descFisica = e.target.value; onChange(); });
@@ -3317,6 +3406,23 @@ function bindEvents(){
       renderPathLevels();
       onChange();
     }
+  });
+  $("#pactosArea").addEventListener("click", e => {
+    const btn = e.target.closest("[data-pacto-firmar]"); if(!btn || btn.disabled) return;
+    const p = pactoDef(btn.dataset.pactoFirmar); if(!p) return;
+    const isOwner = !state.ownerId || state.ownerId === currentUid;
+    if(!isOwner || (Number(state.meta.na) || 0) < PACTOS_NA_MIN || state.pactos.length >= PACTOS_MAX || state.pactos.some(f => f.key === p.key)) return;
+    const prim = PRIMORDIAIS[p.prim].nome;
+    if(!confirm(`Firmar o Pacto "${p.nome}" (${prim})?\n\nÉ irreversível: um Pacto firmado não pode ser trocado nem removido.\n\nConfirme com o Mestre que você tem um item marcado por ${prim} e um Ocultista de alto nível para selar o Pacto.`)) return;
+    state.pactos.push({ key:p.key, item:"" });
+    renderPactos();
+    onChange();
+  });
+  $("#pactosArea").addEventListener("input", e => {
+    const el = e.target.closest("[data-pacto-item]"); if(!el) return;
+    const f = state.pactos[+el.dataset.pactoItem]; if(!f) return;
+    f.item = el.value;
+    onChange();
   });
   wireBuffDebuffControls("pathLevels", () => {
     const c = ensureCustomCaminho();
